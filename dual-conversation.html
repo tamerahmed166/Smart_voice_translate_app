@@ -142,8 +142,8 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 42px;
-            height: 42px;
+            width: 48px;
+            height: 48px;
             border-radius: 12px;
             border: 1px solid rgba(255,255,255,0.3);
             background: rgba(255,255,255,0.2);
@@ -151,6 +151,8 @@
             cursor: pointer;
             transition: all 0.2s ease;
             font-size: 1.2rem;
+            min-width: 48px;
+            min-height: 48px;
         }
         
         .swapbtn:hover {
@@ -188,7 +190,7 @@
         }
         
         .btn {
-            padding: 10px 16px;
+            padding: 12px 20px;
             border-radius: 12px;
             border: 1px solid #e5e7eb;
             background: #fff;
@@ -196,8 +198,11 @@
             transition: all 0.15s ease;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 6px;
             font-size: 0.9rem;
+            min-width: 100px;
+            min-height: 44px;
         }
         
         .btn:hover {
@@ -226,13 +231,14 @@
             flex-direction: column;
             align-items: center;
             gap: 4px;
-            padding: 16px 24px;
+            padding: 18px 28px;
             border-radius: 16px;
             border: 2px solid #e5e7eb;
             background: white;
             cursor: pointer;
             transition: all 0.3s ease;
-            min-width: 140px;
+            min-width: 160px;
+            min-height: 120px;
             position: relative;
             overflow: hidden;
         }
@@ -279,7 +285,7 @@
         /* لوحات المحادثة */
         .panes {
             display: grid;
-            grid-template-columns: 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 16px;
         }
         
@@ -356,8 +362,8 @@
             color: white;
             border: none;
             border-radius: 8px;
-            width: 40px;
-            height: 40px;
+            width: 48px;
+            height: 48px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -367,6 +373,8 @@
             transition: all 0.2s ease;
             margin-bottom: 2px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            min-width: 48px;
+            min-height: 48px;
         }
         
         .lang-swap-btn:hover {
@@ -407,7 +415,7 @@
         }
         
         .chat-messages {
-            height: 300px;
+            height: 200px;
             overflow-y: auto;
             padding: 12px;
             background: #f8fafc;
@@ -483,8 +491,8 @@
         }
         
         .send-btn, .voice-btn {
-            width: 48px;
-            height: 48px;
+            width: 52px;
+            height: 52px;
             border-radius: 50%;
             border: none;
             cursor: pointer;
@@ -493,6 +501,8 @@
             justify-content: center;
             font-size: 1.2rem;
             transition: all 0.3s ease;
+            min-width: 52px;
+            min-height: 52px;
         }
         
         .send-btn {
@@ -538,15 +548,16 @@
         
         .pane {
             border-radius: var(--panel-radius);
-            padding: 14px;
-            min-height: 38vh;
+            padding: 16px;
+            min-height: 40vh;
             display: grid;
             grid-template-rows: auto 1fr auto;
-            gap: 10px;
+            gap: 12px;
             box-shadow: var(--shadow);
             background: #fff;
             border: 2px solid #eef2f7;
             position: relative;
+            min-width: 300px;
         }
         
         .pane.a {
@@ -589,6 +600,189 @@
             align-content: start;
             padding: 6px;
             border-radius: 12px;
+            background: rgba(255, 255, 255, 0.5);
+            min-height: 200px;
+        }
+        
+        /* حالة فارغة */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 150px;
+            color: #64748b;
+            text-align: center;
+        }
+        
+        .empty-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+            opacity: 0.7;
+        }
+        
+        .empty-text {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+        
+        /* أنماط الرسائل */
+        .message {
+            padding: 12px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            animation: slideInMessage 0.3s ease-out;
+        }
+        
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .message.original {
+            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+            border-left: 4px solid #2196f3;
+        }
+        
+        .message.translation {
+            background: linear-gradient(135deg, #f3e5f5, #e1bee7);
+            border-left: 4px solid #9c27b0;
+        }
+        
+        .message-content {
+            margin-bottom: 4px;
+        }
+        
+        .message-text {
+            font-size: 1rem;
+            line-height: 1.4;
+            color: #333;
+        }
+        
+        .original-text {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 4px;
+            font-style: italic;
+        }
+        
+        .translated-text {
+            font-size: 1rem;
+            color: #333;
+            font-weight: 500;
+        }
+        
+        .message-time {
+            font-size: 0.75rem;
+            color: #888;
+            text-align: right;
+        }
+        
+        /* أنماط التحكم */
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .mic-btn, .play-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 12px 16px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .mic-btn {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            flex: 1;
+            min-width: 120px;
+            min-height: 60px;
+        }
+        
+        .mic-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+        }
+        
+        .mic-btn.listening {
+            background: linear-gradient(135deg, #f44336, #d32f2f);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .play-btn {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            min-width: 120px;
+            min-height: 60px;
+            color: white;
+        }
+        
+        .play-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(33, 150, 243, 0.3);
+        }
+        
+        .mic-icon, .play-icon {
+            font-size: 1.2rem;
+        }
+        
+        .mic-text {
+            font-size: 0.8rem;
+            text-align: center;
+        }
+        
+        /* تحسينات الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .panes {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .pane {
+                min-height: 30vh;
+            }
+            
+            .pane-header {
+                flex-direction: column;
+                gap: 8px;
+                text-align: center;
+            }
+            
+            .controls {
+                flex-direction: column;
+            }
+            
+            .mic-btn {
+                width: 100%;
+            }
+        }
+            background: rgba(255, 255, 255, 0.7);
+
+
+
+
+
+
+        .scroll {
             background: rgba(255,255,255,0.7);
         }
         
@@ -1104,7 +1298,7 @@
         
         <!-- اللوجو -->
         <div class="logo-section">
-            <img src="logo-new.svg" alt="LingoLink Logo" class="app-logo" style="width: 80px; height: 80px;">
+            <img src="assets/logo.svg" alt="LingoLink Logo" class="app-logo" style="height: 50px;">
         </div>
 
         <!-- أزرار التبديل بين الأوضاع -->
@@ -1121,22 +1315,7 @@
             </button>
         </div>
 
-        <!-- شريط اللغات -->
-        <div class="langbar" role="toolbar" aria-label="اختيار اللغة">
-            <div class="lang-section right">
-                <span class="flag">🇪🇬</span>
-                <span>العربية</span>
-            </div>
-            <button class="swapbtn" id="swap" title="تبديل اللغات" aria-label="تبديل اللغات">⇄</button>
-            <div class="lang-section left">
-                <span>English</span>
-                <span class="flag">🇬🇧</span>
-            </div>
-            <div class="connection-indicator" id="connectionIndicator">
-                <span class="connection-status" id="connectionStatus">🟢</span>
-                <span id="connectionText">متصل</span>
-            </div>
-        </div>
+
         
         <!-- واجهة الوضع Remote -->
         <div class="remote-chat-container" id="remoteChatContainer">
@@ -1146,10 +1325,60 @@
                     <span>🟢</span>
                     <span>متصل</span>
                 </div>
+                
+                <div class="connection-indicator" id="connectionIndicator">
+                    <span class="connection-status" id="connectionStatus">🟢</span>
+                    <span id="connectionText">متصل</span>
+                </div>
             </div>
             
+            <!-- مربع اختيار اللغات للمحادثة عن بُعد -->
+            <div class="remote-language-selector" id="remoteLangSelector">
+                <div class="language-option">
+                    <label for="speakerLang" style="font-size: 0.85rem; font-weight: 600; color: #475569;">لغة المتحدث:</label>
+                    <select class="lang-select" id="speakerLang">
+                        <option value="ar">العربية 🇪🇬</option>
+                        <option value="en">English 🇺🇸</option>
+                        <option value="fr">Français 🇫🇷</option>
+                        <option value="es">Español 🇪🇸</option>
+                        <option value="de">Deutsch 🇩🇪</option>
+                        <option value="it">Italiano 🇮🇹</option>
+                        <option value="pt">Português 🇵🇹</option>
+                        <option value="ru">Русский 🇷🇺</option>
+                        <option value="ja">日本語 🇯🇵</option>
+                        <option value="ko">한국어 🇰🇷</option>
+                        <option value="zh">中文 🇨🇳</option>
+                        <option value="hi">हिन्दी 🇮🇳</option>
+                        <option value="tr">Türkçe 🇹🇷</option>
+                        <option value="nl">Nederlands 🇳🇱</option>
+                    </select>
+                </div>
+                
+                <button class="lang-swap-btn" id="langSwapBtn" title="تبديل اللغات">
+                    ⇄
+                </button>
+                
+                <div class="language-option">
+                    <label for="receiverLang" style="font-size: 0.85rem; font-weight: 600; color: #475569;">لغة المستقبل:</label>
+                    <select class="lang-select" id="receiverLang">
+                        <option value="en">English 🇺🇸</option>
+                        <option value="ar">العربية 🇪🇬</option>
+                        <option value="fr">Français 🇫🇷</option>
+                        <option value="es">Español 🇪🇸</option>
+                        <option value="de">Deutsch 🇩🇪</option>
+                        <option value="it">Italiano 🇮🇹</option>
+                        <option value="pt">Português 🇵🇹</option>
+                        <option value="ru">Русский 🇷🇺</option>
+                        <option value="ja">日本語 🇯🇵</option>
+                        <option value="ko">한국어 🇰🇷</option>
+                        <option value="zh">中文 🇨🇳</option>
+                        <option value="hi">हिन्दी 🇮🇳</option>
+                        <option value="tr">Türkçe 🇹🇷</option>
+                        <option value="nl">Nederlands 🇳🇱</option>
+                    </select>
+                </div>
+            </div>
 
-            
             <div class="chat-messages" id="chatMessages">
                 <!-- رسائل الدردشة ستظهر هنا -->
             </div>
@@ -1165,6 +1394,90 @@
             </div>
         </div>
         
+        <!-- واجهة وضع وجهاً لوجه -->
+        <div class="panes" id="conversationPanes">
+            <!-- لوحة المتحدث الأول -->
+            <div class="pane a" id="paneA">
+                <div class="pane-header">
+                    <h3 class="pane-title">👤 المتحدث الأول</h3>
+                    <select class="lang-select" id="langA">
+                        <option value="ar">العربية</option>
+                        <option value="en">English</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                        <option value="it">Italiano</option>
+                        <option value="pt">Português</option>
+                        <option value="ru">Русский</option>
+                        <option value="ja">日本語</option>
+                        <option value="ko">한국어</option>
+                        <option value="zh">中文</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="tr">Türkçe</option>
+                        <option value="nl">Nederlands</option>
+                        <option value="sv">Svenska</option>
+                    </select>
+                </div>
+                
+                <div class="scroll" id="scrollA">
+                    <div class="empty-state">
+                        <div class="empty-icon">💬</div>
+                        <div class="empty-text">ابدأ المحادثة بالضغط على الميكروفون</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="mic-btn" id="micA" data-speaker="a" title="اضغط للتحدث">
+                        <span class="mic-icon">🎤</span>
+                        <span class="mic-text">اضغط للتحدث</span>
+                    </button>
+                    <button class="play-btn" id="playA" title="تشغيل الترجمة الصوتية" style="display: none;">
+                        <span class="play-icon">🔊</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- لوحة المتحدث الثاني -->
+            <div class="pane b" id="paneB">
+                <div class="pane-header">
+                    <h3 class="pane-title">👤 المتحدث الثاني</h3>
+                    <select class="lang-select" id="langB">
+                        <option value="en">English</option>
+                        <option value="ar">العربية</option>
+                        <option value="fr">Français</option>
+                        <option value="es">Español</option>
+                        <option value="de">Deutsch</option>
+                        <option value="it">Italiano</option>
+                        <option value="pt">Português</option>
+                        <option value="ru">Русский</option>
+                        <option value="ja">日本語</option>
+                        <option value="ko">한국어</option>
+                        <option value="zh">中文</option>
+                        <option value="hi">हिन्दी</option>
+                        <option value="tr">Türkçe</option>
+                        <option value="nl">Nederlands</option>
+                        <option value="sv">Svenska</option>
+                    </select>
+                </div>
+                
+                <div class="scroll" id="scrollB">
+                    <div class="empty-state">
+                        <div class="empty-icon">💬</div>
+                        <div class="empty-text">Click microphone to start speaking</div>
+                    </div>
+                </div>
+                
+                <div class="controls">
+                    <button class="mic-btn" id="micB" data-speaker="b" title="Click to speak">
+                        <span class="mic-icon">🎤</span>
+                        <span class="mic-text">Click to speak</span>
+                    </button>
+                    <button class="play-btn" id="playB" title="Play audio translation" style="display: none;">
+                        <span class="play-icon">🔊</span>
+                    </button>
+                </div>
+            </div>
+        </div>
 
         
         <!-- التذييل -->
@@ -1189,17 +1502,11 @@
         let lastProcessedText = '';
         let processingTimeout = null;
         
-        // متغيرات الوضع التلقائي
-        let isHandsfreeMode = false;
-        let handsfreeTimeout = null;
-        let silenceDetectionTimeout = null;
-        let lastSpeechTime = 0;
-        let autoSwitchDelay = 3000; // 3 ثوانٍ من الصمت قبل التبديل
-        let minSpeechDuration = 1000; // الحد الأدنى لمدة الكلام
+
         
         // إعدادات مدة التسجيل
         let recordingTimeout = null;
-        let maxRecordingTime = 180000; // 180 ثانية (3 دقائق)
+        let maxRecordingTime = 300000; // 300 ثانية (5 دقائق)
         
         // تهيئة التطبيق
         document.addEventListener('DOMContentLoaded', function() {
@@ -1226,6 +1533,9 @@
                     const result = event.results[event.results.length - 1];
                     if (result.isFinal) {
                         const transcript = result[0].transcript;
+                        // إعادة تعيين محاولات الشبكة عند نجاح العملية
+                        networkRetryAttempts = 0;
+                        console.log('Speech recognition successful, network retry attempts reset');
                         processTranscript(transcript, currentSpeaker);
                     }
                 };
@@ -1248,34 +1558,42 @@
                     
                     switch(event.error) {
                         case 'network':
+                            console.log('Network error detected, handling with improved retry mechanism');
                             handleNetworkError(currentSpeaker);
                             return;
                         case 'not-allowed':
-                            errorMessage = 'يرجى السماح بالوصول إلى الميكروفون من إعدادات المتصفح.';
+                            errorMessage = 'يرجى السماح بالوصول إلى الميكروفون من إعدادات المتصفح. انقر على أيقونة القفل في شريط العنوان.';
                             // إعادة تعيين محاولات الشبكة عند مشاكل الصلاحيات
                             networkRetryAttempts = 0;
                             break;
                         case 'no-speech':
-                            errorMessage = 'لم يتم اكتشاف أي كلام. يرجى التحدث بوضوح أكبر.';
+                            errorMessage = 'لم يتم اكتشاف أي كلام. تأكد من أن الميكروفون يعمل وتحدث بوضوح.';
                             showRetryOption = true;
                             break;
                         case 'audio-capture':
-                            errorMessage = 'خطأ في التقاط الصوت. يرجى التحقق من الميكروفون.';
+                            errorMessage = 'خطأ في التقاط الصوت. تحقق من توصيل الميكروفون وإعداداته.';
                             showRetryOption = true;
                             break;
                         case 'service-not-allowed':
-                            errorMessage = 'خدمة التعرف على الكلام غير متاحة حالياً. جرب إعادة تحميل الصفحة.';
+                            errorMessage = 'خدمة التعرف على الصوت غير متاحة. تحقق من اتصال الإنترنت.';
+                            showRetryOption = true;
+                            break;
+                        case 'bad-grammar':
+                            errorMessage = 'خطأ في إعدادات التعرف على الصوت. جاري إعادة المحاولة...';
+                            showRetryOption = true;
+                            break;
+                        case 'language-not-supported':
+                            errorMessage = 'اللغة المحددة غير مدعومة. سيتم استخدام اللغة الافتراضية.';
+                            showRetryOption = true;
                             break;
                         case 'aborted':
                             // لا نعرض رسالة للإلغاء المقصود
                             stopListening();
                             return;
-                        case 'language-not-supported':
-                            errorMessage = 'اللغة المحددة غير مدعومة للتعرف على الكلام.';
-                            break;
                         default:
-                            errorMessage = `خطأ في التعرف على الكلام: ${event.error}`;
+                            errorMessage = `خطأ في التعرف على الصوت: ${event.error}. جاري إعادة المحاولة...`;
                             showRetryOption = true;
+                            break;
                     }
                     
                     // عرض رسالة الخطأ للمستخدم مع خيار إعادة المحاولة إذا كان مناسباً
@@ -1298,108 +1616,20 @@
         
         // إعداد مستمعي الأحداث
         function setupEventListeners() {
-            document.getElementById('micA').addEventListener('click', () => toggleListening('A'));
-            document.getElementById('micB').addEventListener('click', () => toggleListening('B'));
-            document.getElementById('swap').addEventListener('click', swapLanguages);
+
             document.getElementById('darkMode').addEventListener('click', toggleDarkMode);
             document.getElementById('saveChat').addEventListener('click', saveConversation);
             document.getElementById('clearChat').addEventListener('click', clearConversation);
             document.getElementById('homeBtn').addEventListener('click', () => {
                 window.location.href = 'index.html';
             });
-            document.getElementById('handsfree').addEventListener('change', toggleHandsfreeMode);
+
         }
         
-        // تفعيل/إلغاء الوضع التلقائي
-        function toggleHandsfreeMode() {
-            isHandsfreeMode = document.getElementById('handsfree').checked;
-            
-            if (isHandsfreeMode) {
-                // بدء الوضع التلقائي بالمتحدث الأول
-                startHandsfreeMode();
-            } else {
-                // إيقاف الوضع التلقائي
-                stopHandsfreeMode();
-            }
-        }
-        
-        // بدء الوضع التلقائي
-        function startHandsfreeMode() {
-            if (!currentSpeaker) {
-                startListening('A'); // البدء بالمتحدث الأول
-            }
-            
-            // إظهار مؤشر الوضع التلقائي
-            document.querySelector('.hands-free').classList.add('active');
-            
-            // تعطيل أزرار الميكروفون في الوضع التلقائي
-            document.getElementById('micA').style.opacity = '0.6';
-            document.getElementById('micB').style.opacity = '0.6';
-            document.getElementById('micA').style.cursor = 'not-allowed';
-            document.getElementById('micB').style.cursor = 'not-allowed';
-        }
-        
-        // إيقاف الوضع التلقائي
-        function stopHandsfreeMode() {
-            clearTimeout(handsfreeTimeout);
-            clearTimeout(silenceDetectionTimeout);
-            
-            if (isListening) {
-                stopListening();
-            }
-            
-            // إزالة مؤشر الوضع التلقائي
-            document.querySelector('.hands-free').classList.remove('active');
-            
-            // إعادة تفعيل أزرار الميكروفون
-            document.getElementById('micA').style.opacity = '';
-            document.getElementById('micB').style.opacity = '';
-            document.getElementById('micA').style.cursor = '';
-            document.getElementById('micB').style.cursor = '';
-        }
-        
-        // التبديل التلقائي للمتحدث
-        function autoSwitchSpeaker() {
-            if (!isHandsfreeMode) return;
-            
-            const nextSpeaker = currentSpeaker === 'A' ? 'B' : 'A';
-            
-            // إيقاف الاستماع الحالي
-            if (isListening) {
-                stopListening();
-            }
-            
-            // تأخير قصير قبل بدء الاستماع للمتحدث التالي
-            handsfreeTimeout = setTimeout(() => {
-                if (isHandsfreeMode) {
-                    startListening(nextSpeaker);
-                }
-            }, 1000);
-        }
-        
-        // كشف الصمت في الوضع التلقائي
-        function detectSilenceInHandsfree() {
-            if (!isHandsfreeMode || !isListening) return;
-            
-            clearTimeout(silenceDetectionTimeout);
-            
-            silenceDetectionTimeout = setTimeout(() => {
-                if (isHandsfreeMode && isListening) {
-                    const currentTime = Date.now();
-                    if (currentTime - lastSpeechTime > autoSwitchDelay) {
-                        autoSwitchSpeaker();
-                    }
-                }
-            }, autoSwitchDelay);
-        }
+
         
         // تبديل حالة الاستماع
         function toggleListening(speaker) {
-            // في الوضع التلقائي، لا نسمح بالتحكم اليدوي
-            if (isHandsfreeMode) {
-                return;
-            }
-            
             if (isListening && currentSpeaker === speaker) {
                 stopListening();
             } else {
@@ -1533,17 +1763,7 @@
                     translationCount++;
                     updateStats();
                     
-                    // في الوضع التلقائي، التبديل المباشر للمتحدث التالي بعد الترجمة
-                    if (isHandsfreeMode) {
-                        clearTimeout(silenceDetectionTimeout);
-                        // تأخير قصير للسماح بانتهاء تشغيل الترجمة الصوتية ثم البدء بالاستماع للمتحدث التالي
-                        handsfreeTimeout = setTimeout(() => {
-                            if (isHandsfreeMode) {
-                                const nextSpeaker = speaker === 'A' ? 'B' : 'A';
-                                startListening(nextSpeaker);
-                            }
-                        }, 2000); // تأخير ثانيتين للسماح بانتهاء الترجمة الصوتية
-                    }
+
                 } catch (error) {
                     console.error('خطأ في الترجمة:', error);
                 }
@@ -1801,8 +2021,8 @@
             createErrorMessage(message, true, speaker);
         }
         
-        // إنشاء رسالة خطأ
-        function createErrorMessage(message, showRetry, speaker) {
+        // إنشاء رسالة خطأ محسنة
+        function createErrorMessage(message, showRetry, speaker, errorType = 'default') {
             // إزالة أي رسالة خطأ سابقة
             const existingError = document.querySelector('.error-message');
             if (existingError) {
@@ -1811,16 +2031,33 @@
             
             // إنشاء عنصر رسالة الخطأ
             const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
+            let className = 'error-message';
+            
+            // إضافة أنماط حسب نوع الخطأ
+            if (errorType === 'network') {
+                className += ' network-error';
+            } else if (errorType === 'auto-retry') {
+                className += ' auto-retry';
+            }
+            
+            errorDiv.className = className;
             
             let retryButton = '';
             if (showRetry && speaker) {
                 retryButton = `<button class="error-retry" onclick="retryListening('${speaker}'); this.parentElement.parentElement.remove();">إعادة المحاولة</button>`;
             }
             
+            // أيقونة مختلفة حسب نوع الخطأ
+            let icon = '⚠️';
+            if (errorType === 'network') {
+                icon = '🌐';
+            } else if (errorType === 'auto-retry') {
+                icon = '🔄';
+            }
+            
             errorDiv.innerHTML = `
                 <div class="error-content">
-                    <span class="error-icon">⚠️</span>
+                    <span class="error-icon">${icon}</span>
                     <span class="error-text">${message}</span>
                     <div class="error-actions">
                         ${retryButton}
@@ -1890,6 +2127,34 @@
                         border-color: rgba(255, 255, 255, 0.5);
                     }
                     
+                    /* مؤشر إعادة المحاولة التلقائية */
+                    .error-message.auto-retry {
+                        background: #ff9500;
+                        animation: slideDown 0.3s ease-out, autoRetryPulse 2s infinite;
+                    }
+                    
+                    .error-message.network-error {
+                        background: #ff6b6b;
+                    }
+                    
+                    .retry-countdown {
+                        display: inline-flex;
+                        align-items: center;
+                        gap: 4px;
+                        font-weight: bold;
+                        animation: countdown 1s infinite;
+                    }
+                    
+                    @keyframes autoRetryPulse {
+                        0%, 100% { box-shadow: 0 4px 12px rgba(255, 149, 0, 0.3); }
+                        50% { box-shadow: 0 4px 20px rgba(255, 149, 0, 0.5); }
+                    }
+                    
+                    @keyframes countdown {
+                        0%, 100% { opacity: 1; }
+                        50% { opacity: 0.7; }
+                    }
+                    
                     .error-close {
                         background: none;
                         border: none;
@@ -1943,9 +2208,17 @@
         
         // إعادة المحاولة للاستماع
         function retryListening(speaker) {
+            // إزالة رسائل الخطأ السابقة
+            const existingError = document.querySelector('.error-message');
+            if (existingError) {
+                existingError.remove();
+            }
+            
+            // تأخير قصير قبل إعادة المحاولة لضمان استقرار الاتصال
             setTimeout(() => {
+                console.log(`Retrying speech recognition for ${speaker}`);
                 startListening(speaker);
-            }, 500); // تأخير قصير قبل إعادة المحاولة
+            }, 500);
         }
         
         // حفظ المحادثة
@@ -2054,7 +2327,7 @@
             
             // التحقق من حالة الاتصال
             if (!isOnline) {
-                showErrorMessage('لا يوجد اتصال بالإنترنت. يرجى التحقق من الاتصال.');
+                createErrorMessage('لا يوجد اتصال بالإنترنت. سيتم إعادة المحاولة تلقائياً عند استعادة الاتصال.', false, null, 'network');
                 return;
             }
             
@@ -2067,16 +2340,21 @@
             networkRetryAttempts++;
             
             if (networkRetryAttempts <= maxRetryAttempts) {
-                const retryMessage = `خطأ في الشبكة (المحاولة ${networkRetryAttempts}/${maxRetryAttempts}). هل تريد إعادة المحاولة؟`;
-                showErrorMessageWithRetry(retryMessage, speaker);
-            } else {
-                showErrorMessage('فشل في الاتصال بعد عدة محاولات. يرجى التحقق من الاتصال بالإنترنت أو إعادة تحميل الصفحة.');
-                networkRetryAttempts = 0;
+                // إعادة محاولة تلقائية مع تأخير متدرج
+                const retryDelay = Math.min(1000 * Math.pow(2, networkRetryAttempts - 1), 8000); // تأخير متدرج: 1s, 2s, 4s, 8s
+                const retryMessage = `خطأ في الشبكة (المحاولة ${networkRetryAttempts}/${maxRetryAttempts}). <span class="retry-countdown">إعادة المحاولة خلال ${Math.ceil(retryDelay/1000)} ثانية... ⏱️</span>`;
                 
-                // اقتراح حلول إضافية
+                createErrorMessage(retryMessage, false, null, 'auto-retry');
+                
+                // إعادة محاولة تلقائية
                 setTimeout(() => {
-                    showErrorMessage('نصائح لحل المشكلة:\n• تأكد من استقرار الاتصال بالإنترنت\n• جرب إعادة تحميل الصفحة\n• تحقق من إعدادات الميكروفون في المتصفح');
-                }, 3000);
+                    console.log(`Auto-retrying speech recognition for ${speaker} (attempt ${networkRetryAttempts})`);
+                    retryListening(speaker);
+                }, retryDelay);
+            } else {
+                const finalMessage = `فشل في الاتصال بخدمة التعرف على الصوت بعد ${maxRetryAttempts} محاولات. يرجى التحقق من اتصال الإنترنت.`;
+                createErrorMessage(finalMessage, true, speaker, 'network');
+                networkRetryAttempts = 0; // إعادة تعيين العداد
             }
         }
         
@@ -2100,6 +2378,7 @@
                 this.setupRemoteChat();
                 this.updateUI();
                 this.updateLanguageSettings();
+                this.updateModeButtons();
             }
 
             setupModeButtons() {
@@ -2245,9 +2524,11 @@
                 if (this.currentMode === 'remote') {
                     remoteChatContainer?.classList.add('active');
                     conversationPanes?.style.setProperty('display', 'none');
+                    conversationPanes?.classList.remove('face-to-face');
                 } else {
                     remoteChatContainer?.classList.remove('active');
                     conversationPanes?.style.setProperty('display', 'grid');
+                    conversationPanes?.classList.remove('remote');
                     conversationPanes?.classList.add('face-to-face');
                 }
             }
@@ -2699,11 +2980,524 @@
             }
         }
 
+        // إدارة الميكروفونات المزدوجة لوضع وجهاً لوجه
+        class DualMicrophoneManager {
+            constructor() {
+                this.currentSpeaker = null;
+                this.recognition = null;
+                this.isListening = false;
+                this.conversations = { a: [], b: [] };
+                this.lastAudioText = { a: '', b: '' };
+                
+                this.initializeMicrophones();
+            }
+
+            initializeMicrophones() {
+                // تهيئة التعرف على الصوت
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    this.recognition = new SpeechRecognition();
+                    this.recognition.continuous = false;
+                    this.recognition.interimResults = false;
+                    
+                    this.recognition.onstart = () => {
+                        this.isListening = true;
+                        this.updateMicrophoneUI();
+                    };
+                    
+                    this.recognition.onresult = (event) => {
+                        const text = event.results[0][0].transcript;
+                        this.handleSpeechResult(text);
+                    };
+                    
+                    this.recognition.onerror = (event) => {
+                        console.error('خطأ في التعرف على الصوت:', event.error);
+                        this.stopListening();
+                    };
+                    
+                    this.recognition.onend = () => {
+                        this.stopListening();
+                    };
+                }
+                
+                // ربط أزرار الميكروفون
+                document.getElementById('micA')?.addEventListener('click', () => this.startListening('a'));
+                document.getElementById('micB')?.addEventListener('click', () => this.startListening('b'));
+                
+                // ربط أزرار التشغيل
+                document.getElementById('playA')?.addEventListener('click', () => this.playAudio('a'));
+                document.getElementById('playB')?.addEventListener('click', () => this.playAudio('b'));
+            }
+
+            startListening(speaker) {
+                // التحقق من أن الوضع الحالي هو وجهاً لوجه
+                if (conversationModeManager && conversationModeManager.currentMode !== 'face-to-face') {
+                    return;
+                }
+                
+                if (!this.recognition) {
+                    alert('التعرف على الصوت غير مدعوم في هذا المتصفح');
+                    return;
+                }
+                
+                if (this.isListening) {
+                    this.stopListening();
+                    return;
+                }
+                
+                this.currentSpeaker = speaker;
+                const langSelect = document.getElementById(`lang${speaker.toUpperCase()}`);
+                const selectedLang = langSelect?.value || 'ar';
+                
+                this.recognition.lang = this.getRecognitionLanguage(selectedLang);
+                this.recognition.start();
+            }
+
+            stopListening() {
+                this.isListening = false;
+                this.currentSpeaker = null;
+                this.updateMicrophoneUI();
+                if (this.recognition) {
+                    this.recognition.stop();
+                }
+            }
+
+            updateMicrophoneUI() {
+                const micA = document.getElementById('micA');
+                const micB = document.getElementById('micB');
+                
+                [micA, micB].forEach(mic => {
+                    if (mic) {
+                        const speaker = mic.dataset.speaker;
+                        const isActive = this.isListening && this.currentSpeaker === speaker;
+                        
+                        mic.classList.toggle('listening', isActive);
+                        const micText = mic.querySelector('.mic-text');
+                        if (micText) {
+                            if (isActive) {
+                                micText.textContent = speaker === 'a' ? 'جاري الاستماع...' : 'Listening...';
+                            } else {
+                                micText.textContent = speaker === 'a' ? 'اضغط للتحدث' : 'Click to speak';
+                            }
+                        }
+                    }
+                });
+            }
+
+            async handleSpeechResult(text) {
+                if (!this.currentSpeaker) return;
+                
+                const speaker = this.currentSpeaker;
+                const otherSpeaker = speaker === 'a' ? 'b' : 'a';
+                
+                // إضافة النص الأصلي
+                this.addMessageToPane(speaker, text, 'original');
+                
+                // ترجمة النص
+                const translatedText = await this.translateText(text, speaker, otherSpeaker);
+                
+                // إضافة الترجمة للطرف الآخر
+                this.addMessageToPane(otherSpeaker, translatedText, 'translation', text);
+                
+                // حفظ النص للتشغيل الصوتي
+                this.lastAudioText[otherSpeaker] = translatedText;
+                
+                // إظهار زر التشغيل
+                const playBtn = document.getElementById(`play${otherSpeaker.toUpperCase()}`);
+                if (playBtn) {
+                    playBtn.style.display = 'block';
+                }
+                
+                this.stopListening();
+            }
+
+            async translateText(text, fromSpeaker, toSpeaker) {
+                const fromLang = document.getElementById(`lang${fromSpeaker.toUpperCase()}`)?.value || 'ar';
+                const toLang = document.getElementById(`lang${toSpeaker.toUpperCase()}`)?.value || 'en';
+                
+                try {
+                    const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`);
+                    const data = await response.json();
+                    return data.responseData?.translatedText || text;
+                } catch (error) {
+                    console.error('خطأ في الترجمة:', error);
+                    return `[ترجمة] ${text}`;
+                }
+            }
+
+            addMessageToPane(speaker, text, type, originalText = null) {
+                const scroll = document.getElementById(`scroll${speaker.toUpperCase()}`);
+                if (!scroll) return;
+                
+                // إزالة empty state إذا كان موجوداً
+                const emptyState = scroll.querySelector('.empty-state');
+                if (emptyState) {
+                    emptyState.remove();
+                }
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${type}`;
+                
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('ar-SA', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                let content = `<div class="message-content">`;
+                
+                if (type === 'translation' && originalText) {
+                    content += `<div class="original-text">${originalText}</div>`;
+                    content += `<div class="translated-text">${text}</div>`;
+                } else {
+                    content += `<div class="message-text">${text}</div>`;
+                }
+                
+                content += `</div><div class="message-time">${timeStr}</div>`;
+                messageDiv.innerHTML = content;
+                
+                scroll.appendChild(messageDiv);
+                scroll.scrollTop = scroll.scrollHeight;
+                
+                // حفظ في المحادثة
+                this.conversations[speaker].push({
+                    text,
+                    type,
+                    originalText,
+                    timestamp: now.toISOString()
+                });
+            }
+
+            async playAudio(speaker) {
+                const text = this.lastAudioText[speaker];
+                if (!text) return;
+                
+                const lang = document.getElementById(`lang${speaker.toUpperCase()}`)?.value || 'ar';
+                
+                try {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = this.getTTSLanguage(lang);
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    
+                    speechSynthesis.speak(utterance);
+                } catch (error) {
+                    console.error('خطأ في تشغيل الصوت:', error);
+                }
+            }
+
+            getRecognitionLanguage(langCode) {
+                const langMap = {
+                    'ar': 'ar-SA',
+                    'en': 'en-US',
+                    'fr': 'fr-FR',
+                    'es': 'es-ES',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-BR',
+                    'ru': 'ru-RU',
+                    'ja': 'ja-JP',
+                    'ko': 'ko-KR',
+                    'zh': 'zh-CN',
+                    'hi': 'hi-IN',
+                    'tr': 'tr-TR',
+                    'nl': 'nl-NL',
+                    'sv': 'sv-SE'
+                };
+                return langMap[langCode] || 'ar-SA';
+            }
+
+            getTTSLanguage(langCode) {
+                const langMap = {
+                    'ar': 'ar-SA',
+                    'en': 'en-US',
+                    'fr': 'fr-FR',
+                    'es': 'es-ES',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-BR',
+                    'ru': 'ru-RU',
+                    'ja': 'ja-JP',
+                    'ko': 'ko-KR',
+                    'zh': 'zh-CN',
+                    'hi': 'hi-IN',
+                    'tr': 'tr-TR',
+                    'nl': 'nl-NL',
+                    'sv': 'sv-SE'
+                };
+                return langMap[langCode] || 'ar-SA';
+            }
+        }
+
+        // مدير الترجمة للمحادثة عن بُعد
+        class RemoteTranslationManager {
+            constructor() {
+                this.isRecording = false;
+                this.recognition = null;
+                this.setupEventListeners();
+            }
+
+            setupEventListeners() {
+                // زر تبديل اللغات
+                const langSwapBtn = document.getElementById('langSwapBtn');
+                if (langSwapBtn) {
+                    langSwapBtn.addEventListener('click', () => {
+                        this.swapLanguages();
+                    });
+                }
+
+                // تحديث أزرار الإرسال والصوت للمحادثة عن بُعد
+                const sendBtn = document.getElementById('sendBtn');
+                const voiceBtn = document.getElementById('voiceBtn');
+                const chatInput = document.getElementById('chatInput');
+
+                if (sendBtn) {
+                    sendBtn.addEventListener('click', () => {
+                        this.sendMessage();
+                    });
+                }
+
+                if (chatInput) {
+                    chatInput.addEventListener('keypress', (e) => {
+                        if (e.key === 'Enter') {
+                            this.sendMessage();
+                        }
+                    });
+                }
+
+                if (voiceBtn) {
+                    voiceBtn.addEventListener('click', () => {
+                        this.toggleVoiceRecording();
+                    });
+                }
+            }
+
+            swapLanguages() {
+                const speakerLang = document.getElementById('speakerLang');
+                const receiverLang = document.getElementById('receiverLang');
+                
+                if (speakerLang && receiverLang) {
+                    const temp = speakerLang.value;
+                    speakerLang.value = receiverLang.value;
+                    receiverLang.value = temp;
+                }
+            }
+
+            async sendMessage() {
+                const chatInput = document.getElementById('chatInput');
+                const message = chatInput.value.trim();
+                
+                if (!message) return;
+                
+                // إضافة الرسالة الأصلية
+                this.addChatMessage(message, 'sent', false);
+                
+                // ترجمة الرسالة
+                await this.translateAndSend(message);
+                
+                // مسح حقل الإدخال
+                chatInput.value = '';
+            }
+
+            async translateAndSend(message) {
+                const speakerLang = document.getElementById('speakerLang')?.value || 'ar';
+                const receiverLang = document.getElementById('receiverLang')?.value || 'en';
+                
+                if (speakerLang !== receiverLang) {
+                    try {
+                        const translation = await this.translateText(message, speakerLang, receiverLang);
+                        this.addChatMessage(translation, 'sent', true, message);
+                        
+                        // تشغيل الترجمة صوتياً
+                        setTimeout(() => {
+                            this.speakText(translation, receiverLang);
+                        }, 500);
+                    } catch (error) {
+                        console.error('خطأ في الترجمة:', error);
+                        this.addChatMessage('خطأ في الترجمة', 'sent', true, message);
+                    }
+                }
+            }
+
+            async translateText(text, from, to) {
+                try {
+                    if (!text || text.trim().length === 0) {
+                        return 'النص فارغ';
+                    }
+
+                    const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${from}|${to}`);
+                    const data = await response.json();
+                    
+                    if (data.responseStatus === 200) {
+                        return data.responseData.translatedText;
+                    } else {
+                        return `فشل في الترجمة: ${data.responseDetails || 'خطأ غير معروف'}`;
+                    }
+                } catch (error) {
+                    console.error('خطأ في الترجمة:', error);
+                    return 'خطأ في الترجمة. يرجى المحاولة مرة أخرى.';
+                }
+            }
+
+            addChatMessage(text, type, isTranslation = false, originalText = '') {
+                const chatMessages = document.getElementById('chatMessages');
+                if (!chatMessages) return;
+                
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `chat-message ${type}`;
+                
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString('ar-SA', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                let content = `<div class="message-content">`;
+                
+                if (isTranslation && originalText) {
+                    content += `<div class="original-text" style="font-size: 0.85em; opacity: 0.7; margin-bottom: 4px;">${originalText}</div>`;
+                    content += `<div class="translated-text" style="font-weight: 600;">${text}</div>`;
+                } else {
+                    content += `<div class="message-text">${text}</div>`;
+                }
+                
+                content += `</div><div class="message-time" style="font-size: 0.75em; opacity: 0.6; margin-top: 4px;">${timeStr}</div>`;
+                messageDiv.innerHTML = content;
+                
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            async speakText(text, lang) {
+                if (!text || !('speechSynthesis' in window)) return;
+                
+                try {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    utterance.lang = this.getTTSLanguage(lang);
+                    utterance.rate = 0.9;
+                    utterance.pitch = 1;
+                    
+                    speechSynthesis.speak(utterance);
+                } catch (error) {
+                    console.error('خطأ في تشغيل الصوت:', error);
+                }
+            }
+
+            getTTSLanguage(langCode) {
+                const langMap = {
+                    'ar': 'ar-SA',
+                    'en': 'en-US',
+                    'fr': 'fr-FR',
+                    'es': 'es-ES',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-BR',
+                    'ru': 'ru-RU',
+                    'ja': 'ja-JP',
+                    'ko': 'ko-KR',
+                    'zh': 'zh-CN',
+                    'hi': 'hi-IN',
+                    'tr': 'tr-TR',
+                    'nl': 'nl-NL'
+                };
+                return langMap[langCode] || 'ar-SA';
+            }
+
+            toggleVoiceRecording() {
+                // تطبيق التسجيل الصوتي للمحادثة عن بُعد
+                if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                    alert('المتصفح لا يدعم التعرف على الصوت');
+                    return;
+                }
+
+                const voiceBtn = document.getElementById('voiceBtn');
+                const speakerLang = document.getElementById('speakerLang')?.value || 'ar';
+                
+                if (this.isRecording) {
+                    this.stopRecording();
+                } else {
+                    this.startRecording(speakerLang, voiceBtn);
+                }
+            }
+
+            startRecording(lang, button) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                this.recognition = new SpeechRecognition();
+                
+                this.recognition.lang = this.getRecognitionLanguage(lang);
+                this.recognition.continuous = false;
+                this.recognition.interimResults = false;
+                
+                this.recognition.onstart = () => {
+                    this.isRecording = true;
+                    button.style.background = '#ef4444';
+                    button.innerHTML = '⏹️';
+                };
+                
+                this.recognition.onresult = (event) => {
+                    const transcript = event.results[0][0].transcript;
+                    const chatInput = document.getElementById('chatInput');
+                    if (chatInput) {
+                        chatInput.value = transcript;
+                        this.sendMessage();
+                    }
+                };
+                
+                this.recognition.onerror = (event) => {
+                    console.error('خطأ في التعرف على الصوت:', event.error);
+                    this.stopRecording();
+                };
+                
+                this.recognition.onend = () => {
+                    this.stopRecording();
+                };
+                
+                this.recognition.start();
+            }
+
+            stopRecording() {
+                if (this.recognition) {
+                    this.recognition.stop();
+                }
+                
+                this.isRecording = false;
+                const voiceBtn = document.getElementById('voiceBtn');
+                if (voiceBtn) {
+                    voiceBtn.style.background = '';
+                    voiceBtn.innerHTML = '🎤';
+                }
+            }
+
+            getRecognitionLanguage(langCode) {
+                const langMap = {
+                    'ar': 'ar-SA',
+                    'en': 'en-US',
+                    'fr': 'fr-FR',
+                    'es': 'es-ES',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-BR',
+                    'ru': 'ru-RU',
+                    'ja': 'ja-JP',
+                    'ko': 'ko-KR',
+                    'zh': 'zh-CN',
+                    'hi': 'hi-IN',
+                    'tr': 'tr-TR',
+                    'nl': 'nl-NL'
+                };
+                return langMap[langCode] || 'ar-SA';
+            }
+        }
+
         // تهيئة المدراء
         let conversationModeManager;
+        let dualMicrophoneManager;
+        let remoteTranslationManager;
         
         document.addEventListener('DOMContentLoaded', () => {
             conversationModeManager = new ConversationModeManager();
+            dualMicrophoneManager = new DualMicrophoneManager();
+            remoteTranslationManager = new RemoteTranslationManager();
             
             // ربط أزرار الحفظ والمسح بالمدير الجديد
             const saveBtn = document.getElementById('saveChat');
