@@ -1,0 +1,2 @@
+# Smart_voice_translate_app
+Smart_voice_translate_app
