@@ -441,7 +441,7 @@ class AuthManager {
     }
 
     handleSocialLogin(button) {
-        const provider = button.classList.contains('google-btn') ? 'Google' : 'Facebook';
+        const provider = button.classList.contains('google-btn') ? 'Google' : 'Phone';
         
         this.setButtonLoading(button, true);
         

@@ -352,9 +352,11 @@
     background: rgba(219, 68, 55, 0.05);
 }
 
+
 .facebook-btn:hover {
     border-color: #4267B2;
     color: #4267B2;
+
     background: rgba(66, 103, 178, 0.05);
 }
 

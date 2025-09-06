@@ -1148,46 +1148,7 @@
                 </div>
             </div>
             
-            <!-- خيارات اللغة للوضع Remote -->
-            <div class="remote-language-selector">
-                <div class="language-option">
-                    <label for="myLanguageRemote">لغتي:</label>
-                    <select class="lang-select-remote" id="myLanguageRemote">
-                        <option value="ar">العربية</option>
-                        <option value="en">English</option>
-                        <option value="fr">Français</option>
-                        <option value="es">Español</option>
-                        <option value="de">Deutsch</option>
-                        <option value="it">Italiano</option>
-                        <option value="pt">Português</option>
-                        <option value="ru">Русский</option>
-                        <option value="ja">日本語</option>
-                        <option value="ko">한국어</option>
-                        <option value="zh">中文</option>
-                    </select>
-                </div>
-                
-                <button class="lang-swap-btn" id="langSwapRemote" title="تبديل اللغات">
-                    ⇄
-                </button>
-                
-                <div class="language-option">
-                    <label for="targetLanguageRemote">لغة الطرف الآخر:</label>
-                    <select class="lang-select-remote" id="targetLanguageRemote">
-                        <option value="en">English</option>
-                        <option value="ar">العربية</option>
-                        <option value="fr">Français</option>
-                        <option value="es">Español</option>
-                        <option value="de">Deutsch</option>
-                        <option value="it">Italiano</option>
-                        <option value="pt">Português</option>
-                        <option value="ru">Русский</option>
-                        <option value="ja">日本語</option>
-                        <option value="ko">한국어</option>
-                        <option value="zh">中文</option>
-                    </select>
-                </div>
-            </div>
+
             
             <div class="chat-messages" id="chatMessages">
                 <!-- رسائل الدردشة ستظهر هنا -->
@@ -1204,83 +1165,11 @@
             </div>
         </div>
         
-        <!-- لوحات المحادثة -->
-        <div class="panes face-to-face" id="conversationPanes">
-            <section class="pane a" aria-label="لوحة المتحدث الأول">
-                <div class="pane-header">
-                    <h2 class="pane-title">المتحدث الأول</h2>
-                    <select class="lang-select" id="langA" aria-label="لغة المتحدث الأول">
-                        <option value="ar">العربية</option>
-                        <option value="en">English</option>
-                        <option value="fr">Français</option>
-                        <option value="es">Español</option>
-                        <option value="de">Deutsch</option>
-                    </select>
-                </div>
-                
-                <div id="scrollA" class="scroll">
-                    <div style="text-align: center; color: #64748b; padding: 2rem;">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💬</div>
-                        <div>ابدأ المحادثة...</div>
-                    </div>
-                </div>
-                
-                <div class="controls">
-                    <button class="mic" id="micA" data-side="A" aria-pressed="false">
-                        <span class="mic-icon">🎤</span>
-                        <span class="mic-text">اضغط للتحدث</span>
-                    </button>
-                    <div class="voice-wave" id="waveA" style="color: var(--brand-primary);">
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                    </div>
-                </div>
-            </section>
-            
-            <section class="pane b" aria-label="لوحة المتحدث الثاني">
-                <div class="pane-header">
-                    <h2 class="pane-title">المتحدث الثاني</h2>
-                    <select class="lang-select" id="langB" aria-label="لغة المتحدث الثاني">
-                        <option value="en">English</option>
-                        <option value="ar">العربية</option>
-                        <option value="fr">Français</option>
-                        <option value="es">Español</option>
-                        <option value="de">Deutsch</option>
-                    </select>
-                </div>
-                
-                <div id="scrollB" class="scroll">
-                    <div style="text-align: center; color: #64748b; padding: 2rem;">
-                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💬</div>
-                        <div>Start conversation...</div>
-                    </div>
-                </div>
-                
-                <div class="controls">
-                    <button class="mic" id="micB" data-side="B" aria-pressed="false">
-                        <span class="mic-icon">🎤</span>
-                        <span class="mic-text">Click to speak</span>
-                    </button>
-                    <div class="voice-wave" id="waveB" style="color: var(--brand-secondary);">
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                        <div class="wave-bar"></div>
-                    </div>
-                </div>
-            </section>
-        </div>
+
         
         <!-- التذييل -->
         <div class="footer">
-            <label class="hands-free">
-                <input type="checkbox" id="handsfree" />
-                <span>الوضع التلقائي (تشغيل وتناوب تلقائي)</span>
-            </label>
+
             <div style="font-size: 0.8rem; color: var(--brand-muted);" id="stats">
                 الرسائل: 0 | الترجمات: 0
             </div>
@@ -2528,10 +2417,7 @@
                     <div style="padding: 20px; background: white; border-radius: 12px; margin: 20px;">
                         <h3 style="color: var(--brand-primary); margin-bottom: 16px; text-align: center;">🌐 البحث عن محادثة</h3>
                         
-                        <div style="display: flex; gap: 12px; margin-bottom: 20px; justify-content: center; flex-wrap: wrap;">
-                            <button onclick="conversationModeManager.findRandomUser()" style="background: var(--brand-primary); color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">🎲 محادثة عشوائية</button>
-                        <button onclick="conversationModeManager.showAvailableUsers()" style="background: var(--brand-secondary); color: white; padding: 12px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">👥 اختيار مستخدم</button>
-                        </div>
+
                         
                         <div id="usersList" style="display: none;"></div>
                         <div id="searchingIndicator" style="display: none; text-align: center; padding: 20px;">
