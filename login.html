@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Sign Up - Instant Translation</title>
+    <link rel="icon" href="logo-new.svg" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
+    <style type="text/tailwindcss">
+        :root {
+            --primary-color: #1380ec;
+            --background-color: #f0f2f4;
+            --text-primary: #111418;
+            --text-secondary: #617589;
+            --white: #ffffff;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-btn {
+            color: #617589;
+            background: transparent;
+        }
+        .tab-btn.active {
+            color: #1380ec;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .form-container {
+            display: none;
+        }
+        .form-container.active {
+            display: block;
+        }
+    </style>
+    <style>
+        body {
+            min-height: 100vh;
+        }
+        .login-container {
+            max-width: 500px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        @media (max-width: 768px) {
+            .login-container {
+                max-width: 100%;
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-white">
+    <div class="login-container">
+    <div class="flex flex-col min-h-screen">
+        <header class="flex items-center justify-between p-4 border-b border-gray-200">
+            <button onclick="window.location.href='index.html'" class="p-2 rounded-lg transition-all duration-300 hover:transform hover:scale-105 tooltip" data-tooltip="العودة للصفحة الرئيسية" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">
+                <span class="material-symbols-outlined">arrow_back</span>
+            </button>
+            <div class="flex items-center gap-2">
+                <img src="logo-new.svg" alt="Logo" style="width: 80px; height: 80px;">
+                <h1 id="page-title" class="text-xl font-bold text-gray-900">تسجيل الدخول</h1>
+            </div>
+            <button onclick="window.location.href='settings.html'" class="p-2 rounded-lg transition-all duration-300 hover:transform hover:scale-105 tooltip" data-tooltip="إعدادات التطبيق" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">
+                <span class="material-symbols-outlined">settings</span>
+            </button>
+        </header>
+        <main class="flex-grow p-6 space-y-6">
+            <!-- تبديل بين تسجيل الدخول وإنشاء الحساب -->
+            <div class="flex bg-gray-100 rounded-lg p-1 mb-6">
+                <button id="login-tab" class="tab-btn flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 active tooltip" data-tooltip="تسجيل الدخول بحساب موجود" data-tab="login">
+                    تسجيل الدخول
+                </button>
+                <button id="register-tab" class="tab-btn flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 tooltip" data-tooltip="إنشاء حساب جديد" data-tab="register">
+                    إنشاء حساب
+                </button>
+            </div>
+
+            <!-- نموذج تسجيل الدخول -->
+            <div id="login-form" class="form-container active">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium text-[var(--text-secondary)]" for="login-email">البريد الإلكتروني</label>
+                        <input class="mt-1 w-full p-4 rounded-lg border-gray-300 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-[var(--background-color)] placeholder:text-[var(--text-secondary)] text-base" id="login-email" placeholder="you@example.com" type="email"/>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-[var(--text-secondary)]" for="login-password">كلمة المرور</label>
+                        <input class="mt-1 w-full p-4 rounded-lg border-gray-300 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-[var(--background-color)] placeholder:text-[var(--text-secondary)] text-base" id="login-password" placeholder="أدخل كلمة المرور" type="password"/>
+                    </div>
+                </div>
+                <button class="w-full text-white font-bold py-4 px-4 rounded-xl text-base transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg mt-6 tooltip" data-tooltip="تسجيل الدخول إلى حسابك" style="background: linear-gradient(135deg, #667eea, #764ba2); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3); border-radius: 15px;">
+                    تسجيل الدخول
+                </button>
+            </div>
+
+            <!-- نموذج إنشاء الحساب -->
+            <div id="register-form" class="form-container" style="display: none;">
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-sm font-medium text-[var(--text-secondary)]" for="register-email">البريد الإلكتروني</label>
+                        <input class="mt-1 w-full p-4 rounded-lg border-gray-300 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-[var(--background-color)] placeholder:text-[var(--text-secondary)] text-base" id="register-email" placeholder="you@example.com" type="email"/>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-[var(--text-secondary)]" for="register-password">كلمة المرور</label>
+                        <input class="mt-1 w-full p-4 rounded-lg border-gray-300 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-[var(--background-color)] placeholder:text-[var(--text-secondary)] text-base" id="register-password" placeholder="أدخل كلمة المرور" type="password"/>
+                    </div>
+                    <div>
+                        <label class="text-sm font-medium text-[var(--text-secondary)]" for="confirm-password">تأكيد كلمة المرور</label>
+                        <input class="mt-1 w-full p-4 rounded-lg border-gray-300 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-[var(--background-color)] placeholder:text-[var(--text-secondary)] text-base" id="confirm-password" placeholder="أكد كلمة المرور" type="password"/>
+                    </div>
+                </div>
+                <button class="w-full text-white font-bold py-4 px-4 rounded-xl text-base transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg mt-6 tooltip" data-tooltip="إنشاء حساب جديد" style="background: linear-gradient(135deg, #667eea, #764ba2); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3); border-radius: 15px;">
+                    إنشاء حساب
+                </button>
+            </div>
+
+            <div class="relative flex py-5 items-center">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span id="social-text" class="flex-shrink mx-4 text-[var(--text-secondary)]">أو سجل دخولك عبر</span>
+                <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+            <div class="flex flex-col space-y-4">
+                <button id="phone-login-btn" class="flex items-center justify-center w-full bg-white text-[var(--text-primary)] font-semibold py-3 px-4 rounded-xl transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg tooltip" data-tooltip="تسجيل الدخول باستخدام رقم الهاتف" style="border: 2px solid rgba(102, 126, 234, 0.2); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); border-radius: 15px;">
+                    <span class="material-symbols-outlined w-6 h-6 mr-3 text-[#25D366]">phone</span>
+                    <span id="phone-text">تسجيل الدخول برقم الهاتف</span>
+                </button>
+                <button class="flex items-center justify-center w-full bg-white text-[var(--text-primary)] font-semibold py-3 px-4 rounded-xl transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg tooltip" data-tooltip="تسجيل الدخول باستخدام Google" style="border: 2px solid rgba(102, 126, 234, 0.2); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); border-radius: 15px;">
+                    <img alt="Google logo" class="w-6 h-6 mr-3" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB86GzAZjls-dVbFmPK3n482cNp_45-gGLf56X-3vYq0k_CeCbph7DGkET0Kxaq0VaUOpiSHRQZRP7E1fD5eX4cZxAbqKPtxtbWQqP7ugn3RF_Y607aR60yY4C3q089hM4tntgxUBntzOh09eDcdF-wsrGIBREa68BfLImpt4u1u107dac0oTVu6ZZP9ot1fUVcJHlOC-fCJsbyxuj009qENfNmmvBi_FmAZW6KGSg_ifdxRflRpznA4L6EUIB9VH8mSyy0vCzd"/>
+                    <span id="google-text">تسجيل الدخول عبر Google</span>
+                </button>
+                <button class="flex items-center justify-center w-full bg-white text-[var(--text-primary)] font-semibold py-3 px-4 rounded-xl transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg tooltip" data-tooltip="تسجيل الدخول باستخدام Facebook" style="border: 2px solid rgba(102, 126, 234, 0.2); box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); border-radius: 15px;">
+                    <svg aria-hidden="true" class="w-6 h-6 mr-3 text-[#1877F2]" fill="currentColor" viewBox="0 0 24 24">
+                        <path clip-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" fill-rule="evenodd"></path>
+                    </svg>
+                    <span id="facebook-text">تسجيل الدخول عبر Facebook</span>
+                </button>
+            </div>
+            
+            <!-- ميزة الاستخدام المؤقت بدون تسجيل -->
+            <div class="relative flex py-5 items-center">
+                <div class="flex-grow border-t border-gray-300"></div>
+                <span class="flex-shrink mx-4 text-[var(--text-secondary)]">أو</span>
+                <div class="flex-grow border-t border-gray-300"></div>
+            </div>
+            
+            <button id="guest-mode-btn" class="flex items-center justify-center w-full bg-gradient-to-r from-orange-400 to-pink-400 text-white font-semibold py-4 px-4 rounded-xl transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg tooltip" data-tooltip="استخدم التطبيق لمدة 30 دقيقة بدون تسجيل" style="box-shadow: 0 6px 20px rgba(251, 146, 60, 0.3); border-radius: 15px;">
+                <span class="material-symbols-outlined mr-3">schedule</span>
+                <span>تجربة التطبيق بدون تسجيل (30 دقيقة)</span>
+            </button>
+        </main>
+        <footer class="p-6 text-center">
+            <p id="footer-text" class="text-sm text-[var(--text-secondary)]">
+                ليس لديك حساب؟ <a class="font-medium text-[var(--primary-color)] hover:underline" href="#" onclick="switchToRegister()">إنشاء حساب جديد</a>
+            </p>
+        </footer>
+    </div>
+    </div>
+    
+    <script>
+        // إدارة التبديل بين تسجيل الدخول وإنشاء الحساب
+        function switchTab(targetTab) {
+            const loginTab = document.getElementById('login-tab');
+            const registerTab = document.getElementById('register-tab');
+            const loginForm = document.getElementById('login-form');
+            const registerForm = document.getElementById('register-form');
+            const pageTitle = document.getElementById('page-title');
+            const socialText = document.getElementById('social-text');
+            const googleText = document.getElementById('google-text');
+            const facebookText = document.getElementById('facebook-text');
+            const phoneText = document.getElementById('phone-text');
+            const footerText = document.getElementById('footer-text');
+            
+            // إزالة الفئة النشطة من جميع الأزرار والنماذج
+            loginTab.classList.remove('active');
+            registerTab.classList.remove('active');
+            loginForm.classList.remove('active');
+            registerForm.classList.remove('active');
+            
+            if (targetTab === 'login') {
+                loginTab.classList.add('active');
+                loginForm.classList.add('active');
+                pageTitle.textContent = 'تسجيل الدخول';
+                socialText.textContent = 'أو سجل دخولك عبر';
+                googleText.textContent = 'تسجيل الدخول عبر Google';
+                facebookText.textContent = 'تسجيل الدخول عبر Facebook';
+                phoneText.textContent = 'تسجيل الدخول برقم الهاتف';
+                footerText.innerHTML = 'ليس لديك حساب؟ <a class="font-medium text-[var(--primary-color)] hover:underline" href="#" onclick="switchToRegister()">إنشاء حساب جديد</a>';
+            } else {
+                registerTab.classList.add('active');
+                registerForm.classList.add('active');
+                pageTitle.textContent = 'إنشاء حساب جديد';
+                socialText.textContent = 'أو أنشئ حسابك عبر';
+                googleText.textContent = 'إنشاء حساب عبر Google';
+                facebookText.textContent = 'إنشاء حساب عبر Facebook';
+                phoneText.textContent = 'إنشاء حساب برقم الهاتف';
+                footerText.innerHTML = 'لديك حساب بالفعل؟ <a class="font-medium text-[var(--primary-color)] hover:underline" href="#" onclick="switchToLogin()">تسجيل الدخول</a>';
+            }
+        }
+        
+        function switchToLogin() {
+            switchTab('login');
+        }
+        
+        function switchToRegister() {
+            switchTab('register');
+        }
+        
+        // إضافة مستمعي الأحداث للأزرار
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('login-tab').addEventListener('click', () => switchTab('login'));
+            document.getElementById('register-tab').addEventListener('click', () => switchTab('register'));
+            
+            // إضافة مستمع الأحداث لزر تسجيل الدخول برقم الهاتف
+            const phoneLoginBtn = document.getElementById('phone-login-btn');
+            if (phoneLoginBtn) {
+                phoneLoginBtn.addEventListener('click', () => showPhoneLoginModal());
+            }
+            
+            // التحقق من معاملات URL لتحديد الوضع الافتراضي
+            const urlParams = new URLSearchParams(window.location.search);
+            const mode = urlParams.get('mode');
+            
+            if (mode === 'register') {
+                switchTab('register');
+            } else {
+                switchTab('login'); // الافتراضي هو تسجيل الدخول
+            }
+        });
+        
+        // إدارة الوضع المؤقت بدون تسجيل
+        function initGuestMode() {
+            const guestBtn = document.getElementById('guest-mode-btn');
+            if (guestBtn) {
+                guestBtn.addEventListener('click', function() {
+                    startGuestSession();
+                });
+            }
+        }
+        
+        function startGuestSession() {
+            // إنشاء جلسة مؤقتة لمدة 30 دقيقة
+            const guestSession = {
+                isGuest: true,
+                startTime: Date.now(),
+                duration: 30 * 60 * 1000, // 30 دقيقة بالميلي ثانية
+                email: 'guest@temp.com',
+                name: 'مستخدم مؤقت'
+            };
+            
+            // حفظ الجلسة في localStorage
+            localStorage.setItem('guestSession', JSON.stringify(guestSession));
+            localStorage.setItem('userEmail', guestSession.email);
+            localStorage.setItem('userName', guestSession.name);
+            
+            // عرض رسالة تأكيد
+            showGuestModeMessage();
+            
+            // الانتقال إلى الصفحة الرئيسية بعد ثانيتين
+            setTimeout(() => {
+                window.location.href = 'index.html';
+            }, 2000);
+        }
+        
+        function showGuestModeMessage() {
+            // إنشاء رسالة تأكيد
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300';
+            messageDiv.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span>تم تفعيل الوضع المؤقت! ستنتهي الجلسة خلال 30 دقيقة</span>
+                </div>
+            `;
+            
+            document.body.appendChild(messageDiv);
+            
+            // إزالة الرسالة بعد 3 ثوان
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+        
+        // التحقق من الجلسة المؤقتة عند تحميل الصفحة
+        function checkGuestSession() {
+            const guestSession = localStorage.getItem('guestSession');
+            if (guestSession) {
+                const session = JSON.parse(guestSession);
+                const currentTime = Date.now();
+                const elapsedTime = currentTime - session.startTime;
+                
+                if (elapsedTime >= session.duration) {
+                    // انتهت الجلسة المؤقتة
+                    localStorage.removeItem('guestSession');
+                    localStorage.removeItem('userEmail');
+                    localStorage.removeItem('userName');
+                    
+                    // عرض رسالة انتهاء الجلسة
+                    showSessionExpiredMessage();
+                } else {
+                    // الجلسة ما زالت نشطة، الانتقال للصفحة الرئيسية
+                    window.location.href = 'index.html';
+                }
+            }
+        }
+        
+        function showSessionExpiredMessage() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'fixed top-4 left-1/2 transform -translate-x-1/2 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50';
+            messageDiv.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">schedule</span>
+                    <span>انتهت فترة الاستخدام المؤقت. يرجى تسجيل الدخول للمتابعة</span>
+                </div>
+            `;
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+        
+        // دالة عرض نافذة تسجيل الدخول برقم الهاتف
+        function showPhoneLoginModal() {
+            const modal = document.createElement('div');
+            modal.id = 'phone-login-modal';
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 relative">
+                    <button onclick="closePhoneLoginModal()" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+                        <span class="material-symbols-outlined">close</span>
+                    </button>
+                    <h2 class="text-2xl font-bold text-center mb-6 text-[var(--text-primary)]">تسجيل الدخول برقم الهاتف</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="text-sm font-medium text-[var(--text-secondary)]" for="phone-number">رقم الهاتف</label>
+                            <div class="flex mt-1">
+                                <select id="country-code" class="p-4 rounded-r-lg border-gray-300 bg-[var(--background-color)] text-[var(--text-primary)] border-l-0">
+                                    <option value="+966">🇸🇦 +966</option>
+                                    <option value="+971">🇦🇪 +971</option>
+                                    <option value="+965">🇰🇼 +965</option>
+                                    <option value="+974">🇶🇦 +974</option>
+                                    <option value="+973">🇧🇭 +973</option>
+                                    <option value="+968">🇴🇲 +968</option>
+                                    <option value="+962">🇯🇴 +962</option>
+                                    <option value="+961">🇱🇧 +961</option>
+                                    <option value="+20">🇪🇬 +20</option>
+                                </select>
+                                <input class="flex-1 p-4 rounded-l-lg border-gray-300 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-[var(--background-color)] placeholder:text-[var(--text-secondary)] text-base" id="phone-number" placeholder="501234567" type="tel"/>
+                            </div>
+                        </div>
+                        
+                        <div id="verification-section" style="display: none;">
+                            <label class="text-sm font-medium text-[var(--text-secondary)]" for="verification-code">رمز التحقق</label>
+                            <input class="mt-1 w-full p-4 rounded-lg border-gray-300 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-[var(--background-color)] placeholder:text-[var(--text-secondary)] text-base text-center" id="verification-code" placeholder="123456" type="text" maxlength="6"/>
+                            <p class="text-sm text-[var(--text-secondary)] mt-2">تم إرسال رمز التحقق إلى رقم هاتفك</p>
+                        </div>
+                    </div>
+                    
+                    <button id="phone-submit-btn" onclick="handlePhoneLogin()" class="w-full text-white font-bold py-4 px-4 rounded-xl text-base transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg mt-6" style="background: linear-gradient(135deg, #667eea, #764ba2); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3); border-radius: 15px;">
+                        إرسال رمز التحقق
+                    </button>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        function closePhoneLoginModal() {
+            const modal = document.getElementById('phone-login-modal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // متغير لتتبع حالة التحقق
+        let phoneVerificationStep = 'send'; // 'send' أو 'verify'
+        
+        function handlePhoneLogin() {
+            const phoneNumber = document.getElementById('phone-number').value;
+            const countryCode = document.getElementById('country-code').value;
+            const verificationCode = document.getElementById('verification-code').value;
+            const submitBtn = document.getElementById('phone-submit-btn');
+            
+            if (phoneVerificationStep === 'send') {
+                // التحقق من صحة رقم الهاتف
+                if (!phoneNumber || phoneNumber.length < 8) {
+                    showMessage('يرجى إدخال رقم هاتف صحيح', 'error');
+                    return;
+                }
+                
+                // محاكاة إرسال رمز التحقق
+                const fullPhoneNumber = countryCode + phoneNumber;
+                sendVerificationCode(fullPhoneNumber);
+                
+                // عرض قسم رمز التحقق
+                document.getElementById('verification-section').style.display = 'block';
+                submitBtn.textContent = 'تأكيد رمز التحقق';
+                phoneVerificationStep = 'verify';
+                
+                showMessage('تم إرسال رمز التحقق إلى ' + fullPhoneNumber, 'success');
+                
+            } else if (phoneVerificationStep === 'verify') {
+                // التحقق من رمز التحقق
+                if (!verificationCode || verificationCode.length !== 6) {
+                    showMessage('يرجى إدخال رمز التحقق المكون من 6 أرقام', 'error');
+                    return;
+                }
+                
+                // محاكاة التحقق من الرمز
+                verifyPhoneCode(verificationCode, countryCode + phoneNumber);
+            }
+        }
+        
+        function sendVerificationCode(phoneNumber) {
+            // محاكاة إرسال رمز التحقق
+            // في التطبيق الحقيقي، ستحتاج لاستخدام خدمة مثل Firebase Auth أو Twilio
+            console.log('إرسال رمز التحقق إلى:', phoneNumber);
+            
+            // حفظ رمز التحقق المؤقت (للمحاكاة فقط)
+            localStorage.setItem('tempVerificationCode', '123456');
+            localStorage.setItem('tempPhoneNumber', phoneNumber);
+        }
+        
+        function verifyPhoneCode(code, phoneNumber) {
+            // محاكاة التحقق من الرمز
+            const savedCode = localStorage.getItem('tempVerificationCode');
+            const savedPhone = localStorage.getItem('tempPhoneNumber');
+            
+            if (code === savedCode && phoneNumber === savedPhone) {
+                // نجح التحقق
+                showMessage('تم التحقق بنجاح! جاري تسجيل الدخول...', 'success');
+                
+                // حفظ بيانات المستخدم
+                localStorage.setItem('userEmail', phoneNumber + '@phone.local');
+                localStorage.setItem('userName', 'مستخدم ' + phoneNumber.slice(-4));
+                localStorage.setItem('loginMethod', 'phone');
+                
+                // تنظيف البيانات المؤقتة
+                localStorage.removeItem('tempVerificationCode');
+                localStorage.removeItem('tempPhoneNumber');
+                
+                // إغلاق النافذة والانتقال للصفحة الرئيسية
+                setTimeout(() => {
+                    closePhoneLoginModal();
+                    window.location.href = 'index.html';
+                }, 1500);
+                
+            } else {
+                showMessage('رمز التحقق غير صحيح. يرجى المحاولة مرة أخرى', 'error');
+            }
+        }
+        
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+            const icon = type === 'success' ? 'check_circle' : 'error';
+            
+            messageDiv.className = `fixed top-4 left-1/2 transform -translate-x-1/2 ${bgColor} text-white px-6 py-3 rounded-lg shadow-lg z-50 transition-all duration-300`;
+            messageDiv.innerHTML = `
+                <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined">${icon}</span>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            document.body.appendChild(messageDiv);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+        
+        // تسجيل Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+        
+        // تهيئة الوظائف عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            initGuestMode();
+            checkGuestSession();
+        });
+    </script>
+    
+    <!-- تضمين ملف قاعدة البيانات -->
+    <script src="database.js"></script>
+    <!-- تضمين ملف JavaScript -->
+    <script src="login-script.js"></script>
+    <script>
+        // تهيئة مدير المصادقة عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', function() {
+            window.userDB = new UserDatabase();
+            window.authManager = new AuthManager();
+        });
+    </script>
+</body>
+</html>

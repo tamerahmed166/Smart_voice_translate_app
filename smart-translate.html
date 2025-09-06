@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ترجمة ذكية - Smart Translate</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#667eea">
+    <link rel="icon" href="logo-new.svg" type="image/svg+xml">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="الترجمة الذكية">
+    <link rel="apple-touch-icon" href="icon-192x192.png">
+    
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --card: #ffffff;
+            --muted: #6b7280;
+            --brand: #667eea;
+            --accent: #10b981;
+            --radius: 14px;
+            --pad: 14px;
+            --shadow: 0 8px 24px rgba(102, 126, 234, 0.08);
+            --border: #e2e8f0;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cairo', 'Noto Sans Arabic', system-ui, Arial;
+            margin: 0;
+            background: var(--bg);
+            color: #0f172a;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 920px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 0;
+        }
+        
+        .back-btn, .settings-btn {
+            padding: 8px 16px;
+            background: rgba(102, 126, 234, 0.1);
+            color: var(--brand);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 1px solid rgba(102, 126, 234, 0.3);
+        }
+        
+        .back-btn:hover, .settings-btn:hover {
+            background: var(--brand);
+            color: white;
+            transform: translateY(-1px);
+        }
+        
+        .app-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .app-header h1 {
+            margin: 8px 0;
+            color: var(--brand);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .app-header p {
+            color: var(--muted);
+            margin: 0;
+            font-size: 0.85rem;
+        }
+        
+        .card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 24px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            background: #f1f5f9;
+            padding: 4px;
+            border-radius: 12px;
+        }
+        
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            background: transparent;
+            color: var(--muted);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: inherit;
+        }
+        
+        .tab.active {
+            background: var(--card);
+            color: var(--brand);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            font-weight: 600;
+        }
+        
+        .field {
+            margin-bottom: 16px;
+        }
+        
+        .field label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 14px;
+            border-radius: 10px;
+            border: 2px solid var(--border);
+            font-size: 15px;
+            resize: vertical;
+            font-family: inherit;
+            transition: border-color 0.3s ease;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--brand);
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+        }
+        
+        button {
+            background: var(--brand);
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+        
+        button:hover {
+            background: #5a67d8;
+            transform: translateY(-1px);
+        }
+        
+        button.ghost {
+            background: #fff;
+            color: var(--brand);
+            border: 2px solid var(--border);
+        }
+        
+        button.ghost:hover {
+            background: var(--brand);
+            color: white;
+            border-color: var(--brand);
+        }
+        
+        .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .img-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .img-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: 10px;
+            padding: 16px;
+            min-height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .img-box:hover {
+            border-color: var(--brand);
+            background: rgba(102, 126, 234, 0.05);
+        }
+        
+        .img-box.has-image {
+            border-style: solid;
+            border-color: var(--accent);
+            background: rgba(16, 185, 129, 0.05);
+        }
+        
+        .small {
+            font-size: 13px;
+            color: var(--muted);
+        }
+        
+        #video {
+            width: 100%;
+            border-radius: 10px;
+            background: #000;
+            max-height: 300px;
+        }
+        
+        .result {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 10px;
+            background: #f0f9ff;
+            border: 2px solid #bae6fd;
+            display: none;
+        }
+        
+        .result.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .lang-row {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        
+        .lang-selector {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        
+        .lang-selector select {
+            padding: 6px 10px;
+            border: none;
+            background: transparent;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .lang-selector select:focus {
+            outline: none;
+        }
+        
+        .lang-selector::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 70%;
+            height: 2px;
+            background: var(--brand);
+            border-radius: 1px;
+        }
+        
+        .swap-btn {
+            padding: 6px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .swap-btn:hover {
+            background: var(--brand);
+            color: white;
+            transform: rotate(180deg);
+        }
+        
+        .footer {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        
+        .mode {
+            display: none;
+        }
+        
+        .mode.active {
+            display: block;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 150px;
+            border-radius: 8px;
+        }
+        
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e5e7eb;
+            border-top: 2px solid var(--brand);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error {
+            background: #fef2f2;
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+        
+        .success {
+            background: #f0fdf4;
+            border-color: #bbf7d0;
+            color: #16a34a;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .img-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .lang-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .footer {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-nav">
+                <a href="index.html" class="back-btn">🏠 الرئيسية</a>
+                <div style="display: flex; gap: 10px;">
+                    <a href="settings.html" class="settings-btn">⚙️ الإعدادات</a>
+                </div>
+            </div>
+            
+            <div class="app-header">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
+                     <img src="logo-new.svg" alt="Logo" style="width: 80px; height: 80px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
+                     <h1 style="font-size: 1.4rem; margin: 0;">ترجمة ذكية</h1>
+                 </div>
+ 
+            </div>
+        </header>
+
+        <main>
+            <div class="card">
+                <!-- Tabs -->
+                <div class="tabs" role="tablist">
+                    <button class="tab active" data-mode="text">📝 النص</button>
+                    <button class="tab" data-mode="camera">📷 الكاميرا</button>
+                    <button class="tab" data-mode="image">🖼️ الصور</button>
+                </div>
+
+                <!-- Language selection -->
+                <div class="lang-row">
+                    <div class="lang-selector">
+                        <select id="fromLang">
+                            <option value="auto">كشف تلقائي</option>
+                            <option value="ar">العربية</option>
+                            <option value="en">English</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                            <option value="es">Español</option>
+                            <option value="it">Italiano</option>
+                            <option value="pt">Português</option>
+                            <option value="ru">Русский</option>
+                            <option value="ja">日本語</option>
+                            <option value="ko">한국어</option>
+                            <option value="zh">中文</option>
+                            <option value="hi">हिन्दी</option>
+                            <option value="tr">Türkçe</option>
+                        </select>
+                    </div>
+
+                    <button id="swapLangs" class="swap-btn">🔄</button>
+
+                    <div class="lang-selector">
+                        <select id="toLang">
+                            <option value="en">English</option>
+                            <option value="ar">العربية</option>
+                            <option value="fr">Français</option>
+                            <option value="de">Deutsch</option>
+                            <option value="es">Español</option>
+                            <option value="it">Italiano</option>
+                            <option value="pt">Português</option>
+                            <option value="ru">Русский</option>
+                            <option value="ja">日本語</option>
+                            <option value="ko">한국어</option>
+                            <option value="zh">中文</option>
+                            <option value="hi">हिन्दी</option>
+                            <option value="tr">Türkçe</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- MODE: TEXT -->
+                <div id="mode_text" class="mode active">
+                    <div class="field">
+                        <label for="textInput">النص المراد ترجمته:</label>
+                        <textarea id="textInput" placeholder="اكتب النص أو انسخ محتوى هنا..."></textarea>
+                    </div>
+                    <div class="controls">
+                        <button id="translateTextBtn">🔄 ترجمة</button>
+                        <button id="clearTextBtn" class="ghost">🗑️ مسح</button>
+                    </div>
+                    <div id="textResult" class="result"></div>
+                    <div class="controls" style="margin-top: 10px; justify-content: center;">
+                        <button id="ttsTextBtn" class="ghost">🔊 تشغيل الصوت</button>
+                    </div>
+                </div>
+
+                <!-- MODE: CAMERA -->
+                <div id="mode_camera" class="mode">
+                    <div class="field">
+                        <video id="video" autoplay playsinline style="display: none;"></video>
+                        <canvas id="canvas" style="display: none;"></canvas>
+                        <div id="cameraPlaceholder" class="img-box">
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
+                                <div class="small">اضغط لفتح الكاميرا</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="controls">
+                        <button id="openCamBtn">📷 فتح الكاميرا</button>
+                        <button id="snapBtn" style="display: none;">📸 التقاط وترجمة</button>
+                        <button id="stopCamBtn" class="ghost" style="display: none;">⏹️ إيقاف الكاميرا</button>
+                    </div>
+                    <div class="small" style="margin-top: 10px;">💡 وجه الكاميرا نحو النص أو اللافتة المراد ترجمتها</div>
+                    <div id="cameraResult" class="result"></div>
+                </div>
+
+                <!-- MODE: IMAGE UPLOAD -->
+                <div id="mode_image" class="mode">
+                    <div class="img-grid">
+                        <div class="img-box" id="dropZone">
+                            <div style="text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">🖼️</div>
+                                <div class="small">اسحب الصورة أو اضغط للرفع</div>
+                            </div>
+                        </div>
+                        <div class="img-box" id="previewBox">
+                            <div style="text-align: center; color: var(--muted);">
+                                <div style="font-size: 24px; margin-bottom: 10px;">👁️</div>
+                                <div class="small">معاينة الصورة</div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="file" id="imgFile" accept="image/*" style="display: none;" />
+                    <div class="controls">
+                        <button id="processImgBtn">🔍 استخراج وترجمة النص</button>
+                    </div>
+                    <div class="small" style="margin-top: 10px;">💡 يدعم التطبيق صور PNG, JPG, JPEG, WebP</div>
+                    <div id="imageResult" class="result"></div>
+                    <div class="controls" style="margin-top: 10px; justify-content: center;">
+                        <button id="ttsImgBtn" class="ghost">🔊 تشغيل الترجمة</button>
+                    </div>
+                </div>
+
+                <div class="footer">
+                    <button id="downloadHistory" class="ghost">💾 حفظ السجل</button>
+                    <button id="shareResult" class="ghost">📤 مشاركة</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Tesseract.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+
+    <script>
+        // ---------- State ----------
+        const tabs = document.querySelectorAll('.tab');
+        const modes = document.querySelectorAll('.mode');
+        const fromLang = document.getElementById('fromLang');
+        const toLang = document.getElementById('toLang');
+        const swapLangsBtn = document.getElementById('swapLangs');
+        
+        // Text mode elements
+        const textInput = document.getElementById('textInput');
+        const translateTextBtn = document.getElementById('translateTextBtn');
+        const ttsTextBtn = document.getElementById('ttsTextBtn');
+        const clearTextBtn = document.getElementById('clearTextBtn');
+        const textResult = document.getElementById('textResult');
+        
+        // Camera mode elements
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const cameraPlaceholder = document.getElementById('cameraPlaceholder');
+        const openCamBtn = document.getElementById('openCamBtn');
+        const snapBtn = document.getElementById('snapBtn');
+        const stopCamBtn = document.getElementById('stopCamBtn');
+        const cameraResult = document.getElementById('cameraResult');
+        
+        // Image mode elements
+        const dropZone = document.getElementById('dropZone');
+        const previewBox = document.getElementById('previewBox');
+        const imgFile = document.getElementById('imgFile');
+        const processImgBtn = document.getElementById('processImgBtn');
+        const ttsImgBtn = document.getElementById('ttsImgBtn');
+        const imageResult = document.getElementById('imageResult');
+        
+        // Footer elements
+        const downloadHistory = document.getElementById('downloadHistory');
+        const shareResult = document.getElementById('shareResult');
+        
+        let currentStream = null;
+        let translationHistory = [];
+        let currentTranslation = '';
+        
+        // ---------- Tab Management ----------
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const mode = tab.dataset.mode;
+                switchMode(mode);
+            });
+        });
+        
+        function switchMode(mode) {
+            // Update tabs
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelector(`[data-mode="${mode}"]`).classList.add('active');
+            
+            // Update modes
+            modes.forEach(m => m.classList.remove('active'));
+            document.getElementById(`mode_${mode}`).classList.add('active');
+            
+            // Stop camera if switching away from camera mode
+            if (mode !== 'camera' && currentStream) {
+                stopCamera();
+            }
+        }
+        
+        // ---------- Language Management ----------
+        swapLangsBtn.addEventListener('click', () => {
+            const fromValue = fromLang.value;
+            const toValue = toLang.value;
+            
+            if (fromValue !== 'auto') {
+                fromLang.value = toValue;
+                toLang.value = fromValue;
+            }
+        });
+        
+        // ---------- Translation Functions ----------
+        async function translateText(text, from = 'auto', to = 'en') {
+            console.log('🔄 بدء الترجمة:', { text: text.substring(0, 50) + '...', from, to });
+            
+            try {
+                // Check if text is empty
+                if (!text || text.trim().length === 0) {
+                    return 'النص فارغ';
+                }
+                
+                // Handle 'auto' language detection
+                let sourceLang = from;
+                if (from === 'auto') {
+                    // Simple language detection based on text content
+                    const arabicPattern = /[\u0600-\u06FF]/;
+                    const englishPattern = /[a-zA-Z]/;
+                    
+                    if (arabicPattern.test(text)) {
+                        sourceLang = 'ar';
+                    } else if (englishPattern.test(text)) {
+                        sourceLang = 'en';
+                    } else {
+                        // Default to English if can't detect
+                        sourceLang = 'en';
+                    }
+                    
+                    console.log('🔍 تم اكتشاف اللغة:', sourceLang);
+                }
+                
+                // Primary translation service: MyMemory
+                const response = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${to}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'SmartTranslateApp/1.0'
+                    }
+                });
+                
+                console.log('📡 استجابة الخادم:', response.status, response.statusText);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP Error: ${response.status} ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                console.log('📊 بيانات الترجمة:', data);
+                
+                if (data.responseStatus === 200 && data.responseData && data.responseData.translatedText) {
+                    const translatedText = data.responseData.translatedText;
+                    console.log('✅ نجحت الترجمة:', translatedText.substring(0, 50) + '...');
+                    return translatedText;
+                } else if (data.responseStatus === 403) {
+                    return 'تم تجاوز حد الاستخدام اليومي للخدمة';
+                } else if (data.responseStatus === 429) {
+                    return 'طلبات كثيرة جداً. يرجى الانتظار قليلاً';
+                } else {
+                    return `فشل في الترجمة: ${data.responseDetails || 'خطأ غير معروف'}`;
+                }
+            } catch (error) {
+                console.error('❌ خطأ في الترجمة:', error);
+                
+                // Check if it's a network error
+                if (error.name === 'TypeError' && error.message.includes('fetch')) {
+                    return 'خطأ في الاتصال بالإنترنت. يرجى التحقق من الاتصال والمحاولة مرة أخرى.';
+                }
+                
+                // Check if it's a CORS error
+                if (error.message.includes('CORS') || error.message.includes('Access-Control')) {
+                    return 'خطأ في الوصول لخدمة الترجمة. يرجى المحاولة مرة أخرى.';
+                }
+                
+                // Return specific error message or generic fallback
+                return error.message || 'خطأ في الترجمة. يرجى المحاولة مرة أخرى.';
+            }
+        }
+        
+        // Enhanced AI-powered speech synthesis
+        async function speakText(text, lang = 'ar') {
+            console.log('🔊 بدء تشغيل الصوت:', { text: text.substring(0, 30) + '...', lang });
+            
+            if (!('speechSynthesis' in window)) {
+                console.error('❌ تحويل النص إلى كلام غير مدعوم في هذا المتصفح');
+                alert('تحويل النص إلى كلام غير مدعوم في هذا المتصفح');
+                return;
+            }
+            
+            try {
+                // Stop any currently playing speech
+                speechSynthesis.cancel();
+                
+                // Wait for voices to load
+                await waitForVoices();
+                
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Enhanced language mapping with regional variants
+                const languageMap = {
+                    'ar': 'ar-SA',
+                    'en': 'en-US',
+                    'fr': 'fr-FR',
+                    'es': 'es-ES',
+                    'de': 'de-DE',
+                    'it': 'it-IT',
+                    'pt': 'pt-BR',
+                    'ru': 'ru-RU',
+                    'ja': 'ja-JP',
+                    'ko': 'ko-KR',
+                    'zh': 'zh-CN',
+                    'hi': 'hi-IN',
+                    'tr': 'tr-TR'
+                };
+                
+                utterance.lang = languageMap[lang] || lang;
+                
+                // Find the best available voice for the language
+                const voices = speechSynthesis.getVoices();
+                const preferredVoice = findBestVoice(voices, utterance.lang, lang);
+                
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                    console.log('🎤 استخدام الصوت:', preferredVoice.name, '- اللغة:', preferredVoice.lang);
+                }
+                
+                // Enhanced speech parameters for more natural sound
+                utterance.rate = 0.85;     // Slightly slower for clarity
+                utterance.pitch = 1.0;     // Natural pitch
+                utterance.volume = 0.9;    // High volume
+                
+                // Add event listeners for better user experience
+                utterance.onstart = () => {
+                    console.log('▶️ بدء تشغيل الصوت');
+                    // Add visual feedback (optional)
+                    document.body.style.cursor = 'wait';
+                };
+                
+                utterance.onend = () => {
+                    console.log('⏹️ انتهاء تشغيل الصوت');
+                    document.body.style.cursor = 'default';
+                };
+                
+                utterance.onerror = (event) => {
+                    console.error('❌ خطأ في تشغيل الصوت:', event.error);
+                    document.body.style.cursor = 'default';
+                    
+                    // Provide user-friendly error messages
+                    const errorMessages = {
+                        'network': 'خطأ في الشبكة. تحقق من الاتصال بالإنترنت.',
+                        'synthesis-failed': 'فشل في تحويل النص إلى كلام. جرب نصاً أقصر.',
+                        'synthesis-unavailable': 'خدمة تحويل النص إلى كلام غير متاحة حالياً.',
+                        'voice-unavailable': 'الصوت المطلوب غير متاح. سيتم استخدام الصوت الافتراضي.',
+                        'text-too-long': 'النص طويل جداً. جرب تقسيمه إلى أجزاء أصغر.',
+                        'invalid-argument': 'خطأ في معاملات الصوت.',
+                        'not-allowed': 'تم رفض تشغيل الصوت. تحقق من إعدادات المتصفح.'
+                    };
+                    
+                    const errorMessage = errorMessages[event.error] || 'حدث خطأ غير متوقع في تشغيل الصوت.';
+                    alert(errorMessage);
+                };
+                
+                // Split long text into chunks for better performance
+                if (text.length > 200) {
+                    await speakLongText(text, utterance);
+                } else {
+                    speechSynthesis.speak(utterance);
+                }
+                
+            } catch (error) {
+                console.error('❌ خطأ في إعداد الصوت:', error);
+                alert('حدث خطأ في إعداد تشغيل الصوت.');
+            }
+        }
+        
+        // Helper function to wait for voices to load
+        function waitForVoices() {
+            return new Promise((resolve) => {
+                const voices = speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    resolve(voices);
+                } else {
+                    speechSynthesis.onvoiceschanged = () => {
+                        resolve(speechSynthesis.getVoices());
+                    };
+                }
+            });
+        }
+        
+        // Helper function to find the best voice for a language
+        function findBestVoice(voices, targetLang, baseLang) {
+            // Priority order: exact match > same language family > default
+            const exactMatch = voices.find(voice => voice.lang === targetLang);
+            if (exactMatch) return exactMatch;
+            
+            const languageFamily = voices.find(voice => voice.lang.startsWith(baseLang));
+            if (languageFamily) return languageFamily;
+            
+            // For Arabic, prefer any Arabic voice
+            if (baseLang === 'ar') {
+                const arabicVoice = voices.find(voice => voice.lang.includes('ar'));
+                if (arabicVoice) return arabicVoice;
+            }
+            
+            // For English, prefer US or UK voices
+            if (baseLang === 'en') {
+                const englishVoice = voices.find(voice => 
+                    voice.lang === 'en-US' || voice.lang === 'en-GB' || voice.lang.startsWith('en')
+                );
+                if (englishVoice) return englishVoice;
+            }
+            
+            return null;
+        }
+        
+        // Helper function to handle long text by splitting into chunks
+        async function speakLongText(text, baseUtterance) {
+            const maxChunkLength = 200;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0);
+            
+            for (let i = 0; i < sentences.length; i++) {
+                let chunk = sentences[i].trim();
+                if (chunk.length === 0) continue;
+                
+                // If sentence is still too long, split by commas
+                if (chunk.length > maxChunkLength) {
+                    const subChunks = chunk.split(',').filter(s => s.trim().length > 0);
+                    for (const subChunk of subChunks) {
+                        await speakChunk(subChunk.trim(), baseUtterance);
+                    }
+                } else {
+                    await speakChunk(chunk, baseUtterance);
+                }
+            }
+        }
+        
+        // Helper function to speak a single chunk
+        function speakChunk(text, baseUtterance) {
+            return new Promise((resolve) => {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.voice = baseUtterance.voice;
+                utterance.lang = baseUtterance.lang;
+                utterance.rate = baseUtterance.rate;
+                utterance.pitch = baseUtterance.pitch;
+                utterance.volume = baseUtterance.volume;
+                
+                utterance.onend = () => resolve();
+                utterance.onerror = () => resolve(); // Continue even if one chunk fails
+                
+                speechSynthesis.speak(utterance);
+            });
+        }
+        
+        function showResult(container, originalText, translatedText, from, to) {
+            container.innerHTML = `
+                <div style="margin-bottom: 12px;">
+                    <strong>النص الأصلي (${from}):</strong>
+                    <div style="background: #f8fafc; padding: 10px; border-radius: 6px; margin-top: 4px;">${originalText}</div>
+                </div>
+                <div>
+                    <strong>الترجمة (${to}):</strong>
+                    <div style="background: #f0f9ff; padding: 10px; border-radius: 6px; margin-top: 4px; border-left: 3px solid var(--brand);">${translatedText}</div>
+                </div>
+            `;
+            container.classList.add('show', 'success');
+            
+            // Add to history
+            translationHistory.push({
+                original: originalText,
+                translated: translatedText,
+                from: from,
+                to: to,
+                timestamp: new Date().toISOString()
+            });
+            
+            currentTranslation = translatedText;
+        }
+        
+        function showError(container, message) {
+            container.innerHTML = `<div style="color: #dc2626;">❌ ${message}</div>`;
+            container.classList.add('show', 'error');
+        }
+        
+        function showLoading(container, message = 'جاري المعالجة...') {
+            container.innerHTML = `<div class="loading"><div class="spinner"></div> ${message}</div>`;
+            container.classList.add('show');
+            container.classList.remove('error', 'success');
+        }
+        
+        // ---------- Text Mode ----------
+        translateTextBtn.addEventListener('click', async () => {
+            const text = textInput.value.trim();
+            if (!text) {
+                showError(textResult, 'يرجى إدخال النص المراد ترجمته');
+                return;
+            }
+            
+            // Disable button during translation
+            translateTextBtn.disabled = true;
+            translateTextBtn.textContent = 'جاري الترجمة...';
+            
+            showLoading(textResult, 'جاري الترجمة...');
+            
+            try {
+                const translatedText = await translateText(text, fromLang.value, toLang.value);
+                
+                // Check if translation returned an error message
+                if (translatedText.includes('خطأ في') || translatedText.includes('فشل في') || translatedText.includes('تم تجاوز')) {
+                    showError(textResult, translatedText);
+                } else {
+                    showResult(textResult, text, translatedText, fromLang.value, toLang.value);
+                }
+            } catch (error) {
+                console.error('خطأ في معالجة الترجمة:', error);
+                showError(textResult, 'حدث خطأ غير متوقع. يرجى المحاولة مرة أخرى.');
+            } finally {
+                // Re-enable button
+                translateTextBtn.disabled = false;
+                translateTextBtn.textContent = 'ترجمة';
+            }
+        });
+        
+        ttsTextBtn.addEventListener('click', () => {
+            if (currentTranslation) {
+                speakText(currentTranslation, toLang.value);
+            }
+        });
+        
+        clearTextBtn.addEventListener('click', () => {
+            textInput.value = '';
+            textResult.classList.remove('show');
+            currentTranslation = '';
+        });
+        
+        // ---------- Camera Mode ----------
+        openCamBtn.addEventListener('click', async () => {
+            try {
+                currentStream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: 'environment' } 
+                });
+                video.srcObject = currentStream;
+                video.style.display = 'block';
+                cameraPlaceholder.style.display = 'none';
+                openCamBtn.style.display = 'none';
+                snapBtn.style.display = 'inline-block';
+                stopCamBtn.style.display = 'inline-block';
+            } catch (error) {
+                showError(cameraResult, 'لا يمكن الوصول للكاميرا. يرجى التحقق من الأذونات.');
+            }
+        });
+        
+        stopCamBtn.addEventListener('click', stopCamera);
+        
+        function stopCamera() {
+            if (currentStream) {
+                currentStream.getTracks().forEach(track => track.stop());
+                currentStream = null;
+            }
+            video.style.display = 'none';
+            cameraPlaceholder.style.display = 'flex';
+            openCamBtn.style.display = 'inline-block';
+            snapBtn.style.display = 'none';
+            stopCamBtn.style.display = 'none';
+        }
+        
+        snapBtn.addEventListener('click', async () => {
+            const context = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0);
+            
+            const imageData = canvas.toDataURL('image/jpeg');
+            await processImageOCR(imageData, cameraResult);
+        });
+        
+        // ---------- Image Mode ----------
+        dropZone.addEventListener('click', () => imgFile.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--brand)';
+        });
+        
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '#cbd5e1';
+        });
+        
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#cbd5e1';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleImageFile(files[0]);
+            }
+        });
+        
+        imgFile.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleImageFile(e.target.files[0]);
+            }
+        });
+        
+        function handleImageFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError(imageResult, 'يرجى اختيار ملف صورة صحيح');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'preview-image';
+                previewBox.innerHTML = '';
+                previewBox.appendChild(img);
+                previewBox.classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
+        }
+        
+        processImgBtn.addEventListener('click', async () => {
+            const img = previewBox.querySelector('img');
+            if (!img) {
+                showError(imageResult, 'يرجى اختيار صورة أولاً');
+                return;
+            }
+            
+            await processImageOCR(img.src, imageResult);
+        });
+        
+        ttsImgBtn.addEventListener('click', () => {
+            if (currentTranslation) {
+                speakText(currentTranslation, toLang.value);
+            }
+        });
+        
+        // ---------- OCR Processing ----------
+        async function processImageOCR(imageSrc, resultContainer) {
+            showLoading(resultContainer, 'جاري استخراج النص من الصورة...');
+            
+            try {
+                console.log('🖼️ بدء معالجة الصورة للـ OCR');
+                
+                const { data: { text } } = await Tesseract.recognize(imageSrc, 'ara+eng', {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            showLoading(resultContainer, `جاري استخراج النص... ${Math.round(m.progress * 100)}%`);
+                        }
+                    }
+                });
+                
+                console.log('📝 النص المستخرج:', text.substring(0, 100) + '...');
+                
+                if (!text.trim()) {
+                    showError(resultContainer, 'لم يتم العثور على نص في الصورة. تأكد من وضوح النص في الصورة.');
+                    return;
+                }
+                
+                showLoading(resultContainer, 'جاري ترجمة النص المستخرج...');
+                
+                try {
+                    const translatedText = await translateText(text.trim(), fromLang.value, toLang.value);
+                    
+                    // Check if translation returned an error message
+                    if (translatedText.includes('خطأ في') || translatedText.includes('فشل في') || translatedText.includes('تم تجاوز')) {
+                        showError(resultContainer, `تم استخراج النص بنجاح ولكن فشلت الترجمة: ${translatedText}`);
+                    } else {
+                        showResult(resultContainer, text.trim(), translatedText, fromLang.value, toLang.value);
+                    }
+                } catch (translationError) {
+                    console.error('خطأ في ترجمة النص المستخرج:', translationError);
+                    showError(resultContainer, `تم استخراج النص: "${text.trim().substring(0, 50)}..." ولكن فشلت الترجمة.`);
+                }
+                
+            } catch (error) {
+                console.error('OCR Error:', error);
+                showError(resultContainer, 'خطأ في معالجة الصورة. يرجى المحاولة مرة أخرى.');
+            }
+        }
+        
+        // ---------- Footer Functions ----------
+        downloadHistory.addEventListener('click', () => {
+            if (translationHistory.length === 0) {
+                alert('لا يوجد سجل ترجمة للحفظ');
+                return;
+            }
+            
+            const csv = 'النص الأصلي,الترجمة,اللغة المصدر,اللغة الهدف,التاريخ\n' + 
+                translationHistory.map(item => 
+                    `"${item.original}","${item.translated}","${item.from}","${item.to}","${new Date(item.timestamp).toLocaleString('ar')}"`
+                ).join('\n');
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `translation_history_${new Date().toISOString().split('T')[0]}.csv`;
+            link.click();
+        });
+        
+        shareResult.addEventListener('click', () => {
+            if (!currentTranslation) {
+                alert('لا يوجد ترجمة للمشاركة');
+                return;
+            }
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'ترجمة من التطبيق الذكي',
+                    text: currentTranslation
+                });
+            } else {
+                navigator.clipboard.writeText(currentTranslation).then(() => {
+                    alert('تم نسخ الترجمة للحافظة');
+                });
+            }
+        });
+        
+        // ---------- Keyboard Shortcuts ----------
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                switch (e.key) {
+                    case '1':
+                        e.preventDefault();
+                        switchMode('text');
+                        break;
+                    case '2':
+                        e.preventDefault();
+                        switchMode('camera');
+                        break;
+                    case '3':
+                        e.preventDefault();
+                        switchMode('image');
+                        break;
+                    case 'Enter':
+                        e.preventDefault();
+                        const activeMode = document.querySelector('.mode.active');
+                        if (activeMode.id === 'mode_text') {
+                            translateTextBtn.click();
+                        }
+                        break;
+                }
+            }
+        });
+        
+        // ---------- Initialize ----------
+        console.log('🚀 ترجمة ذكية جاهزة!');
+        console.log('💡 اختصارات لوحة المفاتيح:');
+        console.log('   Ctrl+1: وضع النص');
+        console.log('   Ctrl+2: وضع الكاميرا');
+        console.log('   Ctrl+3: وضع الصور');
+        console.log('   Ctrl+Enter: ترجمة (في وضع النص)');
+    </script>
+</body>
+</html>
