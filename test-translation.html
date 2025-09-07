@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الترجمة - Google Translate API</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: white;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        .result {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            min-height: 50px;
+        }
+        .status {
+            font-style: italic;
+            color: #ffeb3b;
+        }
+        .error {
+            color: #ff5722;
+        }
+        .success {
+            color: #4CAF50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌍 اختبار Google Translate API</h1>
+        
+        <div class="input-group">
+            <label for="apiKey">مفتاح Google Translate API:</label>
+            <input type="password" id="apiKey" placeholder="أدخل مفتاح API الخاص بك">
+            <small style="color: #ffeb3b;">اتركه فارغاً لاستخدام MyMemory API المجاني</small>
+        </div>
+        
+        <div class="input-group">
+            <label for="sourceText">النص المراد ترجمته:</label>
+            <textarea id="sourceText" rows="4" placeholder="أدخل النص هنا...">Hello, how are you today?</textarea>
+        </div>
+        
+        <div class="input-group">
+            <label for="sourceLang">اللغة المصدر:</label>
+            <select id="sourceLang">
+                <option value="auto">تحديد تلقائي</option>
+                <option value="en" selected>English</option>
+                <option value="ar">العربية</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+            </select>
+        </div>
+        
+        <div class="input-group">
+            <label for="targetLang">اللغة المستهدفة:</label>
+            <select id="targetLang">
+                <option value="ar" selected>العربية</option>
+                <option value="en">English</option>
+                <option value="fr">Français</option>
+                <option value="es">Español</option>
+                <option value="de">Deutsch</option>
+            </select>
+        </div>
+        
+        <button onclick="testTranslation()">🔄 ترجم الآن</button>
+        <button onclick="testAllServices()">🧪 اختبر جميع الخدمات</button>
+        
+        <div class="result" id="result">
+            <div class="status">اضغط على "ترجم الآن" لبدء الاختبار</div>
+        </div>
+    </div>
+
+    <script>
+        // نسخ دالة الترجمة من dual-conversation.html
+        const GOOGLE_API_KEY = 'YOUR_GOOGLE_TRANSLATE_API_KEY';
+        
+        async function translateWithGoogle(text, targetLang, sourceLang = 'auto') {
+            if (!GOOGLE_API_KEY || GOOGLE_API_KEY === 'YOUR_GOOGLE_TRANSLATE_API_KEY') {
+                throw new Error('مفتاح Google API غير متوفر');
+            }
+            
+            const url = `https://translation.googleapis.com/language/translate/v2?key=${GOOGLE_API_KEY}`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    q: text,
+                    target: targetLang,
+                    source: sourceLang,
+                    format: 'text'
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Google Translate API Error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.data.translations[0].translatedText;
+        }
+        
+        async function translateWithMyMemory(text, targetLang, sourceLang = 'auto') {
+            const langPair = sourceLang === 'auto' ? `${targetLang}` : `${sourceLang}|${targetLang}`;
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
+            
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`MyMemory API Error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            if (data.responseStatus !== 200) {
+                throw new Error('MyMemory translation failed');
+            }
+            
+            return data.responseData.translatedText;
+        }
+        
+        function mockTranslate(text, targetLang) {
+            const mockTranslations = {
+                'Hello, how are you today?': {
+                    'ar': 'مرحباً، كيف حالك اليوم؟',
+                    'fr': 'Bonjour, comment allez-vous aujourd\'hui?',
+                    'es': 'Hola, ¿cómo estás hoy?',
+                    'de': 'Hallo, wie geht es dir heute?'
+                },
+                'مرحباً': {
+                    'en': 'Hello',
+                    'fr': 'Bonjour',
+                    'es': 'Hola',
+                    'de': 'Hallo'
+                }
+            };
+            
+            return mockTranslations[text]?.[targetLang] || `[محاكاة] ${text} -> ${targetLang}`;
+        }
+        
+        async function translateText(text, targetLang, sourceLang = 'auto', apiKey = null) {
+            const resultDiv = document.getElementById('result');
+            
+            // استخدام مفتاح API المدخل من المستخدم
+            const userApiKey = apiKey || document.getElementById('apiKey').value.trim();
+            
+            try {
+                // محاولة Google Translate أولاً
+                if (userApiKey && userApiKey !== 'YOUR_GOOGLE_TRANSLATE_API_KEY') {
+                    resultDiv.innerHTML = '<div class="status">🔄 جاري الترجمة باستخدام Google Translate...</div>';
+                    
+                    const googleUrl = `https://translation.googleapis.com/language/translate/v2?key=${userApiKey}`;
+                    const response = await fetch(googleUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            q: text,
+                            target: targetLang,
+                            source: sourceLang,
+                            format: 'text'
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        const translation = data.data.translations[0].translatedText;
+                        return { translation, service: 'Google Translate' };
+                    }
+                }
+                
+                // محاولة MyMemory كبديل
+                resultDiv.innerHTML = '<div class="status">🔄 جاري الترجمة باستخدام MyMemory...</div>';
+                const translation = await translateWithMyMemory(text, targetLang, sourceLang);
+                return { translation, service: 'MyMemory' };
+                
+            } catch (error) {
+                // استخدام المحاكاة كحل أخير
+                resultDiv.innerHTML = '<div class="status">🔄 استخدام الترجمة المحاكاة...</div>';
+                const translation = mockTranslate(text, targetLang);
+                return { translation, service: 'محاكاة' };
+            }
+        }
+        
+        async function testTranslation() {
+            const text = document.getElementById('sourceText').value.trim();
+            const sourceLang = document.getElementById('sourceLang').value;
+            const targetLang = document.getElementById('targetLang').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!text) {
+                resultDiv.innerHTML = '<div class="error">⚠️ يرجى إدخال نص للترجمة</div>';
+                return;
+            }
+            
+            try {
+                const result = await translateText(text, targetLang, sourceLang);
+                resultDiv.innerHTML = `
+                    <div class="success">✅ تمت الترجمة بنجاح</div>
+                    <div><strong>الخدمة:</strong> ${result.service}</div>
+                    <div><strong>النص الأصلي:</strong> ${text}</div>
+                    <div><strong>الترجمة:</strong> ${result.translation}</div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">❌ خطأ في الترجمة: ${error.message}</div>`;
+            }
+        }
+        
+        async function testAllServices() {
+            const text = document.getElementById('sourceText').value.trim();
+            const targetLang = document.getElementById('targetLang').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!text) {
+                resultDiv.innerHTML = '<div class="error">⚠️ يرجى إدخال نص للترجمة</div>';
+                return;
+            }
+            
+            resultDiv.innerHTML = '<div class="status">🧪 جاري اختبار جميع خدمات الترجمة...</div>';
+            
+            let results = [];
+            
+            // اختبار Google Translate
+            try {
+                const apiKey = document.getElementById('apiKey').value.trim();
+                if (apiKey) {
+                    const googleResult = await translateWithGoogle(text, targetLang, 'auto');
+                    results.push({ service: 'Google Translate', result: googleResult, status: 'نجح' });
+                } else {
+                    results.push({ service: 'Google Translate', result: 'مفتاح API غير متوفر', status: 'تخطي' });
+                }
+            } catch (error) {
+                results.push({ service: 'Google Translate', result: error.message, status: 'فشل' });
+            }
+            
+            // اختبار MyMemory
+            try {
+                const myMemoryResult = await translateWithMyMemory(text, targetLang, 'auto');
+                results.push({ service: 'MyMemory', result: myMemoryResult, status: 'نجح' });
+            } catch (error) {
+                results.push({ service: 'MyMemory', result: error.message, status: 'فشل' });
+            }
+            
+            // اختبار المحاكاة
+            try {
+                const mockResult = mockTranslate(text, targetLang);
+                results.push({ service: 'محاكاة', result: mockResult, status: 'نجح' });
+            } catch (error) {
+                results.push({ service: 'محاكاة', result: error.message, status: 'فشل' });
+            }
+            
+            // عرض النتائج
+            let html = '<h3>📊 نتائج اختبار جميع الخدمات:</h3>';
+            results.forEach(item => {
+                const statusClass = item.status === 'نجح' ? 'success' : item.status === 'فشل' ? 'error' : 'status';
+                html += `
+                    <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.1); border-radius: 5px;">
+                        <strong>${item.service}:</strong> 
+                        <span class="${statusClass}">${item.status}</span><br>
+                        <em>${item.result}</em>
+                    </div>
+                `;
+            });
+            
+            resultDiv.innerHTML = html;
+        }
+    </script>
+</body>
+</html>
