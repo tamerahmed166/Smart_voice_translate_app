@@ -1,87 +1,151 @@
 <!DOCTYPE html>
-<html lang="en">
+<html dir="rtl" lang="ar">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>Sign Up - Instant Translation</title>
-    <link rel="icon" href="logo-new.svg" type="image/svg+xml">
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&amp;display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet"/>
-    <style type="text/tailwindcss">
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>تسجيل الدخول - تطبيق الترجمة الذكية</title>
+    <link href="logo-new.svg" rel="icon" type="image/svg+xml">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+    <meta content="yes" name="apple-mobile-web-app-capable">
+    <meta content="default" name="apple-mobile-web-app-status-bar-style">
+    <meta content="تطبيق الترجمة الذكية" name="apple-mobile-web-app-title">
+    <style>
         :root {
-            --primary-color: #1380ec;
-            --background-color: #f0f2f4;
-            --text-primary: #111418;
-            --text-secondary: #617589;
-            --white: #ffffff;
+            --primary-color: #667eea;
+            --secondary-color: #764ba2;
+            --accent-color: #f093fb;
+            --background-color: #f8fafc;
+            --text-primary: #1a202c;
+            --text-secondary: #4a5568;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
         }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Cairo', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .tab-btn {
-            color: #617589;
+
+        .tab-button {
             background: transparent;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--text-secondary);
         }
-        .tab-btn.active {
-            color: #1380ec;
-            background: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
+
         .form-container {
             display: none;
         }
+
         .form-container.active {
             display: block;
+            animation: fadeIn 0.3s ease-in-out;
         }
-    </style>
-    <style>
-        body {
-            min-height: 100vh;
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
+
         .login-container {
-            max-width: 500px;
-            margin: 0 auto;
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            max-width: 450px;
+            width: 100%;
+            margin: 20px;
         }
-        @media (max-width: 768px) {
-            .login-container {
-                max-width: 100%;
-                margin: 0;
-            }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1000;
+            margin-bottom: 5px;
+        }
+
+        .tooltip:hover::before {
+            content: '';
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 5px solid transparent;
+            border-top-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .animate-pulse {
+            animation: pulse 2s infinite;
         }
     </style>
 </head>
-<body class="bg-white">
+<body>
     <div class="login-container">
-    <div class="flex flex-col min-h-screen">
-        <header class="flex items-center justify-between p-4 border-b border-gray-200">
-            <button onclick="window.location.href='index.html'" class="p-2 rounded-lg transition-all duration-300 hover:transform hover:scale-105 tooltip" data-tooltip="العودة للصفحة الرئيسية" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">
-                <span class="material-symbols-outlined">arrow_back</span>
+        <header class="flex justify-between items-center p-6 border-b border-gray-200">
+            <button class="p-2 rounded-full hover:bg-gray-100 transition-colors" onclick="window.history.back()">
+                <span class="material-symbols-outlined text-[var(--text-secondary)]">arrow_forward</span>
             </button>
-            <div class="flex items-center gap-2">
-                <img src="logo-new.svg" alt="Logo" style="width: 80px; height: 80px;">
-                <h1 id="page-title" class="text-xl font-bold text-gray-900">تسجيل الدخول</h1>
-            </div>
-            <button onclick="window.location.href='settings.html'" class="p-2 rounded-lg transition-all duration-300 hover:transform hover:scale-105 tooltip" data-tooltip="إعدادات التطبيق" style="background: rgba(102, 126, 234, 0.1); color: #667eea;">
-                <span class="material-symbols-outlined">settings</span>
+            <button class="p-2 rounded-full hover:bg-gray-100 transition-colors" onclick="window.location.href='settings.html'">
+                <span class="material-symbols-outlined text-[var(--text-secondary)]">settings</span>
             </button>
         </header>
-        <main class="flex-grow p-6 space-y-6">
-            <!-- تبديل بين تسجيل الدخول وإنشاء الحساب -->
-            <div class="flex bg-gray-100 rounded-lg p-1 mb-6">
-                <button id="login-tab" class="tab-btn flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 active tooltip" data-tooltip="تسجيل الدخول بحساب موجود" data-tab="login">
-                    تسجيل الدخول
-                </button>
-                <button id="register-tab" class="tab-btn flex-1 py-2 px-4 rounded-md text-sm font-medium transition-all duration-300 tooltip" data-tooltip="إنشاء حساب جديد" data-tab="register">
-                    إنشاء حساب
-                </button>
+        
+        <div class="text-center p-6 border-b border-gray-200">
+            <img alt="شعار التطبيق" class="w-16 h-16 mx-auto mb-4" src="logo-new.svg"/>
+            <h1 id="page-title" class="text-2xl font-bold text-[var(--text-primary)] mb-2">تسجيل الدخول</h1>
+            <p class="text-[var(--text-secondary)]">مرحباً بك في تطبيق الترجمة الذكية</p>
+        </div>
+        
+        <main class="p-6">
+            <!-- أزرار التبديل بين تسجيل الدخول وإنشاء الحساب -->
+            <div class="flex bg-gray-100 rounded-full p-1 mb-6">
+                <button id="login-tab" class="tab-button flex-1 active">تسجيل الدخول</button>
+                <button id="register-tab" class="tab-button flex-1">إنشاء حساب</button>
             </div>
-
+            
             <!-- نموذج تسجيل الدخول -->
             <div id="login-form" class="form-container active">
                 <div class="space-y-4">
@@ -94,8 +158,8 @@
                         <input class="mt-1 w-full p-4 rounded-lg border-gray-300 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-[var(--background-color)] placeholder:text-[var(--text-secondary)] text-base" id="login-password" placeholder="أدخل كلمة المرور" type="password"/>
                     </div>
                 </div>
-                <button class="w-full text-white font-bold py-4 px-4 rounded-xl text-base transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg mt-6 tooltip" data-tooltip="تسجيل الدخول إلى حسابك" style="background: linear-gradient(135deg, #667eea, #764ba2); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3); border-radius: 15px;">
-                    تسجيل الدخول
+                <button class="w-full text-white font-bold py-5 px-6 rounded-2xl text-base transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl mt-6 tooltip" data-tooltip="ادخل إلى عالم الترجمة الذكية" style="background: linear-gradient(135deg, #4f46e5, #7c3aed, #ec4899); box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4); border-radius: 20px;">
+                    🔐 دخول سريع وآمن
                 </button>
             </div>
 
@@ -115,8 +179,8 @@
                         <input class="mt-1 w-full p-4 rounded-lg border-gray-300 focus:ring-[var(--primary-color)] focus:border-[var(--primary-color)] bg-[var(--background-color)] placeholder:text-[var(--text-secondary)] text-base" id="confirm-password" placeholder="أكد كلمة المرور" type="password"/>
                     </div>
                 </div>
-                <button class="w-full text-white font-bold py-4 px-4 rounded-xl text-base transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg mt-6 tooltip" data-tooltip="إنشاء حساب جديد" style="background: linear-gradient(135deg, #667eea, #764ba2); box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3); border-radius: 15px;">
-                    إنشاء حساب
+                <button class="w-full text-white font-bold py-5 px-6 rounded-2xl text-base transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl mt-6 tooltip" data-tooltip="انضم إلى مجتمع المترجمين الأذكياء" style="background: linear-gradient(135deg, #059669, #0891b2, #7c3aed); box-shadow: 0 8px 25px rgba(5, 150, 105, 0.4); border-radius: 20px;">
+                    ✨ انضم إلينا الآن
                 </button>
             </div>
 
@@ -144,9 +208,9 @@
                 <div class="flex-grow border-t border-gray-300"></div>
             </div>
             
-            <button id="guest-mode-btn" class="flex items-center justify-center w-full bg-gradient-to-r from-orange-400 to-pink-400 text-white font-semibold py-4 px-4 rounded-xl transition-all duration-300 hover:transform hover:scale-105 hover:shadow-lg tooltip" data-tooltip="استخدم التطبيق لمدة 30 دقيقة بدون تسجيل" style="box-shadow: 0 6px 20px rgba(251, 146, 60, 0.3); border-radius: 15px;">
-                <span class="material-symbols-outlined mr-3">schedule</span>
-                <span>تجربة التطبيق بدون تسجيل (30 دقيقة)</span>
+            <button id="guest-mode-btn" class="flex items-center justify-center w-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 text-white font-bold py-5 px-6 rounded-2xl transition-all duration-300 hover:transform hover:scale-105 hover:shadow-2xl tooltip animate-pulse" data-tooltip="استمتع بساعة كاملة من الترجمة الذكية مجاناً!" style="box-shadow: 0 8px 25px rgba(168, 85, 247, 0.4); border-radius: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                <span class="material-symbols-outlined mr-3 text-2xl">star</span>
+                <span>🚀 جرب الآن مجاناً لمدة ساعة كاملة! ✨</span>
             </button>
         </main>
         <footer class="p-6 text-center">
@@ -167,7 +231,6 @@
             const pageTitle = document.getElementById('page-title');
             const socialText = document.getElementById('social-text');
             const googleText = document.getElementById('google-text');
-
             const phoneText = document.getElementById('phone-text');
             const footerText = document.getElementById('footer-text');
             
@@ -183,7 +246,6 @@
                 pageTitle.textContent = 'تسجيل الدخول';
                 socialText.textContent = 'أو سجل دخولك عبر';
                 googleText.textContent = 'تسجيل الدخول عبر Google';
-
                 phoneText.textContent = 'تسجيل الدخول برقم الهاتف';
                 footerText.innerHTML = 'ليس لديك حساب؟ <a class="font-medium text-[var(--primary-color)] hover:underline" href="#" onclick="switchToRegister()">إنشاء حساب جديد</a>';
             } else {
@@ -192,7 +254,6 @@
                 pageTitle.textContent = 'إنشاء حساب جديد';
                 socialText.textContent = 'أو أنشئ حسابك عبر';
                 googleText.textContent = 'إنشاء حساب عبر Google';
-
                 phoneText.textContent = 'إنشاء حساب برقم الهاتف';
                 footerText.innerHTML = 'لديك حساب بالفعل؟ <a class="font-medium text-[var(--primary-color)] hover:underline" href="#" onclick="switchToLogin()">تسجيل الدخول</a>';
             }
@@ -239,11 +300,11 @@
         }
         
         function startGuestSession() {
-            // إنشاء جلسة مؤقتة لمدة 30 دقيقة
+            // إنشاء جلسة مؤقتة لمدة ساعة كاملة
             const guestSession = {
                 isGuest: true,
                 startTime: Date.now(),
-                duration: 30 * 60 * 1000, // 30 دقيقة بالميلي ثانية
+                duration: 60 * 60 * 1000, // 60 دقيقة (ساعة كاملة) بالميلي ثانية
                 email: 'guest@temp.com',
                 name: 'مستخدم مؤقت'
             };
