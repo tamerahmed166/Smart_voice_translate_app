@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>معاينة التطبيق - الترجمة الثنائية المتقدمة</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 2.5em;
+        }
+        .preview-btn {
+            background: linear-gradient(45deg, #3b82f6, #10b981);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2em;
+            cursor: pointer;
+            margin: 10px;
+            transition: transform 0.3s ease;
+        }
+        .preview-btn:hover {
+            transform: translateY(-2px);
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            background: #f0f9ff;
+            border: 1px solid #3b82f6;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎯 معاينة التطبيق</h1>
+        <p>تم تحديث التطبيق بنجاح مع التحسينات التالية:</p>
+        <ul style="text-align: right; margin: 20px 0;">
+            <li>✅ تحديث العنوان إلى "الترجمة الثنائية المتقدمة - مترجم صوتي"</li>
+            <li>✅ إضافة الشعار الجديد logo-new.svg</li>
+            <li>✅ تعليمات Google Translate API</li>
+            <li>✅ تحديث متغيرات CSS الجديدة</li>
+            <li>✅ مزامنة جميع المجلدات</li>
+        </ul>
+        
+        <button class="preview-btn" onclick="openApp()">🚀 فتح التطبيق الرئيسي</button>
+        <button class="preview-btn" onclick="openIndex()">🏠 فتح الصفحة الرئيسية</button>
+        
+        <div class="status">
+            <strong>حالة التطبيق:</strong> جاهز للاستخدام ✨<br>
+            <strong>المجلدات المحدثة:</strong> github-deployment, google-play-deployment, backup_enhanced_version
+        </div>
+    </div>
+    
+    <script>
+        function openApp() {
+            window.open('dual-conversation.html', '_blank');
+        }
+        
+        function openIndex() {
+            window.open('index.html', '_blank');
+        }
+    </script>
+</body>
+</html>

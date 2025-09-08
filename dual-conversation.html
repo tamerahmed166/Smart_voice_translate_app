@@ -1422,29 +1422,88 @@
         }
         
         function initializeSpeechRecognition() {
-            if ('webkitSpeechRecognition' in window) {
-                recognition = new webkitSpeechRecognition();
-                recognition.continuous = false;
-                recognition.interimResults = false;
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                // تحسين إعدادات التعرف على الصوت
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.maxAlternatives = 3;
                 recognition.lang = 'ar-SA';
                 
+                recognition.onstart = function() {
+                    console.log('Speech recognition started');
+                };
+                
                 recognition.onresult = function(event) {
-                    const transcript = event.results[0][0].transcript;
-                    handleSpeechResult(transcript);
+                    let finalTranscript = '';
+                    let interimTranscript = '';
+                    
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    
+                    // معالجة النتائج المؤقتة للعرض المباشر
+                    if (interimTranscript.trim()) {
+                        handleSpeechResult(interimTranscript.trim(), false);
+                    }
+                    
+                    // معالجة النص النهائي للترجمة
+                    if (finalTranscript.trim()) {
+                        handleSpeechResult(finalTranscript.trim(), true);
+                    }
                 };
                 
                 recognition.onerror = function(event) {
                     console.error('Speech recognition error:', event.error);
+                    
+                    let errorMessage = 'خطأ في التعرف على الكلام';
+                    switch(event.error) {
+                        case 'no-speech':
+                            errorMessage = 'لم يتم اكتشاف أي كلام. حاول مرة أخرى.';
+                            break;
+                        case 'audio-capture':
+                            errorMessage = 'لا يمكن الوصول للميكروفون. تأكد من الأذونات.';
+                            break;
+                        case 'not-allowed':
+                            errorMessage = 'تم رفض الإذن للوصول للميكروفون.';
+                            break;
+                        case 'network':
+                            errorMessage = 'خطأ في الشبكة. تحقق من الاتصال.';
+                            break;
+                        default:
+                            errorMessage += ': ' + event.error;
+                    }
+                    
                     stopRecording();
-                    showNotification('خطأ في التعرف على الكلام: ' + event.error, 'error');
+                    showNotification(errorMessage, 'error');
                 };
                 
                 recognition.onend = function() {
-                    stopRecording();
+                    console.log('Speech recognition ended');
+                    if (isRecording) {
+                        // إعادة تشغيل التسجيل إذا كان لا يزال نشطاً
+                        setTimeout(() => {
+                            if (isRecording && recognition) {
+                                try {
+                                    recognition.start();
+                                } catch (error) {
+                                    console.error('Error restarting recognition:', error);
+                                    stopRecording();
+                                }
+                            }
+                        }, 100);
+                    }
                 };
             } else {
                 console.warn('Speech recognition not supported');
-                showNotification('التعرف على الكلام غير مدعوم في هذا المتصفح', 'warning');
+                showNotification('التعرف على الكلام غير مدعوم في هذا المتصفح. يرجى استخدام Chrome أو Edge.', 'warning');
             }
         }
         
@@ -1459,41 +1518,67 @@
                 return;
             }
             
-            currentSpeaker = speaker;
-            isRecording = true;
-            
-            // Update UI with enhanced visual feedback
-            const micBtn = document.getElementById(`mic${speaker}`);
-            const recordingIndicator = document.getElementById(`recordingIndicator${speaker}`);
-            const voiceVisualizer = document.getElementById(`voiceVisualizer${speaker}`);
-            
-            micBtn.classList.add('recording');
-            micBtn.innerHTML = '⏹️';
-            recordingIndicator.classList.add('active');
-            voiceVisualizer.classList.add('active');
-            
-            // Set recognition language
-            const lang1 = document.getElementById('lang1').value;
-            if (lang1 !== 'auto') {
-                recognition.lang = getRecognitionLanguage(lang1);
-            }
-            
-            // Add listening state after a short delay
-            setTimeout(() => {
-                if (isRecording) {
-                    micBtn.classList.add('listening');
-                }
-            }, 500);
-            
-            // Haptic feedback if available
-            if (navigator.vibrate) {
-                navigator.vibrate(100);
-            }
-            
-            // Audio feedback
-            playNotificationSound('start');
-            
-            recognition.start();
+            // طلب إذن الميكروفون أولاً
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(() => {
+                    currentSpeaker = speaker;
+                    isRecording = true;
+                    
+                    // Update UI with enhanced visual feedback
+                    const micBtn = document.getElementById(`mic${speaker}`);
+                    const recordingIndicator = document.getElementById(`recordingIndicator${speaker}`);
+                    const voiceVisualizer = document.getElementById(`voiceVisualizer${speaker}`);
+                    
+                    if (micBtn) {
+                        micBtn.classList.add('recording');
+                        micBtn.innerHTML = '⏹️';
+                    }
+                    if (recordingIndicator) {
+                        recordingIndicator.classList.add('active');
+                    }
+                    if (voiceVisualizer) {
+                        voiceVisualizer.classList.add('active');
+                    }
+                    
+                    // Set recognition language based on speaker
+                    const lang1 = document.getElementById('lang1').value;
+                    const lang2 = document.getElementById('lang2').value;
+                    
+                    let sourceLang = speaker === 1 ? lang1 : lang2;
+                    if (sourceLang !== 'auto') {
+                        recognition.lang = getRecognitionLanguage(sourceLang);
+                    } else {
+                        recognition.lang = 'ar-SA'; // افتراضي
+                    }
+                    
+                    // Add listening state after a short delay
+                    setTimeout(() => {
+                        if (isRecording && micBtn) {
+                            micBtn.classList.add('listening');
+                        }
+                    }, 500);
+                    
+                    // Haptic feedback if available
+                    if (navigator.vibrate) {
+                        navigator.vibrate(100);
+                    }
+                    
+                    // Audio feedback
+                    playNotificationSound('start');
+                    
+                    try {
+                        recognition.start();
+                        showNotification('بدء التسجيل...', 'info');
+                    } catch (error) {
+                        console.error('Error starting recognition:', error);
+                        stopRecording();
+                        showNotification('خطأ في بدء التسجيل', 'error');
+                    }
+                })
+                .catch((error) => {
+                    console.error('Microphone access denied:', error);
+                    showNotification('تم رفض الوصول للميكروفون. يرجى السماح بالوصول للميكروفون في إعدادات المتصفح.', 'error');
+                });
         }
         
         function startVoiceRecording() {
@@ -1547,7 +1632,11 @@
             isRecording = false;
             
             if (recognition) {
-                recognition.stop();
+                try {
+                    recognition.stop();
+                } catch (error) {
+                    console.error('Error stopping recognition:', error);
+                }
             }
             
             // Reset UI with enhanced visual feedback
@@ -1555,6 +1644,33 @@
                 const micBtn = document.getElementById(`mic${currentSpeaker}`);
                 const recordingIndicator = document.getElementById(`recordingIndicator${currentSpeaker}`);
                 const voiceVisualizer = document.getElementById(`voiceVisualizer${currentSpeaker}`);
+                
+                if (micBtn) {
+                    micBtn.classList.remove('recording', 'listening');
+                    micBtn.innerHTML = '🎤';
+                }
+                if (recordingIndicator) {
+                    recordingIndicator.classList.remove('active');
+                }
+                if (voiceVisualizer) {
+                    voiceVisualizer.classList.remove('active');
+                }
+            } else if (currentMode === 'remote') {
+                const voiceBtn = document.getElementById('voiceBtn');
+                if (voiceBtn) {
+                    voiceBtn.classList.remove('recording');
+                    voiceBtn.innerHTML = '🎤';
+                }
+            }
+            
+            // Audio feedback
+            playNotificationSound('stop');
+            
+            // Reset current speaker
+            currentSpeaker = null;
+            
+            showNotification('تم إيقاف التسجيل', 'info');
+        }
                 
                 micBtn.classList.remove('recording', 'listening');
                 micBtn.innerHTML = '🎤';
@@ -1602,17 +1718,77 @@
             }
         }
         
-        function handleSpeechResult(transcript) {
+        function handleSpeechResult(transcript, isFinal = true) {
+            if (!transcript || !transcript.trim()) {
+                console.warn('Empty transcript received');
+                return;
+            }
+            
+            const cleanTranscript = transcript.trim();
+            console.log('Speech result received:', cleanTranscript, 'Final:', isFinal);
+            
+            // Show live transcript for interim results
+            if (!isFinal && currentMode === 'face-to-face') {
+                showLiveTranscript(cleanTranscript);
+                return;
+            }
+            
+            // Clear live transcript
+            clearLiveTranscript();
+            
             if (currentMode === 'face-to-face') {
-                handleFaceToFaceSpeech(transcript);
+                handleFaceToFaceSpeech(cleanTranscript);
             } else if (currentMode === 'remote') {
-                handleRemoteSpeech(transcript);
+                handleRemoteSpeech(cleanTranscript);
             }
         }
         
-        async function handleFaceToFaceSpeech(transcript) {
+        function showLiveTranscript(transcript) {
             if (!currentSpeaker) return;
             
+            const conversationArea = document.getElementById(`conversation${currentSpeaker}`);
+            if (!conversationArea) return;
+            
+            let liveElement = conversationArea.querySelector('.live-transcript');
+            if (!liveElement) {
+                liveElement = document.createElement('div');
+                liveElement.className = 'live-transcript';
+                liveElement.style.cssText = `
+                    background: rgba(74, 144, 226, 0.1);
+                    border: 1px dashed #4a90e2;
+                    border-radius: 8px;
+                    padding: 10px;
+                    margin: 5px 0;
+                    font-style: italic;
+                    opacity: 0.8;
+                    animation: pulse 1.5s infinite;
+                `;
+                conversationArea.appendChild(liveElement);
+            }
+            
+            liveElement.textContent = `🎤 ${transcript}`;
+        }
+        
+        function clearLiveTranscript() {
+            const liveElements = document.querySelectorAll('.live-transcript');
+            liveElements.forEach(element => {
+                element.style.transition = 'opacity 0.3s';
+                element.style.opacity = '0';
+                setTimeout(() => {
+                    if (element.parentNode) {
+                        element.parentNode.removeChild(element);
+                    }
+                }, 300);
+            });
+        }
+        
+        async function handleFaceToFaceSpeech(transcript) {
+            if (!currentSpeaker || !transcript.trim()) {
+                console.warn('No current speaker or empty transcript');
+                return;
+            }
+            
+            const cleanTranscript = transcript.trim();
             const lang1 = document.getElementById('lang1').value;
             const lang2 = document.getElementById('lang2').value;
             
@@ -1625,34 +1801,52 @@
                 targetLang = lang1;
             }
             
+            console.log(`Processing speech from speaker ${currentSpeaker}: ${cleanTranscript}`);
+            console.log(`Translation: ${sourceLang} → ${targetLang}`);
+            
             // Add original message
-            addMessageToConversation(currentSpeaker, transcript, 'original');
+            const originalId = addMessageToConversation(currentSpeaker, cleanTranscript, 'original');
             
             // Add processing message with visual feedback
-            const processingId = addMessageToConversation(currentSpeaker, 'جاري الترجمة', 'processing');
+            const processingId = addMessageToConversation(currentSpeaker, 'جاري الترجمة...', 'processing');
             
             try {
                 // Translate the text
-                const translatedText = await translateText(transcript, sourceLang, targetLang);
+                const translatedText = await translateText(cleanTranscript, sourceLang, targetLang);
+                
+                if (!translatedText || translatedText.trim() === '') {
+                    throw new Error('Empty translation result');
+                }
                 
                 // Remove processing message
                 removeMessageFromConversation(processingId);
                 
                 // Add translated message
-                addMessageToConversation(currentSpeaker, translatedText, 'translated');
+                const translatedId = addMessageToConversation(currentSpeaker, translatedText, 'translated');
                 
                 // Success feedback
                 playNotificationSound('success');
+                showNotification('تمت الترجمة بنجاح', 'success');
                 
                 // Speak the translation automatically if enabled
                 if (ttsSettings.autoPlay) {
-                    speakText(translatedText, targetLang);
+                    try {
+                        await speakText(translatedText, targetLang);
+                    } catch (ttsError) {
+                        console.warn('TTS failed:', ttsError);
+                        showNotification('فشل في تشغيل الصوت', 'warning');
+                    }
                 }
+                
+                console.log('Translation completed successfully');
                 
             } catch (error) {
                 console.error('Translation error:', error);
                 // Remove processing message
                 removeMessageFromConversation(processingId);
+                
+                // Add error message
+                addMessageToConversation(currentSpeaker, 'فشل في الترجمة، يرجى المحاولة مرة أخرى', 'error');
                 showNotification('خطأ في الترجمة', 'error');
             }
         }
@@ -1719,18 +1913,29 @@
         const TRANSLATE_API_URL = 'https://translation.googleapis.com/language/translate/v2';
         
         async function translateText(text, sourceLang, targetLang) {
+            if (!text || !text.trim()) {
+                console.warn('Empty text provided for translation');
+                return text;
+            }
+            
+            const cleanText = text.trim();
+            console.log(`Translating: "${cleanText}" from ${sourceLang} to ${targetLang}`);
+            
             try {
                 // التحقق من وجود مفتاح Google API
                 if (GOOGLE_API_KEY && GOOGLE_API_KEY !== 'YOUR_GOOGLE_TRANSLATE_API_KEY') {
-                    return await translateWithGoogle(text, sourceLang, targetLang);
+                    console.log('Using Google Translate API');
+                    return await translateWithGoogle(cleanText, sourceLang, targetLang);
                 } else {
+                    console.log('Using MyMemory API as fallback');
                     // استخدام MyMemory API كبديل مجاني
-                    return await translateWithMyMemory(text, sourceLang, targetLang);
+                    return await translateWithMyMemory(cleanText, sourceLang, targetLang);
                 }
             } catch (error) {
                 console.error('Translation error:', error);
+                console.log('Using simulation as final fallback');
                 // في حالة فشل جميع الطرق، استخدم الترجمة المحاكاة
-                return await simulateTranslation(text, sourceLang, targetLang);
+                return await simulateTranslation(cleanText, sourceLang, targetLang);
             }
         }
         
@@ -1768,15 +1973,32 @@
         
         // MyMemory API function (free alternative)
         async function translateWithMyMemory(text, sourceLang, targetLang) {
-            const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${sourceLang}|${targetLang}`;
+            const langPair = sourceLang === 'auto' ? `auto|${targetLang}` : `${sourceLang}|${targetLang}`;
+            const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
             
-            const response = await fetch(apiUrl);
+            console.log('MyMemory API URL:', apiUrl);
+            
+            const response = await fetch(apiUrl, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`MyMemory API HTTP Error: ${response.status}`);
+            }
+            
             const data = await response.json();
+            console.log('MyMemory API Response:', data);
             
-            if (data.responseStatus === 200) {
-                return data.responseData.translatedText;
+            if (data.responseStatus === 200 && data.responseData && data.responseData.translatedText) {
+                const translatedText = data.responseData.translatedText;
+                console.log('MyMemory translation successful:', translatedText);
+                return translatedText;
             } else {
-                throw new Error(`MyMemory API Error: ${data.responseStatus}`);
+                console.warn('MyMemory API returned error or empty result:', data);
+                throw new Error(`MyMemory API Error: ${data.responseStatus || 'Unknown error'}`);
             }
         }
         
