@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الترجمة الثنائية المتقدمة - مترجم صوتي</title>
+    <title>الترجمة الثنائية - مترجم صوتي</title>
     <!-- 
         تعليمات استخدام Google Translate API:
         1. احصل على مفتاح API من Google Cloud Console
@@ -384,6 +384,63 @@
         .mic-button.listening {
             background: var(--warning-color);
             animation: listening 1s infinite alternate;
+        }
+        
+        /* تحسينات الأزرار الجديدة */
+        .mic-button.enhanced {
+            width: 80px;
+            height: 80px;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .mic-button.enhanced .mic-icon {
+            font-size: 1.8rem;
+        }
+        
+        .mic-button.enhanced .mic-text {
+            font-size: 0.7rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        /* مؤشرات حالة المتحدث */
+        .speaker-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-size: 0.8rem;
+        }
+        
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .status-indicator.ready {
+            background: #28a745;
+            box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+        }
+        
+        .status-indicator.speaking {
+            background: #ffc107;
+            animation: pulse 1s infinite;
+        }
+        
+        .status-indicator.processing {
+            background: #17a2b8;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         
         @keyframes pulse {
@@ -942,7 +999,7 @@
         <header class="header">
             <div class="logo-section">
                 <img src="logo-new.svg" alt="Logo" class="logo" style="width: 40px; height: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
-                <h1 class="app-title">الترجمة الثنائية المتقدمة</h1>
+                <h1 class="app-title">الترجمة الثنائية</h1>
             </div>
             <div class="mode-selector">
                 <button class="mode-btn active" data-mode="face-to-face">
@@ -955,6 +1012,9 @@
             <div class="header-actions">
                 <button class="home-btn" onclick="window.location.href='index.html'" title="القائمة الرئيسية">
                     🏠 الرئيسية
+                </button>
+                <button class="settings-btn" onclick="window.location.href='settings.html'" title="الإعدادات">
+                    ⚙️ الإعدادات
                 </button>
             </div>
         </header>
@@ -1142,6 +1202,10 @@
                     <div class="person-panel person1">
                         <div class="person-header">
                             <h3 class="person-title">👤 المتحدث الأول</h3>
+                            <div class="speaker-status" id="speakerStatus1">
+                                <span class="status-text">جاهز للتحدث</span>
+                                <div class="status-indicator ready"></div>
+                            </div>
                             <div class="recording-indicator" id="recordingIndicator1">🔴 جاري التسجيل</div>
                             <div class="voice-visualizer" id="voiceVisualizer1">
                                 <div class="voice-bar"></div>
@@ -1155,8 +1219,9 @@
                                 <button class="tts-btn" id="ttsToggleBtn" title="تفعيل/إلغاء TTS">🗣️</button>
                                 <button class="tts-btn" id="ttsSpeedBtn" title="سرعة القراءة">⚡</button>
                             </div>
-                            <button class="mic-button" id="mic1" title="اضغط للتحدث">
-                                🎤
+                            <button class="mic-button enhanced" id="mic1" title="اضغط للتحدث">
+                                <span class="mic-icon">🎤</span>
+                                <span class="mic-text">اضغط للتحدث</span>
                             </button>
                         </div>
                         <div class="conversation-area" id="conversation1">
@@ -1168,6 +1233,10 @@
                     <div class="person-panel person2">
                         <div class="person-header">
                             <h3 class="person-title">👤 المتحدث الثاني</h3>
+                            <div class="speaker-status" id="speakerStatus2">
+                                <span class="status-text">جاهز للتحدث</span>
+                                <div class="status-indicator ready"></div>
+                            </div>
                             <div class="recording-indicator" id="recordingIndicator2">🔴 جاري التسجيل</div>
                             <div class="voice-visualizer" id="voiceVisualizer2">
                                 <div class="voice-bar"></div>
@@ -1179,8 +1248,9 @@
                             <div class="tts-controls">
                                 <div class="tts-indicator" id="ttsIndicator">🔊 جاري القراءة...</div>
                             </div>
-                            <button class="mic-button" id="mic2" title="اضغط للتحدث">
-                                🎤
+                            <button class="mic-button enhanced" id="mic2" title="اضغط للتحدث">
+                                <span class="mic-icon">🎤</span>
+                                <span class="mic-text">اضغط للتحدث</span>
                             </button>
                         </div>
                         <div class="conversation-area" id="conversation2">
@@ -1426,36 +1496,67 @@
                 const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
                 
-                // تحسين إعدادات التعرف على الصوت
+                // تحسين إعدادات التعرف على الصوت للحصول على أفضل أداء
                 recognition.continuous = true;
                 recognition.interimResults = true;
-                recognition.maxAlternatives = 3;
+                recognition.maxAlternatives = 5; // زيادة البدائل للحصول على دقة أفضل
                 recognition.lang = 'ar-SA';
+                
+                // إعدادات إضافية لتحسين الأداء
+                if ('grammars' in recognition) {
+                    recognition.grammars = new (window.SpeechGrammarList || window.webkitSpeechGrammarList)();
+                }
+                
+                // تحسين الحساسية والدقة
+                if ('serviceURI' in recognition) {
+                    recognition.serviceURI = 'wss://www.google.com/speech-api/v2/recognize';
+                }
                 
                 recognition.onstart = function() {
                     console.log('Speech recognition started');
                 };
                 
                 recognition.onresult = function(event) {
+                    // تحديث حالة المتحدث إلى يتحدث عند بدء التعرف على الكلام
+                    if (currentSpeaker) {
+                        updateSpeakerStatus(currentSpeaker, 'speaking', 'يتحدث الآن...');
+                    }
+                    
                     let finalTranscript = '';
                     let interimTranscript = '';
+                    let confidence = 0;
                     
                     for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcript = event.results[i][0].transcript;
-                        if (event.results[i].isFinal) {
+                        const result = event.results[i];
+                        const transcript = result[0].transcript;
+                        
+                        // اختيار أفضل نتيجة بناءً على الثقة
+                        if (result.length > 1) {
+                            let bestResult = result[0];
+                            for (let j = 1; j < result.length; j++) {
+                                if (result[j].confidence > bestResult.confidence) {
+                                    bestResult = result[j];
+                                }
+                            }
+                            transcript = bestResult.transcript;
+                            confidence = bestResult.confidence;
+                        }
+                        
+                        if (result.isFinal) {
                             finalTranscript += transcript;
                         } else {
                             interimTranscript += transcript;
                         }
                     }
                     
-                    // معالجة النتائج المؤقتة للعرض المباشر
-                    if (interimTranscript.trim()) {
+                    // معالجة النتائج المؤقتة للعرض المباشر (فقط إذا كانت الثقة عالية)
+                    if (interimTranscript.trim() && confidence > 0.7) {
                         handleSpeechResult(interimTranscript.trim(), false);
                     }
                     
                     // معالجة النص النهائي للترجمة
                     if (finalTranscript.trim()) {
+                        console.log('Final transcript with confidence:', finalTranscript, confidence);
                         handleSpeechResult(finalTranscript.trim(), true);
                     }
                 };
@@ -1488,22 +1589,55 @@
                 recognition.onend = function() {
                     console.log('Speech recognition ended');
                     if (isRecording) {
-                        // إعادة تشغيل التسجيل إذا كان لا يزال نشطاً
+                        // إعادة تشغيل التسجيل إذا كان لا يزال نشطاً مع تحسينات
                         setTimeout(() => {
                             if (isRecording && recognition) {
                                 try {
+                                    // تحديث لغة التعرف حسب المتحدث الحالي
+                                    const lang1 = document.getElementById('lang1').value;
+                                    const lang2 = document.getElementById('lang2').value;
+                                    recognition.lang = currentSpeaker === 1 ? lang1 : lang2;
+                                    
                                     recognition.start();
+                                    console.log('Recognition restarted with language:', recognition.lang);
                                 } catch (error) {
                                     console.error('Error restarting recognition:', error);
-                                    stopRecording();
+                                    // محاولة إعادة التهيئة في حالة الفشل
+                                    if (error.name === 'InvalidStateError') {
+                                        setTimeout(() => {
+                                            try {
+                                                recognition.start();
+                                            } catch (retryError) {
+                                                console.error('Retry failed:', retryError);
+                                                stopRecording();
+                                                showNotification('فشل في إعادة تشغيل التسجيل', 'error');
+                                            }
+                                        }, 500);
+                                    } else {
+                                        stopRecording();
+                                    }
                                 }
                             }
-                        }, 100);
+                        }, 200); // زيادة التأخير قليلاً لضمان الاستقرار
                     }
                 };
             } else {
                 console.warn('Speech recognition not supported');
                 showNotification('التعرف على الكلام غير مدعوم في هذا المتصفح. يرجى استخدام Chrome أو Edge.', 'warning');
+            }
+        }
+        
+        // دالة تحديث حالة المتحدث
+        function updateSpeakerStatus(speaker, status, text) {
+            const statusElement = document.getElementById(`speakerStatus${speaker}`);
+            if (statusElement) {
+                const statusText = statusElement.querySelector('.status-text');
+                const statusIndicator = statusElement.querySelector('.status-indicator');
+                
+                if (statusText) statusText.textContent = text;
+                if (statusIndicator) {
+                    statusIndicator.className = `status-indicator ${status}`;
+                }
             }
         }
         
@@ -1518,6 +1652,9 @@
                 return;
             }
             
+            // تحديث حالة المتحدث
+            updateSpeakerStatus(speaker, 'speaking', 'جاري التحدث...');
+            
             // طلب إذن الميكروفون أولاً
             navigator.mediaDevices.getUserMedia({ audio: true })
                 .then(() => {
@@ -1531,7 +1668,12 @@
                     
                     if (micBtn) {
                         micBtn.classList.add('recording');
-                        micBtn.innerHTML = '⏹️';
+                        // تحديث محتوى الزر المحسن
+                        const micIcon = micBtn.querySelector('.mic-icon');
+                        const micText = micBtn.querySelector('.mic-text');
+                        if (micIcon) micIcon.textContent = '⏹️';
+                        if (micText) micText.textContent = 'إيقاف التسجيل';
+                        else micBtn.innerHTML = '⏹️';
                     }
                     if (recordingIndicator) {
                         recordingIndicator.classList.add('active');
@@ -1639,6 +1781,11 @@
                 }
             }
             
+            // تحديث حالة المتحدث إلى جاهز
+            if (currentSpeaker) {
+                updateSpeakerStatus(currentSpeaker, 'ready', 'جاهز للتحدث');
+            }
+            
             // Reset UI with enhanced visual feedback
             if (currentMode === 'face-to-face' && currentSpeaker) {
                 const micBtn = document.getElementById(`mic${currentSpeaker}`);
@@ -1667,24 +1814,6 @@
             playNotificationSound('stop');
             
             // Reset current speaker
-            // Update UI based on mode
-            if (currentMode === 'face-to-face') {
-                const micBtn = document.getElementById('micBtn');
-                const recordingIndicator = document.getElementById('recordingIndicator');
-                const voiceVisualizer = document.getElementById('voiceVisualizer');
-                
-                micBtn.classList.remove('recording', 'listening');
-                micBtn.innerHTML = '🎤';
-                recordingIndicator.classList.remove('active');
-                voiceVisualizer.classList.remove('active');
-            } else if (currentMode === 'remote') {
-                const voiceBtn = document.getElementById('voiceBtn');
-                voiceBtn.classList.remove('recording', 'listening');
-                voiceBtn.innerHTML = '🎤';
-            }
-            
-            // Audio feedback
-            playNotificationSound('stop');
             
             currentSpeaker = null;
             showNotification('تم إيقاف التسجيل', 'info');
@@ -1790,6 +1919,9 @@
                 return;
             }
             
+            // تحديث حالة المتحدث إلى معالجة
+            updateSpeakerStatus(currentSpeaker, 'processing', 'جاري المعالجة...');
+            
             const cleanTranscript = transcript.trim();
             const lang1 = document.getElementById('lang1').value;
             const lang2 = document.getElementById('lang2').value;
@@ -1813,17 +1945,36 @@
             const processingId = addMessageToConversation(currentSpeaker, 'جاري الترجمة...', 'processing');
             
             try {
-                // Translate the text
-                const translatedText = await translateText(cleanTranscript, sourceLang, targetLang);
+                // تحسين الترجمة مع إعادة المحاولة في حالة الفشل
+                let translatedText;
+                let attempts = 0;
+                const maxAttempts = 3;
+                
+                while (attempts < maxAttempts) {
+                    try {
+                        translatedText = await translateText(cleanTranscript, sourceLang, targetLang);
+                        if (translatedText && translatedText.trim() !== '') {
+                            break; // نجحت الترجمة
+                        }
+                    } catch (translateError) {
+                        console.warn(`Translation attempt ${attempts + 1} failed:`, translateError);
+                    }
+                    attempts++;
+                    
+                    // انتظار قصير قبل إعادة المحاولة
+                    if (attempts < maxAttempts) {
+                        await new Promise(resolve => setTimeout(resolve, 500));
+                    }
+                }
                 
                 if (!translatedText || translatedText.trim() === '') {
-                    throw new Error('Empty translation result');
+                    throw new Error('Translation failed after multiple attempts');
                 }
                 
                 // Remove processing message
                 removeMessageFromConversation(processingId);
                 
-                // Add translated message
+                // Add translated message with enhanced formatting
                 const translatedId = addMessageToConversation(currentSpeaker, translatedText, 'translated');
                 
                 // Success feedback
@@ -1842,6 +1993,9 @@
                 
                 console.log('Translation completed successfully');
                 
+                // تحديث حالة المتحدث إلى جاهز بعد اكتمال الترجمة
+                updateSpeakerStatus(currentSpeaker, 'ready', 'جاهز للتحدث');
+                
             } catch (error) {
                 console.error('Translation error:', error);
                 // Remove processing message
@@ -1850,6 +2004,9 @@
                 // Add error message
                 addMessageToConversation(currentSpeaker, 'فشل في الترجمة، يرجى المحاولة مرة أخرى', 'error');
                 showNotification('خطأ في الترجمة', 'error');
+                
+                // تحديث حالة المتحدث إلى جاهز حتى في حالة الخطأ
+                updateSpeakerStatus(currentSpeaker, 'ready', 'جاهز للتحدث');
             }
         }
         
