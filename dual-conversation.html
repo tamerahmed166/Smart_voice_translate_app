@@ -1667,10 +1667,11 @@
             playNotificationSound('stop');
             
             // Reset current speaker
-            currentSpeaker = null;
-            
-            showNotification('تم إيقاف التسجيل', 'info');
-        }
+            // Update UI based on mode
+            if (currentMode === 'face-to-face') {
+                const micBtn = document.getElementById('micBtn');
+                const recordingIndicator = document.getElementById('recordingIndicator');
+                const voiceVisualizer = document.getElementById('voiceVisualizer');
                 
                 micBtn.classList.remove('recording', 'listening');
                 micBtn.innerHTML = '🎤';
@@ -1686,6 +1687,7 @@
             playNotificationSound('stop');
             
             currentSpeaker = null;
+            showNotification('تم إيقاف التسجيل', 'info');
         }
         
         function playNotificationSound(type) {
