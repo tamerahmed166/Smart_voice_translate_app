@@ -71,35 +71,71 @@
             flex-direction: column;
         }
         
-        /* Header */
-        .header {
+        /* Header Navigation */
+        .header-nav {
             background: var(--bg-primary);
             border-radius: var(--border-radius);
             padding: 20px;
             margin-bottom: 20px;
             box-shadow: var(--shadow-md);
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .logo-section {
-            display: flex;
             align-items: center;
-            gap: 12px;
         }
         
-        .logo {
-            width: 40px;
-            height: 40px;
+        .home-btn, .settings-btn {
+            padding: 8px 16px;
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: var(--border-radius);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
         }
         
-        .app-title {
-            font-size: 1.5rem;
-            font-weight: 700;
+        .home-btn:hover, .settings-btn:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        /* App Header */
+        .app-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .app-header .logo {
+            width: 45px;
+            height: 45px;
+            margin-bottom: 12px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        
+        .app-header h1 {
+            margin: 8px 0;
             color: var(--primary-color);
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        
+        .app-header p {
+            color: var(--text-muted);
+            margin: 0;
+            font-size: 0.85rem;
+        }
+        
+        .mode-selector-container {
+            background: var(--bg-primary);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: center;
         }
         
         .mode-selector {
@@ -131,33 +167,7 @@
             background: var(--bg-tertiary);
         }
         
-        /* Header Actions */
-        .header-actions {
-            display: flex;
-            align-items: center;
-        }
-        
-        .home-btn {
-            padding: 8px 16px;
-            border: 2px solid var(--primary-color);
-            border-radius: 8px;
-            background: transparent;
-            color: var(--primary-color);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .home-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
-        }
+
         
         /* Language Bar */
         .language-bar {
@@ -995,12 +1005,20 @@
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
-        <header class="header">
-            <div class="logo-section">
-                <img src="logo-new.svg" alt="Logo" class="logo" style="width: 40px; height: 40px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
-                <h1 class="app-title">الترجمة الثنائية</h1>
-            </div>
+        <!-- Header Navigation -->
+        <div class="header-nav">
+            <a href="index.html" class="home-btn">🏠 الرئيسية</a>
+            <a href="settings.html" class="settings-btn">⚙️ الإعدادات</a>
+        </div>
+        
+        <!-- App Header -->
+        <div class="app-header">
+            <img src="logo-new.svg" alt="Logo" class="logo">
+            <h1>الترجمة الثنائية</h1>
+        </div>
+        
+        <!-- Mode Selector -->
+        <div class="mode-selector-container">
             <div class="mode-selector">
                 <button class="mode-btn active" data-mode="face-to-face">
                     🤝 وجهاً لوجه
@@ -1009,15 +1027,7 @@
                     🌐 عن بُعد
                 </button>
             </div>
-            <div class="header-actions">
-                <button class="home-btn" onclick="window.location.href='index.html'" title="القائمة الرئيسية">
-                    🏠 الرئيسية
-                </button>
-                <button class="settings-btn" onclick="window.location.href='settings.html'" title="الإعدادات">
-                    ⚙️ الإعدادات
-                </button>
-            </div>
-        </header>
+        </div>
 
         <!-- Language Bar -->
         <div class="language-bar">

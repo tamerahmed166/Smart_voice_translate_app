@@ -342,18 +342,61 @@
         
         .highlighted-word {
             display: inline-block;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .highlighted-word::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .highlighted-word:hover::before {
+            left: 100%;
         }
         
         .highlighted-word:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            z-index: 10;
+        }
+        
+        .highlighted-word:active {
+            transform: translateY(0) scale(0.98);
+            transition: all 0.1s ease;
         }
         
         .highlighted-word.important-word {
             font-weight: 600;
             font-size: 1.05em;
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 5px rgba(74, 144, 226, 0.3);
+            }
+            to {
+                box-shadow: 0 0 15px rgba(74, 144, 226, 0.6);
+            }
+        }
+        
+        .highlighted-word.clicked {
+            animation: clickPulse 0.3s ease;
+        }
+        
+        @keyframes clickPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
         }
         
         .word-count, .confidence-indicator {
@@ -378,21 +421,306 @@
             flex-wrap: wrap;
         }
         
-        .action-buttons button {
-            padding: 8px 12px;
+        /* أنماط التصميم المحسن للنتائج */
+        .text-result-box.enhanced {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--brand), var(--accent));
+            border-radius: 12px;
+            color: white;
+        }
+        
+        .result-title {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .result-meta {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+        
+        .content-sections {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: start;
+            margin-bottom: 20px;
+        }
+        
+        .original-section, .translated-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .language-badge {
+            background: linear-gradient(135deg, var(--brand), var(--accent));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
             font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .text-type {
+            background: rgba(255,255,255,0.1);
+            padding: 4px 8px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+        
+        .quality-badge {
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+        
+        .translation-arrow {
+            font-size: 2em;
+            text-align: center;
+            align-self: center;
+            color: var(--accent);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        @keyframes slideInEnhanced {
+            0% {
+                opacity: 0;
+                transform: translateX(100%) scale(0.8);
+            }
+            100% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        @keyframes slideOutEnhanced {
+            0% {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(100%) scale(0.8);
+            }
+        }
+        
+        .text-stats {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-item {
+            background: rgba(255,255,255,0.1);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .smart-analysis {
+            background: linear-gradient(135deg, rgba(74, 144, 226, 0.1), rgba(80, 227, 194, 0.1));
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(74, 144, 226, 0.3);
+        }
+        
+        .analysis-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: var(--brand);
+        }
+        
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .analysis-item {
+            background: rgba(255,255,255,0.1);
+            padding: 12px;
             border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .analysis-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: var(--text);
+        }
+        
+        .analysis-value {
+            color: var(--accent);
+            font-weight: 500;
+        }
+        
+        .enhanced-action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .action-btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9em;
+            min-width: 120px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .action-btn:hover::before {
+            left: 100%;
+        }
+        
+        .action-btn.primary {
+            background: linear-gradient(135deg, var(--brand), #3a7bc8);
+            color: white;
+        }
+        
+        .action-btn.secondary {
+            background: linear-gradient(135deg, #6c757d, #5a6268);
+            color: white;
+        }
+        
+        .action-btn.accent {
+            background: linear-gradient(135deg, var(--accent), #45a049);
+            color: white;
+        }
+        
+        .action-btn.info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .content-sections {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .translation-arrow {
+                transform: rotate(90deg);
+                margin: 10px 0;
+            }
+            
+            .enhanced-action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .action-btn {
+                min-width: auto;
+            }
+        }
+        
+        .action-buttons button {
+            padding: 10px 16px;
+            font-size: 0.85em;
+            border-radius: 20px;
             background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
             color: var(--brand);
             border: 1px solid rgba(102, 126, 234, 0.3);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(5px);
+        }
+        
+        .action-buttons button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+        }
+        
+        .action-buttons button:hover::before {
+            width: 200px;
+            height: 200px;
         }
         
         .action-buttons button:hover {
             background: linear-gradient(135deg, var(--brand), var(--accent));
             color: white;
-            transform: translateY(-1px);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            border-color: transparent;
+        }
+        
+        .action-buttons button:active {
+            transform: translateY(-1px) scale(0.98);
+            transition: all 0.1s ease;
+        }
+        
+        .action-buttons button.clicked {
+            animation: buttonPulse 0.4s ease;
+        }
+        
+        @keyframes buttonPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
         }
         
         /* تحسين التغذية البصرية للمعالجة */
@@ -1183,35 +1511,161 @@
             const highlightedOriginal = highlightWords(originalText);
             const highlightedTranslated = highlightWords(translatedText);
             
+            // إحصائيات ذكية للنص
+            const originalStats = analyzeText(originalText);
+            const translatedStats = analyzeText(translatedText);
+            
             container.innerHTML = `
-                <div style="margin-bottom: 12px;">
-                    <strong>النص الأصلي (${from}):</strong>
-                    <div class="text-result-box original-text">${highlightedOriginal}</div>
-                    <div class="word-count">📊 عدد الكلمات: ${countWords(originalText)}</div>
+                <div class="result-header">
+                    <div class="result-title">📝 نتيجة الترجمة الذكية</div>
+                    <div class="result-meta">${new Date().toLocaleString('ar-SA')}</div>
                 </div>
-                <div>
-                    <strong>الترجمة (${to}):</strong>
-                    <div class="text-result-box translated-text">${highlightedTranslated}</div>
-                    <div class="confidence-indicator">✅ جودة الترجمة: عالية</div>
+                
+                <div class="content-sections">
+                    <div class="original-section">
+                        <div class="section-header">
+                            <span class="language-badge ${from}">${getLanguageName(from)}</span>
+                            <span class="text-type">${detectTextType(originalText)}</span>
+                        </div>
+                        <div class="text-result-box original-text enhanced">${highlightedOriginal}</div>
+                        <div class="text-stats">
+                            <span class="stat-item">📊 ${originalStats.words} كلمة</span>
+                            <span class="stat-item">📏 ${originalStats.chars} حرف</span>
+                            <span class="stat-item">⏱️ ${originalStats.readTime}د قراءة</span>
+                        </div>
+                    </div>
+                    
+                    <div class="translation-arrow">➡️</div>
+                    
+                    <div class="translated-section">
+                        <div class="section-header">
+                            <span class="language-badge ${to}">${getLanguageName(to)}</span>
+                            <span class="quality-badge high">✨ جودة عالية</span>
+                        </div>
+                        <div class="text-result-box translated-text enhanced">${highlightedTranslated}</div>
+                        <div class="text-stats">
+                            <span class="stat-item">📊 ${translatedStats.words} كلمة</span>
+                            <span class="stat-item">📏 ${translatedStats.chars} حرف</span>
+                            <span class="stat-item">🎯 ${calculateAccuracy(originalStats, translatedStats)}% دقة</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="action-buttons">
-                    <button onclick="copyToClipboard('${translatedText.replace(/'/g, "\\'")}')">📋 نسخ</button>
-                    <button onclick="shareText('${translatedText.replace(/'/g, "\\'")}')">📤 مشاركة</button>
-                    <button onclick="speakText('${translatedText.replace(/'/g, "\\'")}')">🔊 استماع</button>
+                
+                <div class="smart-analysis">
+                    <div class="analysis-title">🧠 التحليل الذكي</div>
+                    <div class="analysis-grid">
+                        <div class="analysis-item">
+                            <span class="analysis-label">نوع المحتوى:</span>
+                            <span class="analysis-value">${getContentType(originalText)}</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="analysis-label">مستوى التعقيد:</span>
+                            <span class="analysis-value">${getComplexityLevel(originalText)}</span>
+                        </div>
+                        <div class="analysis-item">
+                            <span class="analysis-label">الكلمات المهمة:</span>
+                            <span class="analysis-value">${originalStats.importantWords}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="enhanced-action-buttons">
+                    <button class="action-btn primary" onclick="copyToClipboard('${translatedText.replace(/'/g, "\\'")}')">📋 نسخ النص</button>
+                    <button class="action-btn secondary" onclick="shareText('${translatedText.replace(/'/g, "\\'")}')">📤 مشاركة</button>
+                    <button class="action-btn accent" onclick="speakText('${translatedText.replace(/'/g, "\\'")}')">🔊 استماع</button>
+                    <button class="action-btn info" onclick="showDetailedAnalysis('${originalText.replace(/'/g, "\\'")}')">📈 تحليل مفصل</button>
                 </div>
             `;
             container.classList.add('show', 'success');
             
-            // Add to history
+            // Add to history with enhanced stats
             translationHistory.push({
                 original: originalText,
                 translated: translatedText,
                 from: from,
                 to: to,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                stats: { original: originalStats, translated: translatedStats },
+                type: detectTextType(originalText),
+                complexity: getComplexityLevel(originalText)
             });
             
             currentTranslation = translatedText;
+        }
+        
+        // دوال التحليل الذكي المساعدة
+        function analyzeText(text) {
+            const words = text.split(/\s+/).filter(word => word.length > 0);
+            const chars = text.length;
+            const sentences = text.split(/[.!?]+/).filter(s => s.trim().length > 0).length;
+            const readTime = Math.ceil(words.length / 200); // متوسط 200 كلمة في الدقيقة
+            const importantWords = words.filter(word => word.length > 5 || /[A-Z]/.test(word) || /\d/.test(word)).length;
+            
+            return {
+                words: words.length,
+                chars: chars,
+                sentences: sentences,
+                readTime: readTime,
+                importantWords: importantWords
+            };
+        }
+        
+        function getLanguageName(code) {
+            const languages = {
+                'ar': 'العربية', 'en': 'English', 'fr': 'Français', 'es': 'Español',
+                'de': 'Deutsch', 'it': 'Italiano', 'pt': 'Português', 'ru': 'Русский',
+                'ja': '日本語', 'ko': '한국어', 'zh': '中文', 'hi': 'हिन्दी'
+            };
+            return languages[code] || code.toUpperCase();
+        }
+        
+        function detectTextType(text) {
+            if (/[?؟]/.test(text)) return '❓ سؤال';
+            if (/[!！]/.test(text)) return '❗ تعجب';
+            if (/\d+/.test(text)) return '🔢 يحتوي أرقام';
+            if (text.length > 200) return '📄 نص طويل';
+            if (text.length < 50) return '📝 نص قصير';
+            return '📋 نص عادي';
+        }
+        
+        function getContentType(text) {
+            if (/\b(email|@|mail)\b/i.test(text)) return '📧 بريد إلكتروني';
+            if (/\b(http|www|url)\b/i.test(text)) return '🌐 رابط ويب';
+            if (/\b(phone|tel|mobile)\b/i.test(text)) return '📱 رقم هاتف';
+            if (/\b(address|street|city)\b/i.test(text)) return '📍 عنوان';
+            if (/\b(date|time|schedule)\b/i.test(text)) return '📅 تاريخ ووقت';
+            return '📝 نص عام';
+        }
+        
+        function getComplexityLevel(text) {
+            const avgWordLength = text.split(/\s+/).reduce((sum, word) => sum + word.length, 0) / text.split(/\s+/).length;
+            const sentenceCount = text.split(/[.!?]+/).length;
+            const complexity = avgWordLength + (text.length / sentenceCount / 10);
+            
+            if (complexity > 15) return '🔴 معقد';
+            if (complexity > 10) return '🟡 متوسط';
+            return '🟢 بسيط';
+        }
+        
+        function calculateAccuracy(originalStats, translatedStats) {
+            const wordRatio = Math.min(originalStats.words, translatedStats.words) / Math.max(originalStats.words, translatedStats.words);
+            const charRatio = Math.min(originalStats.chars, translatedStats.chars) / Math.max(originalStats.chars, translatedStats.chars);
+            return Math.round((wordRatio + charRatio) / 2 * 100);
+        }
+        
+        function showDetailedAnalysis(text) {
+            const stats = analyzeText(text);
+            const analysis = `
+                📊 تحليل مفصل للنص:
+                \n• عدد الكلمات: ${stats.words}
+                \n• عدد الأحرف: ${stats.chars}
+                \n• عدد الجمل: ${stats.sentences}
+                \n• وقت القراءة المقدر: ${stats.readTime} دقيقة
+                \n• الكلمات المهمة: ${stats.importantWords}
+                \n• نوع المحتوى: ${getContentType(text)}
+                \n• مستوى التعقيد: ${getComplexityLevel(text)}
+            `;
+            alert(analysis);
         }
         
         // وظيفة تمييز الكلمات المحسنة بذكاء
@@ -1219,52 +1673,105 @@
             const words = text.split(/\s+/);
             const importantWords = [];
             const mediumWords = [];
+            const shortWords = [];
             
-            const highlighted = words.map((word, index) => {
+            // تحليل ذكي للكلمات
+            const wordAnalysis = words.map((word, index) => {
                 const cleanWord = word.replace(/[^\w\u0600-\u06FF]/g, '');
+                const isArabic = /[\u0600-\u06FF]/.test(word);
+                const isEnglish = /[a-zA-Z]/.test(word);
+                const isNumber = /\d/.test(word);
+                const hasCapitals = /[A-Z]/.test(word);
+                const hasSpecialChars = /[!@#$%^&*(),.?":{}|<>]/.test(word);
                 
-                // تحديد أهمية الكلمة بناءً على الطول والمحتوى
-                if (cleanWord.length > 6 || /[A-Z]{2,}/.test(word) || /[أ-ي]{6,}/.test(word)) {
-                    importantWords.push(cleanWord);
+                return {
+                    original: word,
+                    clean: cleanWord,
+                    length: cleanWord.length,
+                    isArabic,
+                    isEnglish,
+                    isNumber,
+                    hasCapitals,
+                    hasSpecialChars,
+                    index
+                };
+            });
+            
+            const highlighted = wordAnalysis.map((wordInfo) => {
+                const { original, clean, length, isArabic, isEnglish, isNumber, hasCapitals, index } = wordInfo;
+                
+                // تصنيف الكلمات حسب الأهمية والنوع
+                if (length >= 7 || isNumber || hasCapitals) {
+                    importantWords.push(clean);
+                    const bgColor = isNumber ? 
+                        'linear-gradient(135deg, #e0e7ff, #c7d2fe)' : 
+                        isArabic ? 'linear-gradient(135deg, #fef3c7, #fde68a)' : 
+                        'linear-gradient(135deg, #fce7f3, #fbcfe8)';
+                    const borderColor = isNumber ? '#6366f1' : isArabic ? '#f59e0b' : '#ec4899';
+                    const emoji = isNumber ? '🔢' : isArabic ? '🇸🇦' : '🇺🇸';
+                    
                     return `<span class="highlighted-word important-word" 
-                            style="background: linear-gradient(135deg, #fef3c7, #fde68a); 
+                            style="background: ${bgColor}; 
                                    padding: 3px 8px; border-radius: 6px; margin: 2px;
-                                   border: 1px solid #f59e0b; font-weight: 600;
-                                   box-shadow: 0 2px 4px rgba(245, 158, 11, 0.2);
-                                   cursor: pointer; transition: all 0.2s ease;"
+                                   border: 2px solid ${borderColor}; font-weight: 700;
+                                   cursor: pointer; transition: all 0.3s ease;
+                                   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+                                   position: relative;
+                                   display: inline-block;"
                             data-word-index="${index}" 
-                            onclick="selectWord(this, '${word}')" 
-                            onmouseover="this.style.transform='scale(1.05)'"
-                            onmouseout="this.style.transform='scale(1)'">${word}</span>`;
-                } else if (cleanWord.length > 4 || /[A-Z]/.test(word) || /[أ-ي]{4,}/.test(word)) {
-                    mediumWords.push(cleanWord);
+                            data-word-type="important"
+                            data-language="${isArabic ? 'ar' : isEnglish ? 'en' : 'other'}"
+                            onclick="selectWord(this, '${original}')"
+                            onmouseover="this.style.transform='translateY(-3px) scale(1.05)'; this.style.boxShadow='0 6px 12px rgba(0,0,0,0.25)'; this.style.zIndex='10'"
+                            onmouseout="this.style.transform='translateY(0) scale(1)'; this.style.boxShadow='0 2px 6px rgba(0,0,0,0.15)'; this.style.zIndex='1'"
+                            title="${emoji} كلمة مهمة - ${length} ${length === 1 ? 'حرف' : 'أحرف'}">${original}</span>`;
+                } else if (length >= 4) {
+                    mediumWords.push(clean);
+                    const bgColor = isArabic ? 
+                        'linear-gradient(135deg, #e0f2fe, #bae6fd)' : 
+                        'linear-gradient(135deg, #eff6ff, #dbeafe)';
+                    const borderColor = isArabic ? '#0ea5e9' : '#3b82f6';
+                    
                     return `<span class="highlighted-word medium-word" 
-                            style="background: linear-gradient(135deg, #e0f2fe, #bae6fd); 
+                            style="background: ${bgColor}; 
                                    padding: 2px 6px; border-radius: 4px; margin: 1px;
-                                   border: 1px solid #0ea5e9;
-                                   box-shadow: 0 1px 3px rgba(14, 165, 233, 0.2);
-                                   cursor: pointer; transition: all 0.2s ease;"
+                                   border: 1px solid ${borderColor}; 
+                                   cursor: pointer; transition: all 0.25s ease;
+                                   box-shadow: 0 1px 3px rgba(0,0,0,0.1);"
                             data-word-index="${index}" 
-                            onclick="selectWord(this, '${word}')"
-                            onmouseover="this.style.transform='translateY(-1px)'"
-                            onmouseout="this.style.transform='translateY(0)'">${word}</span>`;
-                } else if (cleanWord.length > 2) {
-                    return `<span class="highlighted-word normal-word" 
+                            data-word-type="medium"
+                            data-language="${isArabic ? 'ar' : isEnglish ? 'en' : 'other'}"
+                            onclick="selectWord(this, '${original}')"
+                            onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 3px 6px rgba(0,0,0,0.2)'"
+                            onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)'"
+                            title="كلمة متوسطة - ${length} ${length === 1 ? 'حرف' : 'أحرف'}">${original}</span>`;
+                } else if (length >= 2) {
+                    shortWords.push(clean);
+                    return `<span class="highlighted-word short-word" 
                             style="background: linear-gradient(135deg, #f0fdf4, #dcfce7); 
                                    padding: 1px 4px; border-radius: 3px; margin: 1px;
                                    border: 1px solid #22c55e; opacity: 0.8;
-                                   cursor: pointer;"
+                                   cursor: pointer; transition: all 0.2s ease;"
                             data-word-index="${index}" 
-                            onclick="selectWord(this, '${word}')">${word}</span>`;
+                            data-word-type="short"
+                            data-language="${isArabic ? 'ar' : isEnglish ? 'en' : 'other'}"
+                            onclick="selectWord(this, '${original}')"
+                            onmouseover="this.style.opacity='1'; this.style.transform='translateY(-1px)'"
+                            onmouseout="this.style.opacity='0.8'; this.style.transform='translateY(0)'"
+                            title="كلمة قصيرة - ${length} ${length === 1 ? 'حرف' : 'أحرف'}">${original}</span>`;
                 }
-                return `<span class="word" data-word-index="${index}">${word}</span>`;
+                return `<span class="word" data-word-index="${index}" title="رمز أو علامة ترقيم">${original}</span>`;
             }).join(' ');
             
-            // حفظ إحصائيات الكلمات للاستخدام لاحقاً
+            // حفظ إحصائيات الكلمات المحسنة للاستخدام لاحقاً
             window.currentWordStats = {
                 important: importantWords,
                 medium: mediumWords,
+                short: shortWords,
                 total: words.length,
+                arabic: wordAnalysis.filter(w => w.isArabic).length,
+                english: wordAnalysis.filter(w => w.isEnglish).length,
+                numbers: wordAnalysis.filter(w => w.isNumber).length,
                 highlighted: highlighted
             };
             
@@ -1275,16 +1782,22 @@
         function selectWord(element, word) {
             // إزالة التحديد السابق
             document.querySelectorAll('.highlighted-word.selected').forEach(el => {
-                el.classList.remove('selected');
+                el.classList.remove('selected', 'clicked');
                 el.style.transform = '';
                 el.style.boxShadow = el.style.boxShadow.replace(/, 0 4px 12px rgba\(102, 126, 234, 0\.4\)/, '');
             });
             
-            // تحديد الكلمة الحالية
-            element.classList.add('selected');
-            element.style.transform = 'scale(1.1)';
-            element.style.boxShadow += ', 0 4px 12px rgba(102, 126, 234, 0.4)';
-            element.style.zIndex = '10';
+            // إضافة تأثير النقر
+            element.classList.add('clicked');
+            
+            // تحديد الكلمة الحالية بعد تأخير قصير
+            setTimeout(() => {
+                element.classList.remove('clicked');
+                element.classList.add('selected');
+                element.style.transform = 'scale(1.1)';
+                element.style.boxShadow += ', 0 4px 12px rgba(102, 126, 234, 0.4)';
+                element.style.zIndex = '10';
+            }, 150);
             
             // تشغيل صوت النقر
             playClickSound();
@@ -1294,42 +1807,83 @@
             
             // إضافة تأثير الاهتزاز للهاتف
             if (navigator.vibrate) {
-                navigator.vibrate(50);
+                navigator.vibrate([50, 30, 50]);
             }
         }
         
         // وظيفة عرض معلومات الكلمة المحسنة
         function showWordInfo(word, index) {
             const cleanWord = word.replace(/[^\w\u0600-\u06FF]/g, '');
-            const isArabic = /[\u0600-\u06FF]/.test(word);
-            const isEnglish = /[a-zA-Z]/.test(word);
+            const analysis = analyzeWordInDetail(word);
             
             const popup = document.createElement('div');
-            popup.className = 'word-info-popup';
+            popup.className = 'word-info-popup enhanced';
             popup.style.cssText = `
                 position: fixed;
                 top: 20px;
                 right: 20px;
                 background: linear-gradient(135deg, #667eea, #764ba2);
                 color: white;
-                padding: 15px 20px;
-                border-radius: 12px;
-                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                padding: 20px;
+                border-radius: 16px;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.2);
                 z-index: 1000;
-                animation: slideIn 0.3s ease;
-                max-width: 280px;
+                animation: slideInEnhanced 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                max-width: 320px;
                 font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255,255,255,0.2);
             `;
             
             popup.innerHTML = `
-                <div style="font-weight: 600; margin-bottom: 8px; font-size: 1.1em;">📝 تحليل الكلمة</div>
-                <div style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 6px; margin-bottom: 8px;">
-                    <div style="font-size: 1em; margin-bottom: 4px;">الكلمة: <strong>${word}</strong></div>
-                    <div style="font-size: 0.9em; opacity: 0.9;">الطول: ${cleanWord.length} ${cleanWord.length === 1 ? 'حرف' : 'أحرف'}</div>
-                    <div style="font-size: 0.9em; opacity: 0.9;">الموضع: ${parseInt(index) + 1}</div>
-                    <div style="font-size: 0.9em; opacity: 0.9;">النوع: ${isArabic ? '🇸🇦 عربي' : isEnglish ? '🇺🇸 إنجليزي' : '🔤 أخرى'}</div>
+                <div class="popup-header">
+                    <div style="font-weight: 700; margin-bottom: 12px; font-size: 1.2em; display: flex; align-items: center; gap: 8px;">
+                        ${analysis.icon} تحليل ذكي للكلمة
+                        <button onclick="this.parentElement.parentElement.parentElement.remove()" style="margin-left: auto; background: rgba(255,255,255,0.2); border: none; color: white; border-radius: 50%; width: 24px; height: 24px; cursor: pointer;">×</button>
+                    </div>
                 </div>
-                <div style="font-size: 0.8em; opacity: 0.8; text-align: center;">انقر على كلمة أخرى للتحليل</div>
+                
+                <div class="word-display" style="background: rgba(255,255,255,0.15); padding: 12px; border-radius: 10px; margin-bottom: 12px; text-align: center;">
+                    <div style="font-size: 1.4em; font-weight: bold; margin-bottom: 4px;">${word}</div>
+                    <div style="font-size: 0.9em; opacity: 0.8;">${analysis.pronunciation}</div>
+                </div>
+                
+                <div class="analysis-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                    <div class="analysis-card" style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 0.8em; opacity: 0.8;">الطول</div>
+                        <div style="font-weight: bold;">${cleanWord.length} ${analysis.lengthUnit}</div>
+                    </div>
+                    <div class="analysis-card" style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 0.8em; opacity: 0.8;">الموضع</div>
+                        <div style="font-weight: bold;">#${parseInt(index) + 1}</div>
+                    </div>
+                    <div class="analysis-card" style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 0.8em; opacity: 0.8;">اللغة</div>
+                        <div style="font-weight: bold;">${analysis.language}</div>
+                    </div>
+                    <div class="analysis-card" style="background: rgba(255,255,255,0.1); padding: 8px; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 0.8em; opacity: 0.8;">النوع</div>
+                        <div style="font-weight: bold;">${analysis.type}</div>
+                    </div>
+                </div>
+                
+                <div class="detailed-analysis" style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 10px; margin-bottom: 12px;">
+                    <div style="font-weight: 600; margin-bottom: 8px; font-size: 0.95em;">🔍 تحليل متقدم</div>
+                    <div style="font-size: 0.85em; line-height: 1.4;">
+                        <div>• الأهمية: ${analysis.importance}</div>
+                        <div>• التعقيد: ${analysis.complexity}</div>
+                        <div>• التكرار: ${analysis.frequency}</div>
+                        ${analysis.specialFeatures ? `<div>• خصائص: ${analysis.specialFeatures}</div>` : ''}
+                    </div>
+                </div>
+                
+                <div class="action-buttons" style="display: flex; gap: 8px; justify-content: center;">
+                    <button onclick="copyToClipboard('${word}')" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8em;">📋 نسخ</button>
+                    <button onclick="speakText('${word}')" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8em;">🔊 نطق</button>
+                    <button onclick="searchWordOnline('${cleanWord}')" style="background: rgba(255,255,255,0.2); border: none; color: white; padding: 6px 12px; border-radius: 15px; cursor: pointer; font-size: 0.8em;">🔍 بحث</button>
+                </div>
+                
+                <div style="font-size: 0.75em; opacity: 0.7; text-align: center; margin-top: 8px;">انقر على كلمة أخرى للتحليل • يختفي تلقائياً خلال 6 ثوان</div>
             `;
             
             // إزالة النوافذ السابقة
@@ -1337,13 +1891,113 @@
             
             document.body.appendChild(popup);
             
+            // إضافة تأثيرات التفاعل
+            popup.addEventListener('mouseenter', () => {
+                popup.style.transform = 'scale(1.02)';
+                popup.style.transition = 'transform 0.2s ease';
+            });
+            
+            popup.addEventListener('mouseleave', () => {
+                popup.style.transform = 'scale(1)';
+            });
+            
             // إزالة النافذة تلقائياً
             setTimeout(() => {
                 if (popup.parentNode) {
-                    popup.style.animation = 'slideOut 0.3s ease';
-                    setTimeout(() => popup.remove(), 300);
+                    popup.style.animation = 'slideOutEnhanced 0.4s ease';
+                    setTimeout(() => popup.remove(), 400);
                 }
-            }, 4000);
+            }, 6000);
+        }
+        
+        // دالة تحليل الكلمة بالتفصيل
+        function analyzeWordInDetail(word) {
+            const cleanWord = word.replace(/[^\w\u0600-\u06FF]/g, '');
+            const isArabic = /[\u0600-\u06FF]/.test(word);
+            const isEnglish = /[a-zA-Z]/.test(word);
+            const hasNumbers = /\d/.test(word);
+            const hasSpecialChars = /[^\w\u0600-\u06FF\s]/.test(word);
+            
+            let analysis = {
+                icon: '📝',
+                language: '🔤 أخرى',
+                type: 'عادي',
+                importance: 'متوسط',
+                complexity: 'بسيط',
+                frequency: 'نادر',
+                pronunciation: '',
+                lengthUnit: 'أحرف',
+                specialFeatures: null
+            };
+            
+            // تحديد اللغة والأيقونة
+            if (isArabic) {
+                analysis.language = '🇸🇦 عربي';
+                analysis.icon = '📜';
+                analysis.pronunciation = 'كلمة عربية';
+            } else if (isEnglish) {
+                analysis.language = '🇺🇸 إنجليزي';
+                analysis.icon = '📖';
+                analysis.pronunciation = 'English word';
+            }
+            
+            // تحديد النوع
+            if (hasNumbers) {
+                analysis.type = '🔢 رقمي';
+                analysis.icon = '🔢';
+            } else if (hasSpecialChars) {
+                analysis.type = '⚡ خاص';
+                analysis.icon = '⚡';
+            } else if (cleanWord.length > 8) {
+                analysis.type = '📏 طويل';
+            } else if (cleanWord.length < 3) {
+                analysis.type = '📝 قصير';
+            }
+            
+            // تحديد الأهمية
+            if (cleanWord.length > 6 || /[A-Z]/.test(word) || hasNumbers) {
+                analysis.importance = '⭐ عالي';
+            } else if (cleanWord.length > 4) {
+                analysis.importance = '🔸 متوسط';
+            } else {
+                analysis.importance = '🔹 منخفض';
+            }
+            
+            // تحديد التعقيد
+            if (cleanWord.length > 10 || hasSpecialChars) {
+                analysis.complexity = '🔴 معقد';
+            } else if (cleanWord.length > 6) {
+                analysis.complexity = '🟡 متوسط';
+            } else {
+                analysis.complexity = '🟢 بسيط';
+            }
+            
+            // تحديد التكرار (تقدير)
+            if (cleanWord.length < 4) {
+                analysis.frequency = '🔥 شائع';
+            } else if (cleanWord.length < 7) {
+                analysis.frequency = '📊 متوسط';
+            } else {
+                analysis.frequency = '💎 نادر';
+            }
+            
+            // الخصائص الخاصة
+            let features = [];
+            if (word.includes('@')) features.push('بريد إلكتروني');
+            if (/^https?:\/\//.test(word)) features.push('رابط ويب');
+            if (/^\d+$/.test(cleanWord)) features.push('رقم خالص');
+            if (/[A-Z]{2,}/.test(word)) features.push('اختصار');
+            if (features.length > 0) {
+                analysis.specialFeatures = features.join(', ');
+            }
+            
+            return analysis;
+        }
+        
+        // دالة البحث عن الكلمة عبر الإنترنت
+        function searchWordOnline(word) {
+            const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(word + ' معنى تعريف')}`;
+            window.open(searchUrl, '_blank');
         }
         
         // وظيفة تشغيل صوت النقر
@@ -1719,7 +2373,30 @@
             }
         });
         
+        // ---------- Button Click Effects ----------
+        function addButtonClickEffects() {
+            document.querySelectorAll('button').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    // إضافة تأثير النقر
+                    this.classList.add('clicked');
+                    
+                    // إزالة التأثير بعد انتهاء الرسوم المتحركة
+                    setTimeout(() => {
+                        this.classList.remove('clicked');
+                    }, 400);
+                    
+                    // تأثير الاهتزاز للهاتف
+                    if (navigator.vibrate) {
+                        navigator.vibrate(30);
+                    }
+                });
+            });
+        }
+        
         // ---------- Initialize ----------
+        // إضافة تأثيرات النقر للأزرار
+        addButtonClickEffects();
+        
         console.log('🚀 ترجمة ذكية جاهزة!');
         console.log('💡 اختصارات لوحة المفاتيح:');
         console.log('   Ctrl+1: وضع النص');

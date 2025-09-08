@@ -331,9 +331,9 @@
         <!-- Bottom Navigation -->
         <nav class="bg-white/90 backdrop-blur-md border-t border-gray-200 px-4 py-2">
             <div class="flex justify-around items-center max-w-md mx-auto">
-                <a href="translate.html" class="flex flex-col items-center p-2 text-gray-500 hover:text-blue-600 transition-colors">
+                <a href="smart-translate.html" class="flex flex-col items-center p-2 text-gray-500 hover:text-blue-600 transition-colors">
                     <span class="material-symbols-outlined text-2xl">translate</span>
-                    <span class="text-xs mt-1">ترجمة</span>
+                    <span class="text-xs mt-1">ترجمة ذكية</span>
                 </a>
                 <a href="index.html" class="flex flex-col items-center p-2 text-gray-500 hover:text-blue-600 transition-colors">
                     <span class="material-symbols-outlined text-2xl">home</span>
@@ -564,19 +564,27 @@
 
         // Account management functions removed as account section was deleted
         
-        function showNotification(message) {
+        function showNotification(message, type = 'success') {
             // Create notification element
             const notification = document.createElement('div');
-            notification.className = 'fixed top-4 right-4 bg-blue-500 text-white px-4 py-2 rounded-lg shadow-lg z-50 transition-all duration-300';
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            notification.className = `fixed top-4 right-4 ${bgColor} text-white px-4 py-2 rounded-lg shadow-lg z-50 transform translate-x-full transition-transform duration-300`;
             notification.textContent = message;
             
             document.body.appendChild(notification);
             
-            // Remove notification after 3 seconds
+            // Show notification
             setTimeout(() => {
-                notification.style.opacity = '0';
+                notification.classList.remove('translate-x-full');
+            }, 100);
+            
+            // Hide notification after 3 seconds
+            setTimeout(() => {
+                notification.classList.add('translate-x-full');
                 setTimeout(() => {
-                    document.body.removeChild(notification);
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
                 }, 300);
             }, 3000);
         }
@@ -832,6 +840,65 @@
              }
          }
 
+        // Volume control functions
+        function updateVolumeDisplay(value) {
+            const volumeValue = document.getElementById('volume-value');
+            if (volumeValue) {
+                volumeValue.textContent = value + '%';
+            }
+            // Apply volume to all audio elements across the app
+            const audioElements = document.querySelectorAll('audio');
+            audioElements.forEach(audio => {
+                audio.volume = value / 100;
+            });
+            localStorage.setItem('appVolume', value);
+        }
+
+        function saveVolumeSettings() {
+            const volumeSlider = document.getElementById('volume-slider');
+            if (volumeSlider) {
+                const volume = volumeSlider.value;
+                localStorage.setItem('appVolume', volume);
+                updateVolumeDisplay(volume);
+                showNotification('تم حفظ إعدادات الصوت');
+            }
+        }
+
+        // Translation settings
+        function saveTranslationSettings() {
+            const engineSelect = document.getElementById('translation-engine');
+            const qualitySelect = document.getElementById('translation-quality');
+            const saveHistoryCheckbox = document.getElementById('save-history');
+            
+            if (engineSelect && qualitySelect && saveHistoryCheckbox) {
+                const autoTranslate = saveHistoryCheckbox.checked;
+                const engine = engineSelect.value;
+                const quality = qualitySelect.value;
+                
+                localStorage.setItem('autoTranslate', autoTranslate);
+                localStorage.setItem('translation-engine', engine);
+                localStorage.setItem('translation-quality', quality);
+                
+                // Apply settings globally
+                window.translationSettings = {
+                    autoTranslate: autoTranslate,
+                    engine: engine,
+                    quality: quality
+                };
+                
+                // Broadcast settings to other pages
+                if (typeof BroadcastChannel !== 'undefined') {
+                    const channel = new BroadcastChannel('app-settings');
+                    channel.postMessage({
+                        type: 'translation-settings',
+                        settings: window.translationSettings
+                    });
+                }
+                
+                showNotification('تم حفظ إعدادات الترجمة');
+            }
+        }
+
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             // Apply saved theme
@@ -846,6 +913,48 @@
             // Initialize translation settings
             initializeTranslationSettings();
             
+            // Add event listeners for volume control
+            const volumeSlider = document.getElementById('volume-slider');
+            if (volumeSlider) {
+                volumeSlider.addEventListener('input', function() {
+                    updateVolumeDisplay(this.value);
+                });
+                volumeSlider.addEventListener('change', saveVolumeSettings);
+            }
+            
+            // Add event listeners for translation settings
+            const translationEngine = document.getElementById('translation-engine');
+            const translationQuality = document.getElementById('translation-quality');
+            const saveHistory = document.getElementById('save-history');
+            
+            if (translationEngine) {
+                translationEngine.addEventListener('change', saveTranslationSettings);
+            }
+            if (translationQuality) {
+                translationQuality.addEventListener('change', saveTranslationSettings);
+            }
+            if (saveHistory) {
+                saveHistory.addEventListener('change', saveTranslationSettings);
+            }
+            
+            // Add event listeners for feedback and help toggles
+            const autoFeedback = document.getElementById('auto-feedback');
+            const autoHelp = document.getElementById('auto-help');
+            
+            if (autoFeedback) {
+                autoFeedback.addEventListener('change', function() {
+                    localStorage.setItem('auto-feedback', this.checked);
+                    showNotification(this.checked ? 'تم تفعيل الملاحظات التلقائية' : 'تم إلغاء تفعيل الملاحظات التلقائية');
+                });
+            }
+            
+            if (autoHelp) {
+                autoHelp.addEventListener('change', function() {
+                    localStorage.setItem('auto-help', this.checked);
+                    showNotification(this.checked ? 'تم تفعيل المساعدة التلقائية' : 'تم إلغاء تفعيل المساعدة التلقائية');
+                });
+            }
+            
             // Load saved toggle states
             document.querySelectorAll('.toggle-switch input').forEach(toggle => {
                 const flexContainer = toggle.closest('.flex');
@@ -858,7 +967,44 @@
                     }
                 }
             });
+            
+            // Load saved settings
+            loadSavedSettings();
         });
+        
+        // Load saved settings function
+        function loadSavedSettings() {
+            // Load volume setting
+            const savedVolume = localStorage.getItem('appVolume') || '70';
+            const volumeSlider = document.getElementById('volume-slider');
+            if (volumeSlider) {
+                volumeSlider.value = savedVolume;
+                updateVolumeDisplay(savedVolume);
+            }
+            
+            // Load translation settings
+            const savedEngine = localStorage.getItem('translation-engine') || 'google';
+            const savedQuality = localStorage.getItem('translation-quality') || 'standard';
+            const savedHistory = localStorage.getItem('save-history') !== 'false';
+            
+            const engineSelect = document.getElementById('translation-engine');
+            const qualitySelect = document.getElementById('translation-quality');
+            const saveHistoryCheckbox = document.getElementById('save-history');
+            
+            if (engineSelect) engineSelect.value = savedEngine;
+            if (qualitySelect) qualitySelect.value = savedQuality;
+            if (saveHistoryCheckbox) saveHistoryCheckbox.checked = savedHistory;
+            
+            // Load feedback and help settings
+            const savedAutoFeedback = localStorage.getItem('auto-feedback') !== 'false';
+            const savedAutoHelp = localStorage.getItem('auto-help') !== 'false';
+            
+            const autoFeedback = document.getElementById('auto-feedback');
+            const autoHelp = document.getElementById('auto-help');
+            
+            if (autoFeedback) autoFeedback.checked = savedAutoFeedback;
+            if (autoHelp) autoHelp.checked = savedAutoHelp;
+        }
         
         // تسجيل Service Worker
         if ('serviceWorker' in navigator) {
