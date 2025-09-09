@@ -105,7 +105,7 @@
         /* App Header */
         .app-header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 15px;
         }
         
         .app-header .logo {
@@ -267,6 +267,55 @@
             flex-direction: column;
             gap: 15px;
             min-height: 400px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        /* حالات المتحدثين المحسنة */
+        .person-panel.speaking {
+            background: linear-gradient(135deg, #e8f5e8, #f0f9ff);
+            border: 2px solid var(--success-color);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+            transform: scale(1.02);
+        }
+        
+        .person-panel.waiting {
+            background: linear-gradient(135deg, #fff7ed, #fef3c7);
+            border: 2px solid #f59e0b;
+            opacity: 0.8;
+        }
+        
+        .person-panel.processing {
+            background: linear-gradient(135deg, #ede9fe, #e0e7ff);
+            border: 2px solid var(--primary-color);
+            animation: processingPulse 2s infinite;
+        }
+        
+        .person-panel.listening {
+            background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+            border: 2px solid #10b981;
+            animation: listeningGlow 1.5s infinite alternate;
+        }
+        
+        .person-panel.ready {
+            background: var(--bg-primary);
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .person-panel.ready:hover {
+            border-color: var(--primary-color);
+            box-shadow: 0 6px 20px rgba(74, 144, 226, 0.15);
+        }
+        
+        @keyframes processingPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        @keyframes listeningGlow {
+            from { box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
+            to { box-shadow: 0 0 25px rgba(16, 185, 129, 0.6); }
         }
         
         .person-panel.person1 {
@@ -427,25 +476,76 @@
         }
         
         .status-indicator {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             transition: all 0.3s ease;
+            position: relative;
         }
         
         .status-indicator.ready {
             background: #28a745;
             box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+            animation: readyPulse 2s infinite;
         }
         
         .status-indicator.speaking {
             background: #ffc107;
-            animation: pulse 1s infinite;
+            animation: speakingPulse 1s infinite;
+            box-shadow: 0 0 12px rgba(255, 193, 7, 0.6);
         }
         
         .status-indicator.processing {
             background: #17a2b8;
-            animation: spin 1s linear infinite;
+            animation: processingSpin 1s linear infinite;
+            box-shadow: 0 0 10px rgba(23, 162, 184, 0.5);
+        }
+        
+        .status-indicator.waiting {
+            background: #f59e0b;
+            animation: waitingPulse 1.5s infinite;
+        }
+        
+        .status-indicator.listening {
+            background: #10b981;
+            animation: listeningRipple 1s infinite;
+        }
+        
+        .status-indicator.playing {
+            background: var(--primary-color);
+            animation: playingWave 0.8s infinite;
+        }
+        
+        @keyframes readyPulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.2); opacity: 0.8; }
+        }
+        
+        @keyframes speakingPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+        }
+        
+        @keyframes processingSpin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        @keyframes waitingPulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes listeningRipple {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.5); opacity: 0; }
+        }
+        
+        @keyframes playingWave {
+            0%, 100% { transform: scaleY(1); }
+            25% { transform: scaleY(1.3); }
+            50% { transform: scaleY(0.7); }
+            75% { transform: scaleY(1.1); }
         }
         
         @keyframes spin {
@@ -985,7 +1085,53 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Dark mode support */
+        /* Dark theme styles */
+        .dark-theme {
+            --bg-primary: #1e293b;
+            --bg-secondary: #334155;
+            --bg-tertiary: #475569;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: #475569;
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+        }
+        
+        .dark-theme .header-nav,
+        .dark-theme .mode-selector-container,
+        .dark-theme .language-bar,
+        .dark-theme .chat-container,
+        .dark-theme .person-panel {
+            background: var(--bg-primary);
+            border-color: var(--border-color);
+        }
+        
+        .dark-theme .mode-selector {
+            background: var(--bg-secondary);
+        }
+        
+        .dark-theme .language-select,
+        .dark-theme .room-input,
+        .dark-theme .chat-input {
+            background: var(--bg-secondary);
+            border-color: var(--border-color);
+            color: var(--text-primary);
+        }
+        
+        .dark-theme .message {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+        }
+        
+        .dark-theme .message.person1 {
+            background: rgba(59, 130, 246, 0.1);
+        }
+        
+        .dark-theme .message.person2 {
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        /* Dark mode support for system preference */
         @media (prefers-color-scheme: dark) {
             :root {
                 --bg-primary: #1e293b;
@@ -1411,8 +1557,59 @@
             'mn': 'المنغولية'
         };
         
+        // Initialize theme and language from localStorage
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        let currentLanguage = localStorage.getItem('language') || 'ar';
+        
+        // Apply saved settings on page load
+        function applySettings() {
+            // Apply theme
+            if (currentTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+            
+            // Apply language
+            if (currentLanguage === 'en') {
+                document.documentElement.lang = 'en';
+                document.documentElement.dir = 'ltr';
+            } else {
+                document.documentElement.lang = 'ar';
+                document.documentElement.dir = 'rtl';
+            }
+        }
+        
+        // Listen for settings changes from other pages
+        const settingsChannel = new BroadcastChannel('settings-sync');
+        settingsChannel.addEventListener('message', function(event) {
+            const { type, value, settings } = event.data;
+            
+            if (type === 'theme') {
+                currentTheme = value;
+                localStorage.setItem('theme', value);
+                applySettings();
+            } else if (type === 'language') {
+                currentLanguage = value;
+                localStorage.setItem('language', value);
+                applySettings();
+            } else if (type === 'translation-settings') {
+                // Apply translation settings
+                if (settings) {
+                    localStorage.setItem('translation-engine', settings.engine || 'google');
+                    localStorage.setItem('translation-quality', settings.quality || 'standard');
+                    localStorage.setItem('autoTranslate', settings.autoTranslate || false);
+                    
+                    // Update global translation settings
+                    window.translationSettings = settings;
+                    console.log('Translation settings updated:', settings);
+                }
+            }
+        });
+
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
+            applySettings(); // Apply settings first
             initializeApp();
         });
         
@@ -1637,7 +1834,7 @@
             }
         }
         
-        // دالة تحديث حالة المتحدث
+        // دالة تحديث حالة المتحدث المحسنة
         function updateSpeakerStatus(speaker, status, text) {
             const statusElement = document.getElementById(`speakerStatus${speaker}`);
             if (statusElement) {
@@ -1649,10 +1846,122 @@
                     statusIndicator.className = `status-indicator ${status}`;
                 }
             }
+            
+            // إضافة تأثيرات بصرية للحالة
+            const personPanel = document.querySelector(`.person-panel.person${speaker}`);
+            if (personPanel) {
+                // إزالة جميع فئات الحالة السابقة
+                personPanel.classList.remove('speaking', 'waiting', 'processing', 'ready');
+                // إضافة فئة الحالة الجديدة
+                personPanel.classList.add(status);
+            }
+        }
+        
+        // دالة تشغيل الصوت المحسنة
+        async function speakTranslationWithEnhancement(text, language, speaker) {
+            if (!text || !text.trim()) {
+                console.warn('Empty text provided for TTS');
+                return;
+            }
+            
+            // إيقاف أي تشغيل صوتي سابق
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+            }
+            
+            return new Promise((resolve, reject) => {
+                try {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    // تحسين إعدادات الصوت
+                    utterance.lang = getTTSLanguage(language);
+                    utterance.rate = ttsSettings.rate || 0.9;
+                    utterance.pitch = ttsSettings.pitch || 1.0;
+                    utterance.volume = ttsSettings.volume || 0.8;
+                    
+                    // اختيار أفضل صوت متاح
+                    const voices = window.speechSynthesis.getVoices();
+                    const preferredVoice = voices.find(voice => 
+                        voice.lang.startsWith(language) && voice.localService
+                    ) || voices.find(voice => voice.lang.startsWith(language));
+                    
+                    if (preferredVoice) {
+                        utterance.voice = preferredVoice;
+                    }
+                    
+                    // تحديث حالة المتحدث أثناء التشغيل
+                    updateSpeakerStatus(speaker, 'playing', 'يتم تشغيل الترجمة...');
+                    
+                    utterance.onstart = () => {
+                        console.log('TTS started for speaker', speaker);
+                        // إضافة مؤشر بصري للتشغيل
+                        const personPanel = document.querySelector(`.person-panel.person${speaker}`);
+                        if (personPanel) {
+                            personPanel.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.3)';
+                        }
+                    };
+                    
+                    utterance.onend = () => {
+                        console.log('TTS ended for speaker', speaker);
+                        updateSpeakerStatus(speaker, 'ready', 'جاهز للتحدث');
+                        // إزالة المؤشر البصري
+                        const personPanel = document.querySelector(`.person-panel.person${speaker}`);
+                        if (personPanel) {
+                            personPanel.style.boxShadow = '';
+                        }
+                        resolve();
+                    };
+                    
+                    utterance.onerror = (error) => {
+                        console.error('TTS error:', error);
+                        updateSpeakerStatus(speaker, 'ready', 'جاهز للتحدث');
+                        reject(error);
+                    };
+                    
+                    // تشغيل الصوت
+                    window.speechSynthesis.speak(utterance);
+                    
+                } catch (error) {
+                    console.error('TTS setup error:', error);
+                    updateSpeakerStatus(speaker, 'ready', 'جاهز للتحدث');
+                    reject(error);
+                }
+            });
+        }
+        
+        // دالة للحصول على لغة TTS المناسبة
+        function getTTSLanguage(langCode) {
+            const ttsLanguageMap = {
+                'ar': 'ar-SA',
+                'en': 'en-US',
+                'fr': 'fr-FR',
+                'es': 'es-ES',
+                'de': 'de-DE',
+                'it': 'it-IT',
+                'pt': 'pt-BR',
+                'ru': 'ru-RU',
+                'ja': 'ja-JP',
+                'ko': 'ko-KR',
+                'zh': 'zh-CN',
+                'hi': 'hi-IN',
+                'tr': 'tr-TR'
+            };
+            
+            return ttsLanguageMap[langCode] || langCode;
         }
         
         function startRecording(speaker) {
-            if (isRecording) {
+            // إيقاف أي تسجيل نشط للمتحدث الآخر
+            if (isRecording && currentSpeaker !== speaker) {
+                stopRecording();
+                // انتظار قصير للتأكد من إيقاف التسجيل السابق
+                setTimeout(() => {
+                    startRecording(speaker);
+                }, 300);
+                return;
+            }
+            
+            if (isRecording && currentSpeaker === speaker) {
                 stopRecording();
                 return;
             }
@@ -1662,14 +1971,33 @@
                 return;
             }
             
-            // تحديث حالة المتحدث
+            // تحديث حالة المتحدث الجديد
             updateSpeakerStatus(speaker, 'speaking', 'جاري التحدث...');
             
+            // تحديث حالة المتحدث الآخر إلى انتظار
+            const otherSpeaker = speaker === 1 ? 2 : 1;
+            updateSpeakerStatus(otherSpeaker, 'waiting', 'في انتظار دورك...');
+            
             // طلب إذن الميكروفون أولاً
-            navigator.mediaDevices.getUserMedia({ audio: true })
+            navigator.mediaDevices.getUserMedia({ 
+                audio: {
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true,
+                    sampleRate: 44100
+                }
+            })
                 .then(() => {
                     currentSpeaker = speaker;
                     isRecording = true;
+                    
+                    // تعطيل زر المتحدث الآخر
+                    const otherMicBtn = document.getElementById(`mic${otherSpeaker}`);
+                    if (otherMicBtn) {
+                        otherMicBtn.disabled = true;
+                        otherMicBtn.style.opacity = '0.5';
+                        otherMicBtn.style.cursor = 'not-allowed';
+                    }
                     
                     // Update UI with enhanced visual feedback
                     const micBtn = document.getElementById(`mic${speaker}`);
@@ -1678,12 +2006,8 @@
                     
                     if (micBtn) {
                         micBtn.classList.add('recording');
-                        // تحديث محتوى الزر المحسن
-                        const micIcon = micBtn.querySelector('.mic-icon');
-                        const micText = micBtn.querySelector('.mic-text');
-                        if (micIcon) micIcon.textContent = '⏹️';
-                        if (micText) micText.textContent = 'إيقاف التسجيل';
-                        else micBtn.innerHTML = '⏹️';
+                        micBtn.innerHTML = '⏹️ إيقاف التسجيل';
+                        micBtn.style.background = 'var(--danger-color)';
                     }
                     if (recordingIndicator) {
                         recordingIndicator.classList.add('active');
@@ -1712,7 +2036,7 @@
                     
                     // Haptic feedback if available
                     if (navigator.vibrate) {
-                        navigator.vibrate(100);
+                        navigator.vibrate([100, 50, 100]);
                     }
                     
                     // Audio feedback
@@ -1720,7 +2044,7 @@
                     
                     try {
                         recognition.start();
-                        showNotification('بدء التسجيل...', 'info');
+                        showNotification(`المتحدث ${speaker} يتحدث الآن...`, 'info');
                     } catch (error) {
                         console.error('Error starting recognition:', error);
                         stopRecording();
@@ -1794,6 +2118,18 @@
             // تحديث حالة المتحدث إلى جاهز
             if (currentSpeaker) {
                 updateSpeakerStatus(currentSpeaker, 'ready', 'جاهز للتحدث');
+                
+                // تحديث حالة المتحدث الآخر إلى جاهز أيضاً
+                const otherSpeaker = currentSpeaker === 1 ? 2 : 1;
+                updateSpeakerStatus(otherSpeaker, 'ready', 'جاهز للتحدث');
+                
+                // إعادة تفعيل زر المتحدث الآخر
+                const otherMicBtn = document.getElementById(`mic${otherSpeaker}`);
+                if (otherMicBtn) {
+                    otherMicBtn.disabled = false;
+                    otherMicBtn.style.opacity = '1';
+                    otherMicBtn.style.cursor = 'pointer';
+                }
             }
             
             // Reset UI with enhanced visual feedback
@@ -1804,7 +2140,8 @@
                 
                 if (micBtn) {
                     micBtn.classList.remove('recording', 'listening');
-                    micBtn.innerHTML = '🎤';
+                    micBtn.innerHTML = '🎤 ابدأ التحدث';
+                    micBtn.style.background = 'var(--primary-color)';
                 }
                 if (recordingIndicator) {
                     recordingIndicator.classList.remove('active');
@@ -1823,10 +2160,11 @@
             // Audio feedback
             playNotificationSound('stop');
             
-            // Reset current speaker
+            // إشعار بانتهاء دور المتحدث
+            showNotification(`انتهى دور المتحدث ${currentSpeaker}. يمكن للمتحدث الآخر البدء الآن.`, 'success');
             
+            // Reset current speaker
             currentSpeaker = null;
-            showNotification('تم إيقاف التسجيل', 'info');
         }
         
         function playNotificationSound(type) {
@@ -1991,14 +2329,20 @@
                 playNotificationSound('success');
                 showNotification('تمت الترجمة بنجاح', 'success');
                 
-                // Speak the translation automatically if enabled
+                // تشغيل الترجمة الصوتية تلقائياً مع تحسينات
                 if (ttsSettings.autoPlay) {
                     try {
-                        await speakText(translatedText, targetLang);
+                        // إضافة تأخير قصير لضمان وضوح الصوت
+                        setTimeout(async () => {
+                            await speakTranslationWithEnhancement(translatedText, targetLang, currentSpeaker);
+                        }, 500);
                     } catch (ttsError) {
                         console.warn('TTS failed:', ttsError);
                         showNotification('فشل في تشغيل الصوت', 'warning');
                     }
+                } else {
+                    // إضافة إشعار للمستخدم بإمكانية تشغيل الصوت
+                    showNotification('اضغط على زر التشغيل لسماع الترجمة', 'info');
                 }
                 
                 console.log('Translation completed successfully');
@@ -2048,14 +2392,50 @@
             messageDiv.appendChild(textDiv);
             messageDiv.appendChild(metaDiv);
             
-            // Add play button for translated messages
+            // Add enhanced play button for translated messages
             if (type === 'translated') {
                 const playBtn = document.createElement('button');
-                playBtn.className = 'play-button';
-                playBtn.innerHTML = '▶️';
-                playBtn.onclick = () => {
+                playBtn.className = 'play-button enhanced-play-btn';
+                playBtn.innerHTML = '🔊 تشغيل الصوت';
+                playBtn.style.cssText = `
+                    background: var(--success-color);
+                    color: white;
+                    border: none;
+                    border-radius: 6px;
+                    padding: 6px 12px;
+                    margin: 5px 0;
+                    cursor: pointer;
+                    font-size: 0.8rem;
+                    transition: all 0.3s ease;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                `;
+                
+                playBtn.onmouseover = () => {
+                    playBtn.style.background = 'var(--secondary-color)';
+                    playBtn.style.transform = 'scale(1.05)';
+                };
+                
+                playBtn.onmouseout = () => {
+                    playBtn.style.background = 'var(--success-color)';
+                    playBtn.style.transform = 'scale(1)';
+                };
+                
+                playBtn.onclick = async () => {
                     const targetLang = speaker === 1 ? document.getElementById('lang2').value : document.getElementById('lang1').value;
-                    speakText(text, targetLang);
+                    playBtn.innerHTML = '⏸️ جاري التشغيل...';
+                    playBtn.disabled = true;
+                    
+                    try {
+                        await speakTranslationWithEnhancement(text, targetLang, speaker);
+                    } catch (error) {
+                        console.error('TTS Error:', error);
+                        showNotification('فشل في تشغيل الصوت', 'error');
+                    } finally {
+                        playBtn.innerHTML = '🔊 تشغيل الصوت';
+                        playBtn.disabled = false;
+                    }
                 };
                 messageDiv.appendChild(playBtn);
             }

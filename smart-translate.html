@@ -1012,6 +1012,77 @@
             color: #16a34a;
         }
         
+        /* Dark theme styles */
+        .dark-theme {
+            --bg-primary: rgba(30, 41, 59, 0.95);
+            --bg-secondary: rgba(51, 65, 85, 0.8);
+            --bg-tertiary: rgba(71, 85, 105, 0.6);
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: rgba(148, 163, 184, 0.2);
+        }
+        
+        .dark-theme body {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+            color: var(--text-primary);
+        }
+        
+        .dark-theme .card {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .dark-theme .tab {
+            background: var(--bg-secondary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .dark-theme .tab.active {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .dark-theme select,
+        .dark-theme textarea,
+        .dark-theme input {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .dark-theme .btn {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .dark-theme .btn:hover {
+            background: var(--bg-tertiary);
+        }
+        
+        .dark-theme .btn.primary {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .dark-theme .result-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
+        .dark-theme .drop-zone {
+            background: var(--bg-secondary);
+            border: 2px dashed var(--border-color);
+            color: var(--text-secondary);
+        }
+        
+        .dark-theme .preview-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 16px;
@@ -1221,6 +1292,57 @@
         let currentStream = null;
         let translationHistory = [];
         let currentTranslation = '';
+        
+        // Initialize theme and language from localStorage
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        let currentLanguage = localStorage.getItem('language') || 'ar';
+        
+        // Apply saved settings on page load
+        function applySettings() {
+            // Apply theme
+            if (currentTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+            
+            // Apply language
+            if (currentLanguage === 'en') {
+                document.documentElement.lang = 'en';
+                document.documentElement.dir = 'ltr';
+            } else {
+                document.documentElement.lang = 'ar';
+                document.documentElement.dir = 'rtl';
+            }
+        }
+        
+        // Listen for settings changes from other pages
+        if (typeof BroadcastChannel !== 'undefined') {
+            const settingsChannel = new BroadcastChannel('app-settings');
+            settingsChannel.addEventListener('message', function(event) {
+                if (event.data.type === 'theme-change') {
+                    currentTheme = event.data.theme;
+                    localStorage.setItem('theme', currentTheme);
+                    applySettings();
+                } else if (event.data.type === 'language-change') {
+                    currentLanguage = event.data.language;
+                    localStorage.setItem('language', currentLanguage);
+                    applySettings();
+                } else if (event.data.type === 'translation-settings') {
+                    // Apply translation settings
+                    const settings = event.data.settings;
+                    if (settings) {
+                        localStorage.setItem('translation-engine', settings.engine || 'google');
+                        localStorage.setItem('translation-quality', settings.quality || 'standard');
+                        localStorage.setItem('autoTranslate', settings.autoTranslate || false);
+                        
+                        // Update global translation settings
+                        window.translationSettings = settings;
+                        console.log('Translation settings updated:', settings);
+                    }
+                }
+            });
+        }
         
         // ---------- Tab Management ----------
         tabs.forEach(tab => {
@@ -2265,48 +2387,243 @@
             }
         });
         
-        // ---------- OCR Processing ----------
+        // ---------- Enhanced AI-Powered OCR Processing ----------
         async function processImageOCR(imageSrc, resultContainer) {
-            showLoading(resultContainer, 'جاري استخراج النص من الصورة...');
+            showLoading(resultContainer, '🤖 جاري تحليل الصورة بالذكاء الاصطناعي...');
             
             try {
-                console.log('🖼️ بدء معالجة الصورة للـ OCR');
+                console.log('🖼️ بدء معالجة الصورة المحسنة بالذكاء الاصطناعي');
                 
-                const { data: { text } } = await Tesseract.recognize(imageSrc, 'ara+eng', {
-                    logger: m => {
-                        if (m.status === 'recognizing text') {
-                            showLoading(resultContainer, `جاري استخراج النص... ${Math.round(m.progress * 100)}%`);
-                        }
-                    }
-                });
+                // تحسين الصورة قبل المعالجة
+                const enhancedImageSrc = await enhanceImageForOCR(imageSrc);
+                showLoading(resultContainer, '🔍 جاري تحسين جودة الصورة...');
                 
-                console.log('📝 النص المستخرج:', text.substring(0, 100) + '...');
+                // تحديد اللغات المحتملة بذكاء
+                const detectedLanguages = await detectImageLanguages(enhancedImageSrc);
+                const languageString = detectedLanguages.join('+');
                 
-                if (!text.trim()) {
-                    showError(resultContainer, 'لم يتم العثور على نص في الصورة. تأكد من وضوح النص في الصورة.');
+                showLoading(resultContainer, `📖 جاري استخراج النص (${detectedLanguages.map(lang => getLanguageName(lang)).join(', ')})...`);
+                
+                // معالجة OCR محسنة مع إعدادات ذكية
+                const ocrResult = await performEnhancedOCR(enhancedImageSrc, languageString, resultContainer);
+                
+                if (!ocrResult.text || !ocrResult.text.trim()) {
+                    showError(resultContainer, '🔍 لم يتم العثور على نص واضح في الصورة. جرب:\n• تحسين الإضاءة\n• زيادة وضوح النص\n• تجنب الانعكاسات');
                     return;
                 }
                 
-                showLoading(resultContainer, 'جاري ترجمة النص المستخرج...');
+                // تنظيف وتحسين النص المستخرج بالذكاء الاصطناعي
+                const cleanedText = await intelligentTextCleaning(ocrResult.text, ocrResult.confidence);
+                console.log('✨ النص المحسن:', cleanedText.substring(0, 100) + '...');
+                
+                showLoading(resultContainer, '🌐 جاري الترجمة الذكية...');
                 
                 try {
-                    const translatedText = await translateText(text.trim(), fromLang.value, toLang.value);
+                    // ترجمة محسنة مع تحليل السياق
+                    const translatedText = await enhancedTranslateText(cleanedText, fromLang.value, toLang.value, ocrResult.context);
                     
-                    // Check if translation returned an error message
                     if (translatedText.includes('خطأ في') || translatedText.includes('فشل في') || translatedText.includes('تم تجاوز')) {
-                        showError(resultContainer, `تم استخراج النص بنجاح ولكن فشلت الترجمة: ${translatedText}`);
+                        showError(resultContainer, `✅ تم استخراج النص بنجاح ولكن فشلت الترجمة: ${translatedText}`);
                     } else {
-                        showResult(resultContainer, text.trim(), translatedText, fromLang.value, toLang.value);
+                        // عرض النتائج مع تحليل ذكي محسن
+                        showEnhancedResult(resultContainer, cleanedText, translatedText, fromLang.value, toLang.value, ocrResult);
                     }
                 } catch (translationError) {
                     console.error('خطأ في ترجمة النص المستخرج:', translationError);
-                    showError(resultContainer, `تم استخراج النص: "${text.trim().substring(0, 50)}..." ولكن فشلت الترجمة.`);
+                    showError(resultContainer, `✅ تم استخراج النص: "${cleanedText.substring(0, 50)}..." ولكن فشلت الترجمة.`);
                 }
                 
             } catch (error) {
-                console.error('OCR Error:', error);
-                showError(resultContainer, 'خطأ في معالجة الصورة. يرجى المحاولة مرة أخرى.');
+                console.error('❌ خطأ في معالجة OCR المحسنة:', error);
+                showError(resultContainer, '⚠️ خطأ في معالجة الصورة. يرجى التأكد من جودة الصورة والمحاولة مرة أخرى.');
             }
+        }
+        
+        // تحسين الصورة قبل معالجة OCR
+        async function enhanceImageForOCR(imageSrc) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = () => {
+                    // تحسين دقة الصورة
+                    const scale = Math.min(2, Math.max(1, 1200 / Math.max(img.width, img.height)));
+                    canvas.width = img.width * scale;
+                    canvas.height = img.height * scale;
+                    
+                    // تطبيق فلاتر تحسين الصورة
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // تحسين التباين والسطوع
+                    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                    const data = imageData.data;
+                    
+                    for (let i = 0; i < data.length; i += 4) {
+                        // تحسين التباين
+                        const contrast = 1.2;
+                        const brightness = 10;
+                        
+                        data[i] = Math.min(255, Math.max(0, contrast * (data[i] - 128) + 128 + brightness));
+                        data[i + 1] = Math.min(255, Math.max(0, contrast * (data[i + 1] - 128) + 128 + brightness));
+                        data[i + 2] = Math.min(255, Math.max(0, contrast * (data[i + 2] - 128) + 128 + brightness));
+                    }
+                    
+                    ctx.putImageData(imageData, 0, 0);
+                    resolve(canvas.toDataURL('image/jpeg', 0.95));
+                };
+                
+                img.src = imageSrc;
+            });
+        }
+        
+        // تحديد اللغات في الصورة بذكاء
+        async function detectImageLanguages(imageSrc) {
+            // تحليل أولي سريع لتحديد اللغات المحتملة
+            try {
+                const quickSample = await Tesseract.recognize(imageSrc, 'ara+eng', {
+                    logger: () => {}, // تجاهل اللوغات للعينة السريعة
+                    tessedit_pageseg_mode: Tesseract.PSM.SPARSE_TEXT,
+                    tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ابتثجحخدذرزسشصضطظعغفقكلمنهويءآأؤإئة'
+                });
+                
+                const text = quickSample.data.text;
+                const languages = [];
+                
+                // تحديد اللغة العربية
+                if (/[\u0600-\u06FF]/.test(text)) {
+                    languages.push('ara');
+                }
+                
+                // تحديد اللغة الإنجليزية
+                if (/[a-zA-Z]/.test(text)) {
+                    languages.push('eng');
+                }
+                
+                // تحديد لغات أخرى محتملة
+                if (/[\u4e00-\u9fff]/.test(text)) languages.push('chi_sim');
+                if (/[\u3040-\u309f\u30a0-\u30ff]/.test(text)) languages.push('jpn');
+                if (/[\u0590-\u05ff]/.test(text)) languages.push('heb');
+                if (/[\u0400-\u04ff]/.test(text)) languages.push('rus');
+                
+                return languages.length > 0 ? languages : ['ara', 'eng'];
+            } catch (error) {
+                console.log('⚠️ فشل في تحديد اللغة، استخدام الافتراضي');
+                return ['ara', 'eng'];
+            }
+        }
+        
+        // معالجة OCR محسنة مع إعدادات ذكية
+        async function performEnhancedOCR(imageSrc, languages, resultContainer) {
+            const ocrOptions = {
+                logger: (m) => {
+                    if (m.status === 'recognizing text') {
+                        const progress = Math.round(m.progress * 100);
+                        showLoading(resultContainer, `🔍 جاري استخراج النص... ${progress}%`);
+                    }
+                },
+                tessedit_pageseg_mode: Tesseract.PSM.AUTO,
+                tessedit_ocr_engine_mode: Tesseract.OEM.LSTM_ONLY,
+                preserve_interword_spaces: '1',
+                tessedit_char_whitelist: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789ابتثجحخدذرزسشصضطظعغفقكلمنهويءآأؤإئة .,!?;:()[]{}"\'-/\\@#$%^&*+=<>|~`'
+            };
+            
+            const result = await Tesseract.recognize(imageSrc, languages, ocrOptions);
+            
+            // تحليل السياق والثقة
+            const confidence = result.data.confidence || 0;
+            const words = result.data.words || [];
+            const lines = result.data.lines || [];
+            
+            // تحديد نوع المحتوى
+            const context = analyzeImageContext(result.data.text, words, lines);
+            
+            return {
+                text: result.data.text,
+                confidence: confidence,
+                words: words,
+                lines: lines,
+                context: context
+            };
+        }
+        
+        // تحليل سياق الصورة والمحتوى
+        function analyzeImageContext(text, words, lines) {
+            const context = {
+                type: 'general',
+                layout: 'paragraph',
+                quality: 'medium',
+                structure: 'text'
+            };
+            
+            // تحديد نوع المحتوى
+            if (/\b(menu|price|\$|€|£|ريال|درهم)\b/i.test(text)) {
+                context.type = 'menu';
+            } else if (/\b(sign|warning|caution|تحذير|إشارة)\b/i.test(text)) {
+                context.type = 'signage';
+            } else if (/\b(document|certificate|شهادة|وثيقة)\b/i.test(text)) {
+                context.type = 'document';
+            } else if (/\b(book|article|مقال|كتاب)\b/i.test(text)) {
+                context.type = 'literature';
+            }
+            
+            // تحديد تخطيط النص
+            if (lines && lines.length > 10) {
+                context.layout = 'multi_column';
+            } else if (lines && lines.length > 5) {
+                context.layout = 'paragraph';
+            } else {
+                context.layout = 'short_text';
+            }
+            
+            // تقييم جودة الاستخراج
+            const avgConfidence = words.reduce((sum, word) => sum + (word.confidence || 0), 0) / (words.length || 1);
+            if (avgConfidence > 80) {
+                context.quality = 'high';
+            } else if (avgConfidence > 60) {
+                context.quality = 'medium';
+            } else {
+                context.quality = 'low';
+            }
+            
+            return context;
+        }
+        
+        // تنظيف وتحسين النص بالذكاء الاصطناعي
+        async function intelligentTextCleaning(rawText, confidence) {
+            let cleanedText = rawText;
+            
+            // إزالة الأحرف الغريبة والرموز غير المرغوبة
+            cleanedText = cleanedText.replace(/[^\w\s\u0600-\u06FF.,!?;:()\[\]{}"'\-\/\\@#$%^&*+=<>|~`]/g, '');
+            
+            // تصحيح المسافات
+            cleanedText = cleanedText.replace(/\s+/g, ' ').trim();
+            
+            // تصحيح علامات الترقيم
+            cleanedText = cleanedText.replace(/\s+([.,!?;:])/g, '$1');
+            cleanedText = cleanedText.replace(/([.,!?;:])([^\s])/g, '$1 $2');
+            
+            // تصحيح الأحرف العربية الشائعة
+            const arabicCorrections = {
+                'أ': /[آاإ]/g,
+                'ة': /[هة]/g,
+                'ي': /[يى]/g,
+                'و': /[وؤ]/g
+            };
+            
+            // تطبيق التصحيحات إذا كانت الثقة منخفضة
+            if (confidence < 70) {
+                for (const [correct, pattern] of Object.entries(arabicCorrections)) {
+                    cleanedText = cleanedText.replace(pattern, correct);
+                }
+            }
+            
+            // تصحيح الأرقام والتواريخ
+            cleanedText = cleanedText.replace(/([0-9])\s+([0-9])/g, '$1$2');
+            
+            return cleanedText;
         }
         
         // ---------- Footer Functions ----------
@@ -2394,6 +2711,9 @@
         }
         
         // ---------- Initialize ----------
+        // Apply saved settings first
+        applySettings();
+        
         // إضافة تأثيرات النقر للأزرار
         addButtonClickEffects();
         

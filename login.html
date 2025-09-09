@@ -94,7 +94,7 @@
             background: rgba(0, 0, 0, 0.8);
             color: white;
             padding: 8px 12px;
-            border-radius: 8px;
+            border-radius: 6px;
             font-size: 12px;
             white-space: nowrap;
             z-index: 1000;
@@ -110,6 +110,45 @@
             border: 5px solid transparent;
             border-top-color: rgba(0, 0, 0, 0.8);
             z-index: 1000;
+        }
+        
+        /* Dark theme styles */
+        .dark-theme {
+            --background-color: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --border-color: rgba(148, 163, 184, 0.2);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+        }
+        
+        .dark-theme body {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+            color: var(--text-primary);
+        }
+        
+        .dark-theme .login-container {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid var(--border-color);
+        }
+        
+        .dark-theme input,
+        .dark-theme select {
+            background: rgba(51, 65, 85, 0.8) !important;
+            color: var(--text-primary) !important;
+            border-color: var(--border-color) !important;
+        }
+        
+        .dark-theme input::placeholder {
+            color: var(--text-secondary) !important;
+        }
+        
+        .dark-theme .tab-button {
+            color: var(--text-secondary);
+        }
+        
+        .dark-theme .tab-button.active {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
         }
 
         @keyframes pulse {
@@ -534,6 +573,45 @@
             }, 3000);
         }
         
+        // Initialize theme and language from localStorage
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        let currentLanguage = localStorage.getItem('language') || 'ar';
+        
+        // Apply saved settings on page load
+        function applySettings() {
+            // Apply theme
+            if (currentTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+            
+            // Apply language
+            if (currentLanguage === 'en') {
+                document.documentElement.lang = 'en';
+                document.documentElement.dir = 'ltr';
+            } else {
+                document.documentElement.lang = 'ar';
+                document.documentElement.dir = 'rtl';
+            }
+        }
+        
+        // Listen for settings changes from other pages
+        if (typeof BroadcastChannel !== 'undefined') {
+            const settingsChannel = new BroadcastChannel('app-settings');
+            settingsChannel.addEventListener('message', function(event) {
+                if (event.data.type === 'theme-change') {
+                    currentTheme = event.data.theme;
+                    localStorage.setItem('theme', currentTheme);
+                    applySettings();
+                } else if (event.data.type === 'language-change') {
+                    currentLanguage = event.data.language;
+                    localStorage.setItem('language', currentLanguage);
+                    applySettings();
+                }
+            });
+        }
+        
         // تسجيل Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
@@ -549,6 +627,9 @@
         
         // تهيئة الوظائف عند تحميل الصفحة
         document.addEventListener('DOMContentLoaded', function() {
+            // Apply saved settings first
+            applySettings();
+            
             initGuestMode();
             checkGuestSession();
         });
