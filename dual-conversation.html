@@ -2764,11 +2764,14 @@
              return getRecognitionLanguage(langCode);
          }
          
-         // Remote mode functions
+         // Remote mode functions - Real-time messaging system
+         let roomConnection = null;
+         let localUserId = Math.random().toString(36).substring(2, 15);
+         let messageListener = null;
+         
          function setupWebSocket() {
-             // WebSocket setup for remote conversations
-             // This would connect to a real-time communication server
-             console.log('WebSocket setup initialized');
+             // Real-time connection setup for remote conversations
+             console.log('Real-time messaging system initialized');
          }
          
          function joinRoom() {
@@ -2780,8 +2783,7 @@
                  return;
              }
              
-             // Simulate joining room
-             simulateConnection(roomCode);
+             connectToRoom(roomCode, false);
          }
          
          function createRoom() {
@@ -2789,30 +2791,135 @@
              const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
              document.getElementById('roomInput').value = roomCode;
              
-             // Simulate creating room
-             simulateConnection(roomCode, true);
+             connectToRoom(roomCode, true);
          }
          
-         function simulateConnection(roomCode, isCreator = false) {
-             isConnected = true;
-             roomId = roomCode;
-             
-             // Update UI
+         function connectToRoom(roomCode, isCreator = false) {
+             try {
+                 // Initialize room connection using localStorage for real-time simulation
+                 roomConnection = {
+                     roomId: roomCode,
+                     userId: localUserId,
+                     isCreator: isCreator,
+                     lastMessageId: 0
+                 };
+                 
+                 // Initialize room data in localStorage
+                 const roomKey = `room_${roomCode}`;
+                 let roomData = JSON.parse(localStorage.getItem(roomKey) || '{}');
+                 
+                 if (!roomData.participants) {
+                     roomData = {
+                         participants: {},
+                         messages: [],
+                         created: Date.now()
+                     };
+                 }
+                 
+                 // Add current user to participants
+                 roomData.participants[localUserId] = {
+                     joinedAt: Date.now(),
+                     lastSeen: Date.now()
+                 };
+                 
+                 localStorage.setItem(roomKey, JSON.stringify(roomData));
+                 
+                 isConnected = true;
+                 roomId = roomCode;
+                 
+                 // Update UI
+                 updateConnectionStatus(roomCode, Object.keys(roomData.participants).length);
+                 
+                 showNotification(isCreator ? `تم إنشاء الغرفة: ${roomCode}` : `تم الانضمام للغرفة: ${roomCode}`, 'success');
+                 
+                 // Start listening for messages
+                 startMessageListener();
+                 
+                 // Load existing messages
+                 loadRoomMessages();
+                 
+             } catch (error) {
+                 console.error('Error connecting to room:', error);
+                 showNotification('خطأ في الاتصال بالغرفة', 'error');
+             }
+         }
+         
+         function updateConnectionStatus(roomCode, participantCount) {
              const connectionDot = document.getElementById('connectionDot');
              const connectionStatus = document.getElementById('connectionStatus');
-             const participantCount = document.getElementById('participantCount');
+             const participantCountEl = document.getElementById('participantCount');
              
-             connectionDot.classList.add('connected');
-             connectionStatus.textContent = `متصل - غرفة: ${roomCode}`;
-             participantCount.textContent = isCreator ? '1 مشارك (أنت)' : '2 مشارك';
+             if (connectionDot) connectionDot.classList.add('connected');
+             if (connectionStatus) connectionStatus.textContent = `متصل - غرفة: ${roomCode}`;
+             if (participantCountEl) participantCountEl.textContent = `${participantCount} مشارك`;
+         }
+         
+         function startMessageListener() {
+             // Clear existing listener
+             if (messageListener) {
+                 clearInterval(messageListener);
+             }
              
-             showNotification(isCreator ? `تم إنشاء الغرفة: ${roomCode}` : `تم الانضمام للغرفة: ${roomCode}`, 'success');
-             
-             // Add welcome message
-             if (!isCreator) {
-                 setTimeout(() => {
-                     addChatBubble('مرحباً! أنا متصل الآن', 'received');
-                 }, 1000);
+             // Poll for new messages every 1 second
+             messageListener = setInterval(() => {
+                 if (isConnected && roomConnection) {
+                     checkForNewMessages();
+                 }
+             }, 1000);
+         }
+         
+         function checkForNewMessages() {
+             try {
+                 const roomKey = `room_${roomConnection.roomId}`;
+                 const roomData = JSON.parse(localStorage.getItem(roomKey) || '{}');
+                 
+                 if (roomData.messages && roomData.messages.length > roomConnection.lastMessageId) {
+                     const newMessages = roomData.messages.slice(roomConnection.lastMessageId);
+                     
+                     newMessages.forEach(message => {
+                         if (message.userId !== localUserId) {
+                             addChatBubble(message.text, 'received', message.originalText);
+                         }
+                     });
+                     
+                     roomConnection.lastMessageId = roomData.messages.length;
+                 }
+                 
+                 // Update participant count
+                 const participantCount = Object.keys(roomData.participants || {}).length;
+                 updateConnectionStatus(roomConnection.roomId, participantCount);
+                 
+             } catch (error) {
+                 console.error('Error checking for messages:', error);
+             }
+         }
+         
+         function loadRoomMessages() {
+             try {
+                 const roomKey = `room_${roomConnection.roomId}`;
+                 const roomData = JSON.parse(localStorage.getItem(roomKey) || '{}');
+                 
+                 if (roomData.messages) {
+                     // Clear existing messages
+                     const chatMessages = document.getElementById('chatMessages');
+                     if (chatMessages) {
+                         chatMessages.innerHTML = '';
+                     }
+                     
+                     roomData.messages.forEach(message => {
+                         const type = message.userId === localUserId ? 'sent' : 'received';
+                         addChatBubble(message.text, type, message.originalText, false);
+                     });
+                     
+                     roomConnection.lastMessageId = roomData.messages.length;
+                     
+                     // Scroll to bottom
+                     if (chatMessages) {
+                         chatMessages.scrollTop = chatMessages.scrollHeight;
+                     }
+                 }
+             } catch (error) {
+                 console.error('Error loading room messages:', error);
              }
          }
          
@@ -2827,36 +2934,78 @@
                  return;
              }
              
-             // Add sent message
+             // Add sent message locally
              addChatBubble(message, 'sent');
              
              // Clear input
              chatInput.value = '';
              
-             // Translate and send
-             try {
-                 const lang1 = document.getElementById('lang1').value;
-                 const lang2 = document.getElementById('lang2').value;
-                 
-                 const translatedText = await translateText(message, lang1, lang2);
-                 
-                 // Simulate network delay
-                 setTimeout(() => {
-                     addChatBubble(translatedText, 'sent', message);
+             // Send message to room if connected
+             if (roomConnection) {
+                 try {
+                     const roomKey = `room_${roomConnection.roomId}`;
+                     let roomData = JSON.parse(localStorage.getItem(roomKey) || '{}');
                      
-                     // Simulate response
-                     setTimeout(() => {
-                         addChatBubble('شكراً لك على الرسالة!', 'received');
-                     }, 1000 + Math.random() * 2000);
-                 }, 500);
-                 
-             } catch (error) {
-                 console.error('Error sending message:', error);
-                 showNotification('خطأ في إرسال الرسالة', 'error');
+                     if (!roomData.messages) {
+                         roomData.messages = [];
+                     }
+                     
+                     const lang1 = document.getElementById('lang1').value;
+                     const lang2 = document.getElementById('lang2').value;
+                     
+                     // Translate message for remote users
+                     const translatedText = await translateText(message, lang1, lang2);
+                     
+                     const messageData = {
+                         id: Date.now() + Math.random(),
+                         userId: localUserId,
+                         text: translatedText,
+                         originalText: message,
+                         timestamp: Date.now(),
+                         language: lang1
+                     };
+                     
+                     roomData.messages.push(messageData);
+                     localStorage.setItem(roomKey, JSON.stringify(roomData));
+                     
+                     // Update last seen for current user
+                     if (roomData.participants && roomData.participants[localUserId]) {
+                         roomData.participants[localUserId].lastSeen = Date.now();
+                         localStorage.setItem(roomKey, JSON.stringify(roomData));
+                     }
+                     
+                 } catch (error) {
+                     console.error('Error sending message:', error);
+                     showNotification('خطأ في إرسال الرسالة', 'error');
+                     
+                     // Send original message if translation fails
+                     try {
+                         const roomKey = `room_${roomConnection.roomId}`;
+                         let roomData = JSON.parse(localStorage.getItem(roomKey) || '{}');
+                         
+                         if (!roomData.messages) {
+                             roomData.messages = [];
+                         }
+                         
+                         const messageData = {
+                             id: Date.now() + Math.random(),
+                             userId: localUserId,
+                             text: message,
+                             originalText: message,
+                             timestamp: Date.now(),
+                             language: 'ar'
+                         };
+                         
+                         roomData.messages.push(messageData);
+                         localStorage.setItem(roomKey, JSON.stringify(roomData));
+                     } catch (fallbackError) {
+                         console.error('Fallback message send failed:', fallbackError);
+                     }
+                 }
              }
          }
          
-         function addChatBubble(message, type, originalText = null) {
+         function addChatBubble(message, type, originalText = null, autoPlay = true) {
              const chatMessages = document.getElementById('chatMessages');
              
              const bubble = document.createElement('div');
@@ -2893,8 +3042,8 @@
              chatMessages.appendChild(bubble);
              chatMessages.scrollTop = chatMessages.scrollHeight;
              
-             // Auto-play for received messages if enabled
-             if (type === 'received' && ttsSettings.autoPlay && ttsSettings.enabled) {
+             // Auto-play for received messages if enabled (only for new messages)
+             if (type === 'received' && autoPlay && ttsSettings.autoPlay && ttsSettings.enabled) {
                  setTimeout(() => {
                      const lang = document.getElementById('lang1').value;
                      speakText(message, lang);
