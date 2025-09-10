@@ -1571,17 +1571,41 @@
             }
             
             // Apply language
-            if (currentLanguage === 'en') {
-                document.documentElement.lang = 'en';
-                document.documentElement.dir = 'ltr';
-            } else {
-                document.documentElement.lang = 'ar';
-                document.documentElement.dir = 'rtl';
-            }
+            const languageMap = {
+                'ar': { lang: 'ar', dir: 'rtl' },
+                'en': { lang: 'en', dir: 'ltr' },
+                'fr': { lang: 'fr', dir: 'ltr' },
+                'es': { lang: 'es', dir: 'ltr' },
+                'de': { lang: 'de', dir: 'ltr' },
+                'zh': { lang: 'zh', dir: 'ltr' }
+            };
+            
+            const langConfig = languageMap[currentLanguage] || languageMap['ar'];
+            document.documentElement.lang = langConfig.lang;
+            document.documentElement.dir = langConfig.dir;
+            
+            // Apply translation settings
+            const translationEngine = localStorage.getItem('translation-engine') || 'google';
+            const translationQuality = localStorage.getItem('translation-quality') || 'standard';
+            const translationMethod = localStorage.getItem('translation-method') || 'realtime';
+            
+            // Update global translation settings
+            window.translationSettings = {
+                engine: translationEngine,
+                quality: translationQuality,
+                method: translationMethod,
+                autoTranslate: localStorage.getItem('save-history') !== 'false'
+            };
+            
+            console.log('Dual conversation settings applied:', {
+                theme: currentTheme,
+                language: currentLanguage,
+                translation: window.translationSettings
+            });
         }
         
         // Listen for settings changes from other pages
-        const settingsChannel = new BroadcastChannel('settings-sync');
+        const settingsChannel = new BroadcastChannel('app-settings');
         settingsChannel.addEventListener('message', function(event) {
             const { type, value, settings } = event.data;
             
@@ -1593,17 +1617,58 @@
                 currentLanguage = value;
                 localStorage.setItem('language', value);
                 applySettings();
+            } else if (type === 'settings-update') {
+                // Apply all settings from settings page
+                if (settings) {
+                    // Update theme and language
+                    if (settings.theme) {
+                        currentTheme = settings.theme;
+                        localStorage.setItem('theme', currentTheme);
+                    }
+                    if (settings.language) {
+                        currentLanguage = settings.language;
+                        localStorage.setItem('language', currentLanguage);
+                    }
+                    
+                    // Update translation settings
+                    localStorage.setItem('translation-engine', settings.translationEngine || 'google');
+                    localStorage.setItem('translation-quality', settings.translationQuality || 'standard');
+                    localStorage.setItem('translation-method', settings.translationMethod || 'realtime');
+                    localStorage.setItem('save-history', settings.saveHistory !== false);
+                    
+                    // Apply all settings
+                    applySettings();
+                    console.log('All dual conversation settings updated:', settings);
+                }
             } else if (type === 'translation-settings') {
-                // Apply translation settings
+                // Legacy support for old translation settings
                 if (settings) {
                     localStorage.setItem('translation-engine', settings.engine || 'google');
                     localStorage.setItem('translation-quality', settings.quality || 'standard');
+                    if (settings.method) {
+                        localStorage.setItem('translation-method', settings.method);
+                    }
                     localStorage.setItem('autoTranslate', settings.autoTranslate || false);
                     
-                    // Update global translation settings
-                    window.translationSettings = settings;
+                    applySettings();
                     console.log('Translation settings updated:', settings);
                 }
+            }
+        });
+        
+        // Also listen to the old channel for backward compatibility
+        const legacyChannel = new BroadcastChannel('settings-sync');
+        legacyChannel.addEventListener('message', function(event) {
+            const { type, value } = event.data;
+            
+            if (type === 'theme') {
+                currentTheme = value;
+                localStorage.setItem('theme', value);
+                applySettings();
+            } else if (type === 'language') {
+                currentLanguage = value;
+                localStorage.setItem('language', value);
+                applySettings();
             }
         });
 
@@ -1615,8 +1680,43 @@
         
         function initializeApp() {
             setupEventListeners();
-            initializeSpeechRecognition();
+            checkBrowserCompatibility();
+            // Add delay for speech recognition initialization
+            setTimeout(() => {
+                initializeSpeechRecognition();
+            }, 1000);
             setupWebSocket();
+        }
+        
+        function checkBrowserCompatibility() {
+            console.log('🔍 Checking browser compatibility...');
+            
+            // Check Speech Recognition
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                console.error('❌ Speech Recognition not supported');
+                showNotification('متصفحك لا يدعم التعرف على الكلام', 'error');
+                return false;
+            }
+            console.log('✅ Speech Recognition supported');
+            
+            // Check Media Devices
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.error('❌ Media Devices not supported');
+                showNotification('متصفحك لا يدعم الوصول للميكروفون', 'error');
+                return false;
+            }
+            console.log('✅ Media Devices supported');
+            
+            // Check Speech Synthesis
+            if (!('speechSynthesis' in window)) {
+                console.error('❌ Speech Synthesis not supported');
+                showNotification('متصفحك لا يدعم تحويل النص إلى كلام', 'error');
+                return false;
+            }
+            console.log('✅ Speech Synthesis supported');
+            
+            console.log('✅ All browser features supported');
+            return true;
         }
         
         function setupEventListeners() {
@@ -1699,15 +1799,26 @@
         }
         
         function initializeSpeechRecognition() {
+            console.log('🎤 Initializing Speech Recognition...');
+            
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                recognition = new SpeechRecognition();
+                try {
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    recognition = new SpeechRecognition();
+                    console.log('✅ SpeechRecognition object created successfully');
                 
                 // تحسين إعدادات التعرف على الصوت للحصول على أفضل أداء
                 recognition.continuous = true;
                 recognition.interimResults = true;
                 recognition.maxAlternatives = 5; // زيادة البدائل للحصول على دقة أفضل
-                recognition.lang = 'ar-SA';
+                recognition.lang = getRecognitionLanguage();
+                
+                console.log('🔧 Speech Recognition configured:', {
+                    continuous: recognition.continuous,
+                    interimResults: recognition.interimResults,
+                    maxAlternatives: recognition.maxAlternatives,
+                    language: recognition.lang
+                });
                 
                 // إعدادات إضافية لتحسين الأداء
                 if ('grammars' in recognition) {
@@ -1828,11 +1939,18 @@
                         }, 200); // زيادة التأخير قليلاً لضمان الاستقرار
                     }
                 };
+                } catch (error) {
+                    console.error('❌ Error initializing Speech Recognition:', error);
+                    showNotification('فشل في تهيئة التعرف على الكلام: ' + error.message, 'error');
+                }
             } else {
-                console.warn('Speech recognition not supported');
+                console.error('❌ Speech recognition not supported in this browser');
                 showNotification('التعرف على الكلام غير مدعوم في هذا المتصفح. يرجى استخدام Chrome أو Edge.', 'warning');
             }
+            
+            console.log('🎤 Speech Recognition initialization completed');
         }
+        
         
         // دالة تحديث حالة المتحدث المحسنة
         function updateSpeakerStatus(speaker, status, text) {
@@ -1951,8 +2069,12 @@
         }
         
         function startRecording(speaker) {
+            console.log('🎙️ Starting recording for speaker:', speaker);
+            console.log('📊 Current state:', { isRecording, currentSpeaker, recognitionExists: !!recognition });
+            
             // إيقاف أي تسجيل نشط للمتحدث الآخر
             if (isRecording && currentSpeaker !== speaker) {
+                console.log('⏹️ Stopping recording for other speaker');
                 stopRecording();
                 // انتظار قصير للتأكد من إيقاف التسجيل السابق
                 setTimeout(() => {
@@ -1962,14 +2084,18 @@
             }
             
             if (isRecording && currentSpeaker === speaker) {
+                console.log('⏹️ Stopping recording for same speaker');
                 stopRecording();
                 return;
             }
             
             if (!recognition) {
+                console.error('❌ Recognition object not available');
                 showNotification('التعرف على الكلام غير متاح', 'error');
                 return;
             }
+            
+            console.log('✅ Recognition object available, proceeding with recording');
             
             // تحديث حالة المتحدث الجديد
             updateSpeakerStatus(speaker, 'speaking', 'جاري التحدث...');
@@ -1978,6 +2104,7 @@
             const otherSpeaker = speaker === 1 ? 2 : 1;
             updateSpeakerStatus(otherSpeaker, 'waiting', 'في انتظار دورك...');
             
+            console.log('🎤 Requesting microphone permission...');
             // طلب إذن الميكروفون أولاً
             navigator.mediaDevices.getUserMedia({ 
                 audio: {
@@ -1988,8 +2115,10 @@
                 }
             })
                 .then(() => {
+                    console.log('✅ Microphone permission granted');
                     currentSpeaker = speaker;
                     isRecording = true;
+                    console.log('📝 Recording state updated:', { currentSpeaker, isRecording });
                     
                     // تعطيل زر المتحدث الآخر
                     const otherMicBtn = document.getElementById(`mic${otherSpeaker}`);
@@ -2043,19 +2172,23 @@
                     playNotificationSound('start');
                     
                     try {
+                        console.log('🎯 Starting speech recognition with language:', recognition.lang);
                         recognition.start();
+                        console.log('✅ Speech recognition started successfully');
                         showNotification(`المتحدث ${speaker} يتحدث الآن...`, 'info');
                     } catch (error) {
-                        console.error('Error starting recognition:', error);
+                        console.error('❌ Error starting recognition:', error);
+                        console.error('Error details:', { name: error.name, message: error.message });
                         stopRecording();
-                        showNotification('خطأ في بدء التسجيل', 'error');
+                        showNotification('خطأ في بدء التسجيل: ' + error.message, 'error');
                     }
                 })
                 .catch((error) => {
-                    console.error('Microphone access denied:', error);
+                    console.error('❌ Microphone access denied:', error);
+                    console.error('Error details:', { name: error.name, message: error.message });
                     showNotification('تم رفض الوصول للميكروفون. يرجى السماح بالوصول للميكروفون في إعدادات المتصفح.', 'error');
                 });
-        }
+         }
         
         function startVoiceRecording() {
             if (isRecording) {
@@ -2079,6 +2212,45 @@
             const lang1 = document.getElementById('lang1').value;
             if (lang1 !== 'auto') {
                 recognition.lang = getRecognitionLanguage(lang1);
+            }
+            
+            // Start audio recording for remote mode
+            if (currentMode === 'remote') {
+                navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        autoGainControl: true,
+                        sampleRate: 44100
+                    }
+                })
+                .then(stream => {
+                    // Create MediaRecorder to capture audio
+                    window.mediaRecorder = new MediaRecorder(stream);
+                    window.recordedChunks = [];
+                    
+                    window.mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            window.recordedChunks.push(event.data);
+                        }
+                    };
+                    
+                    window.mediaRecorder.onstop = () => {
+                        // Create blob from recorded chunks
+                        const blob = new Blob(window.recordedChunks, { type: 'audio/webm' });
+                        window.lastRecordedAudio = blob;
+                        
+                        // Stop all tracks
+                        stream.getTracks().forEach(track => track.stop());
+                    };
+                    
+                    // Start recording
+                    window.mediaRecorder.start();
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    showNotification('خطأ في الوصول للميكروفون', 'error');
+                });
             }
             
             // Setup remote-specific handlers for STT
@@ -2106,6 +2278,11 @@
             if (!isRecording) return;
             
             isRecording = false;
+            
+            // Stop MediaRecorder if it exists
+            if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {
+                window.mediaRecorder.stop();
+            }
             
             if (recognition) {
                 try {
@@ -2365,12 +2542,70 @@
         }
         
         async function handleRemoteSpeech(transcript) {
-            // Add to chat input
-            document.getElementById('chatInput').value = transcript;
-            
-            // Auto-send if connected
-            if (isConnected) {
-                await sendMessage();
+            try {
+                if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN) {
+                    showNotification('يجب الاتصال بغرفة أولاً', 'warning');
+                    return;
+                }
+                
+                const lang1 = document.getElementById('lang1').value;
+                const lang2 = document.getElementById('lang2').value;
+                
+                // Translate the speech for remote users
+                const translatedText = await translateText(transcript, lang1, lang2);
+                
+                // Add to local chat
+                addChatBubble(translatedText, 'sent', transcript);
+                
+                // Send voice message via WebSocket with proper structure
+                const voiceMessage = {
+                    type: 'send_voice',
+                    room_id: roomConnection?.roomId,
+                    user_id: localUserId,
+                    transcript: transcript,
+                    translation: translatedText,
+                    voice_data: null, // Will be set if audio recording is available
+                    language: lang1
+                };
+                
+                // Try to get recorded audio data if available
+                if (window.lastRecordedAudio) {
+                    try {
+                        // Convert audio blob to base64
+                        const reader = new FileReader();
+                        reader.onload = function() {
+                            const base64Audio = reader.result.split(',')[1];
+                            voiceMessage.voice_data = base64Audio;
+                            ws.send(JSON.stringify(voiceMessage));
+                        };
+                        reader.readAsDataURL(window.lastRecordedAudio);
+                    } catch (e) {
+                        console.log('Could not attach audio data:', e);
+                        ws.send(JSON.stringify(voiceMessage));
+                    }
+                } else {
+                    ws.send(JSON.stringify(voiceMessage));
+                }
+                
+            } catch (error) {
+                console.error('Error handling remote speech:', error);
+                showNotification('خطأ في إرسال الرسالة الصوتية', 'error');
+                
+                // Fallback: send original transcript
+                try {
+                    addChatBubble(transcript, 'sent');
+                    
+                    const fallbackData = {
+                        type: 'voice_message',
+                        transcript: transcript,
+                        translatedText: transcript,
+                        language: 'ar'
+                    };
+                    
+                    ws.send(JSON.stringify(fallbackData));
+                } catch (fallbackError) {
+                    console.error('Fallback voice message failed:', fallbackError);
+                }
             }
         }
         
@@ -2768,10 +3003,110 @@
          let roomConnection = null;
          let localUserId = Math.random().toString(36).substring(2, 15);
          let messageListener = null;
+         let wsUrl = 'ws://localhost:3000';
          
          function setupWebSocket() {
              // Real-time connection setup for remote conversations
-             console.log('Real-time messaging system initialized');
+             try {
+                 ws = new WebSocket(wsUrl);
+                 
+                 ws.onopen = function() {
+                     console.log('WebSocket connected');
+                     showNotification('تم الاتصال بالخادم', 'success');
+                 };
+                 
+                 ws.onmessage = function(event) {
+                     try {
+                         const data = JSON.parse(event.data);
+                         handleWebSocketMessage(data);
+                     } catch (error) {
+                         console.error('Error parsing WebSocket message:', error);
+                     }
+                 };
+                 
+                 ws.onclose = function() {
+                     console.log('WebSocket disconnected');
+                     showNotification('انقطع الاتصال بالخادم', 'warning');
+                     isConnected = false;
+                     updateConnectionStatus('غير متصل', 0);
+                 };
+                 
+                 ws.onerror = function(error) {
+                     console.error('WebSocket error:', error);
+                     showNotification('خطأ في الاتصال بالخادم', 'error');
+                 };
+                 
+             } catch (error) {
+                 console.error('Error setting up WebSocket:', error);
+                 showNotification('فشل في الاتصال بالخادم', 'error');
+             }
+         }
+         
+         function handleWebSocketMessage(data) {
+             switch (data.type) {
+                 case 'room_joined':
+                     isConnected = true;
+                     roomConnection = {
+                         roomId: data.roomId,
+                         userId: localUserId,
+                         participants: data.participants
+                     };
+                     updateConnectionStatus(data.roomId, data.participantCount);
+                     showNotification(`تم الانضمام للغرفة: ${data.roomId}`, 'success');
+                     break;
+                     
+                 case 'user_joined':
+                     if (data.userId !== localUserId) {
+                         updateConnectionStatus(roomConnection.roomId, data.participantCount);
+                         showNotification(`انضم ${data.userName || 'مستخدم'} للغرفة`, 'info');
+                     }
+                     break;
+                     
+                 case 'user_left':
+                     if (data.userId !== localUserId) {
+                         updateConnectionStatus(roomConnection.roomId, data.participantCount);
+                         showNotification(`غادر مستخدم الغرفة`, 'info');
+                     }
+                     break;
+                     
+                 case 'new_message':
+                     if (data.userId !== localUserId) {
+                         addChatBubble(data.text, 'received', data.originalText);
+                     }
+                     break;
+                     
+                 case 'voice_message':
+                     if (data.userId !== localUserId) {
+                         // Add chat bubble with translation and original text
+                         addChatBubble(data.translation, 'received', data.transcript, true);
+                         
+                         // Play the received voice message if voice data is available
+                         if (data.voice_data && ttsSettings.enabled) {
+                             try {
+                                 // Convert base64 to blob and play
+                                 const audioData = atob(data.voice_data);
+                                 const audioArray = new Uint8Array(audioData.length);
+                                 for (let i = 0; i < audioData.length; i++) {
+                                     audioArray[i] = audioData.charCodeAt(i);
+                                 }
+                                 const audioBlob = new Blob([audioArray], { type: 'audio/wav' });
+                                 const audioUrl = URL.createObjectURL(audioBlob);
+                                 const audio = new Audio(audioUrl);
+                                 audio.play().catch(e => console.log('Audio play failed:', e));
+                             } catch (e) {
+                                 console.log('Voice playback failed:', e);
+                                 // Fallback to TTS if voice data playback fails
+                                 if (data.translation) {
+                                     speakText(data.translation);
+                                 }
+                             }
+                         } else if (data.translation && ttsSettings.enabled && ttsSettings.autoPlay) {
+                             // Use TTS for translation if no voice data
+                             speakText(data.translation);
+                         }
+                     }
+                     break;
+             }
          }
          
          function joinRoom() {
@@ -2783,10 +3118,22 @@
                  return;
              }
              
+             if (!ws || ws.readyState !== WebSocket.OPEN) {
+                 showNotification('يجب الاتصال بالخادم أولاً', 'warning');
+                 setupWebSocket();
+                 return;
+             }
+             
              connectToRoom(roomCode, false);
          }
          
          function createRoom() {
+             if (!ws || ws.readyState !== WebSocket.OPEN) {
+                 showNotification('يجب الاتصال بالخادم أولاً', 'warning');
+                 setupWebSocket();
+                 return;
+             }
+             
              // Generate random room ID
              const roomCode = Math.random().toString(36).substring(2, 8).toUpperCase();
              document.getElementById('roomInput').value = roomCode;
@@ -2796,47 +3143,30 @@
          
          function connectToRoom(roomCode, isCreator = false) {
              try {
-                 // Initialize room connection using localStorage for real-time simulation
+                 if (!ws || ws.readyState !== WebSocket.OPEN) {
+                     showNotification('غير متصل بالخادم', 'error');
+                     return;
+                 }
+                 
+                 // Send join room request to WebSocket server
+                 const joinData = {
+                     type: 'join_room',
+                     roomId: roomCode,
+                     userId: localUserId,
+                     userName: `مستخدم_${localUserId.substring(0, 6)}`,
+                     isCreator: isCreator
+                 };
+                 
+                 ws.send(JSON.stringify(joinData));
+                 
+                 // Store room info locally
                  roomConnection = {
                      roomId: roomCode,
                      userId: localUserId,
-                     isCreator: isCreator,
-                     lastMessageId: 0
+                     isCreator: isCreator
                  };
                  
-                 // Initialize room data in localStorage
-                 const roomKey = `room_${roomCode}`;
-                 let roomData = JSON.parse(localStorage.getItem(roomKey) || '{}');
-                 
-                 if (!roomData.participants) {
-                     roomData = {
-                         participants: {},
-                         messages: [],
-                         created: Date.now()
-                     };
-                 }
-                 
-                 // Add current user to participants
-                 roomData.participants[localUserId] = {
-                     joinedAt: Date.now(),
-                     lastSeen: Date.now()
-                 };
-                 
-                 localStorage.setItem(roomKey, JSON.stringify(roomData));
-                 
-                 isConnected = true;
                  roomId = roomCode;
-                 
-                 // Update UI
-                 updateConnectionStatus(roomCode, Object.keys(roomData.participants).length);
-                 
-                 showNotification(isCreator ? `تم إنشاء الغرفة: ${roomCode}` : `تم الانضمام للغرفة: ${roomCode}`, 'success');
-                 
-                 // Start listening for messages
-                 startMessageListener();
-                 
-                 // Load existing messages
-                 loadRoomMessages();
                  
              } catch (error) {
                  console.error('Error connecting to room:', error);
@@ -2929,7 +3259,7 @@
              
              if (!message) return;
              
-             if (!isConnected) {
+             if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN) {
                  showNotification('يجب الاتصال بغرفة أولاً', 'warning');
                  return;
              }
@@ -2940,16 +3270,9 @@
              // Clear input
              chatInput.value = '';
              
-             // Send message to room if connected
-             if (roomConnection) {
+             // Send message to room via WebSocket
+             if (roomConnection && ws && ws.readyState === WebSocket.OPEN) {
                  try {
-                     const roomKey = `room_${roomConnection.roomId}`;
-                     let roomData = JSON.parse(localStorage.getItem(roomKey) || '{}');
-                     
-                     if (!roomData.messages) {
-                         roomData.messages = [];
-                     }
-                     
                      const lang1 = document.getElementById('lang1').value;
                      const lang2 = document.getElementById('lang2').value;
                      
@@ -2957,22 +3280,13 @@
                      const translatedText = await translateText(message, lang1, lang2);
                      
                      const messageData = {
-                         id: Date.now() + Math.random(),
-                         userId: localUserId,
+                         type: 'send_message',
                          text: translatedText,
                          originalText: message,
-                         timestamp: Date.now(),
                          language: lang1
                      };
                      
-                     roomData.messages.push(messageData);
-                     localStorage.setItem(roomKey, JSON.stringify(roomData));
-                     
-                     // Update last seen for current user
-                     if (roomData.participants && roomData.participants[localUserId]) {
-                         roomData.participants[localUserId].lastSeen = Date.now();
-                         localStorage.setItem(roomKey, JSON.stringify(roomData));
-                     }
+                     ws.send(JSON.stringify(messageData));
                      
                  } catch (error) {
                      console.error('Error sending message:', error);
@@ -2980,24 +3294,14 @@
                      
                      // Send original message if translation fails
                      try {
-                         const roomKey = `room_${roomConnection.roomId}`;
-                         let roomData = JSON.parse(localStorage.getItem(roomKey) || '{}');
-                         
-                         if (!roomData.messages) {
-                             roomData.messages = [];
-                         }
-                         
-                         const messageData = {
-                             id: Date.now() + Math.random(),
-                             userId: localUserId,
+                         const fallbackData = {
+                             type: 'send_message',
                              text: message,
                              originalText: message,
-                             timestamp: Date.now(),
                              language: 'ar'
                          };
                          
-                         roomData.messages.push(messageData);
-                         localStorage.setItem(roomKey, JSON.stringify(roomData));
+                         ws.send(JSON.stringify(fallbackData));
                      } catch (fallbackError) {
                          console.error('Fallback message send failed:', fallbackError);
                      }
@@ -3196,6 +3500,9 @@
                      showNotification(`سرعة القراءة: ${(speeds[remoteSpeedIndex] * 100)}%`, 'info');
                  });
              }
+             
+             // Initialize WebSocket connection for remote mode
+             setupWebSocket();
          });
      </script>
  </body>
