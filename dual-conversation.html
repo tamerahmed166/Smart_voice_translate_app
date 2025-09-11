@@ -814,15 +814,15 @@
         }
         
         .btn.reconnect {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            background: var(--warning-color);
             color: white;
-            font-size: 14px;
-            padding: 10px 16px;
+            font-size: 0.9rem;
+            padding: 8px 12px;
         }
         
         .btn.reconnect:hover {
-            background: linear-gradient(135deg, #ee5a24, #ff6b6b);
-            transform: translateY(-2px);
+            background: #e0a800;
+            transform: scale(1.05);
         }
         
         .chat-container {
@@ -1159,6 +1159,34 @@
                 background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
             }
         }
+        
+        .current-speaker-indicator {
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #ccc;
+            color: #666;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            min-width: 100px;
+            z-index: 10;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(76, 175, 80, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -1485,11 +1513,13 @@
         let isRecording = false;
         let recognition = null;
         let synthesis = window.speechSynthesis;
-        let currentSpeaker = null;
+        let currentSpeaker = 1; // البدء بالمتحدث الأول
         let autoDetect = true;
         let roomId = null;
         let isConnected = false;
         let ws = null;
+        let turnBasedMode = true; // النظام الجديد للأدوار
+        let detectedLanguages = { speaker1: null, speaker2: null }; // اللغات المكتشفة
         
         // Language mappings
         const languageNames = {
@@ -1699,6 +1729,75 @@
                 initializeSpeechRecognition();
             }, 1000);
             setupWebSocket();
+            
+            // تهيئة النظام الجديد للأدوار
+            if (turnBasedMode) {
+                initializeTurnBasedMode();
+            }
+        }
+        
+        // تهيئة النظام الجديد للأدوار
+        function initializeTurnBasedMode() {
+            console.log('🔄 Initializing turn-based mode...');
+            
+            // تحديث أزرار الميكروفون للنظام الجديد
+            updateMicrophoneButtons();
+            
+            // تحديث حالة المتحدثين
+            updateSpeakerStatus(1, 'ready', 'دورك الآن - اضغط للتحدث');
+            updateSpeakerStatus(2, 'ready', 'انتظار الدور');
+            
+            // إخفاء عناصر التحكم في اللغة (لأن النظام الجديد يكتشف اللغة تلقائياً)
+            const langControls = document.querySelectorAll('.language-controls');
+            langControls.forEach(control => {
+                control.style.display = 'none';
+            });
+            
+            // إضافة مؤشر للمتحدث الحالي
+            addCurrentSpeakerIndicator();
+            
+            console.log('✅ Turn-based mode initialized');
+        }
+        
+        // إضافة مؤشر للمتحدث الحالي
+        function addCurrentSpeakerIndicator() {
+            const speaker1Panel = document.querySelector('.speaker-panel:first-child');
+            const speaker2Panel = document.querySelector('.speaker-panel:last-child');
+            
+            if (speaker1Panel && speaker2Panel) {
+                // إضافة مؤشر للمتحدث الأول
+                const indicator1 = document.createElement('div');
+                indicator1.id = 'currentSpeakerIndicator1';
+                indicator1.className = 'current-speaker-indicator active';
+                indicator1.innerHTML = '👤 دورك الآن';
+                indicator1.style.cssText = `
+                    background: linear-gradient(45deg, #4CAF50, #45a049);
+                    color: white;
+                    padding: 5px 10px;
+                    border-radius: 15px;
+                    font-size: 12px;
+                    margin: 5px 0;
+                    text-align: center;
+                    animation: pulse 2s infinite;
+                `;
+                speaker1Panel.insertBefore(indicator1, speaker1Panel.firstChild);
+                
+                // إضافة مؤشر للمتحدث الثاني
+                const indicator2 = document.createElement('div');
+                indicator2.id = 'currentSpeakerIndicator2';
+                indicator2.className = 'current-speaker-indicator';
+                indicator2.innerHTML = '⏳ انتظار الدور';
+                indicator2.style.cssText = `
+                    background: #ccc;
+                    color: #666;
+                    padding: 5px 10px;
+                    border-radius: 15px;
+                    font-size: 12px;
+                    margin: 5px 0;
+                    text-align: center;
+                `;
+                speaker2Panel.insertBefore(indicator2, speaker2Panel.firstChild);
+            }
         }
         
         function checkBrowserCompatibility() {
@@ -2082,23 +2181,18 @@
             return ttsLanguageMap[langCode] || langCode;
         }
         
-        function startRecording(speaker) {
+        function startRecording(speaker = null) {
+            // في النظام الجديد، نستخدم currentSpeaker إذا لم يتم تحديد متحدث
+            if (turnBasedMode && !speaker) {
+                speaker = currentSpeaker;
+            }
+            
             console.log('🎙️ Starting recording for speaker:', speaker);
             console.log('📊 Current state:', { isRecording, currentSpeaker, recognitionExists: !!recognition });
             
-            // إيقاف أي تسجيل نشط للمتحدث الآخر
-            if (isRecording && currentSpeaker !== speaker) {
-                console.log('⏹️ Stopping recording for other speaker');
-                stopRecording();
-                // انتظار قصير للتأكد من إيقاف التسجيل السابق
-                setTimeout(() => {
-                    startRecording(speaker);
-                }, 300);
-                return;
-            }
-            
-            if (isRecording && currentSpeaker === speaker) {
-                console.log('⏹️ Stopping recording for same speaker');
+            // في النظام الجديد، إيقاف التسجيل إذا كان نشطاً
+            if (isRecording) {
+                console.log('⏹️ Stopping current recording');
                 stopRecording();
                 return;
             }
@@ -2110,6 +2204,9 @@
             }
             
             console.log('✅ Recognition object available, proceeding with recording');
+            
+            // تحديث المتحدث الحالي
+            currentSpeaker = speaker;
             
             // تحديث حالة المتحدث الجديد
             updateSpeakerStatus(speaker, 'speaking', 'جاري التحدث...');
@@ -2306,8 +2403,21 @@
                 }
             }
             
-            // تحديث حالة المتحدث إلى جاهز
-            if (currentSpeaker) {
+            // في النظام الجديد، تبديل الدور للمتحدث التالي
+            if (currentSpeaker && turnBasedMode) {
+                updateSpeakerStatus(currentSpeaker, 'ready', 'انتهى الدور');
+                
+                // تبديل الدور للمتحدث الآخر
+                const nextSpeaker = currentSpeaker === 1 ? 2 : 1;
+                currentSpeaker = nextSpeaker;
+                updateSpeakerStatus(nextSpeaker, 'ready', 'دورك الآن - اضغط للتحدث');
+                
+                // تحديث أزرار الميكروفون
+                updateMicrophoneButtons();
+                
+                // إشعار بتبديل الدور
+                showNotification(`الآن دور المتحدث ${nextSpeaker}`, 'info');
+            } else if (currentSpeaker) {
                 updateSpeakerStatus(currentSpeaker, 'ready', 'جاهز للتحدث');
                 
                 // تحديث حالة المتحدث الآخر إلى جاهز أيضاً
@@ -2351,12 +2461,76 @@
             // Audio feedback
             playNotificationSound('stop');
             
-            // إشعار بانتهاء دور المتحدث
-            showNotification(`انتهى دور المتحدث ${currentSpeaker}. يمكن للمتحدث الآخر البدء الآن.`, 'success');
-            
-            // Reset current speaker
-            currentSpeaker = null;
+            // إشعار بانتهاء دور المتحدث (فقط في النظام القديم)
+            if (!turnBasedMode) {
+                showNotification(`انتهى دور المتحدث ${currentSpeaker}. يمكن للمتحدث الآخر البدء الآن.`, 'success');
+                // Reset current speaker في النظام القديم فقط
+                currentSpeaker = null;
+            }
         }
+        
+        // وظيفة تحديث أزرار الميكروفون للنظام الجديد
+         function updateMicrophoneButtons() {
+             if (!turnBasedMode) return;
+             
+             const mic1 = document.getElementById('mic1');
+             const mic2 = document.getElementById('mic2');
+             const indicator1 = document.getElementById('currentSpeakerIndicator1');
+             const indicator2 = document.getElementById('currentSpeakerIndicator2');
+             
+             if (mic1 && mic2) {
+                 // تفعيل زر المتحدث الحالي وتعطيل الآخر
+                 if (currentSpeaker === 1) {
+                     mic1.style.opacity = '1';
+                     mic1.style.cursor = 'pointer';
+                     mic1.disabled = false;
+                     mic1.innerHTML = '🎤 ابدأ التحدث';
+                     
+                     mic2.style.opacity = '0.5';
+                     mic2.style.cursor = 'not-allowed';
+                     mic2.disabled = true;
+                     mic2.innerHTML = '⏳ انتظار الدور';
+                     
+                     // تحديث المؤشرات
+                     if (indicator1) {
+                         indicator1.innerHTML = '👤 دورك الآن';
+                         indicator1.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                         indicator1.style.color = 'white';
+                         indicator1.style.animation = 'pulse 2s infinite';
+                     }
+                     if (indicator2) {
+                         indicator2.innerHTML = '⏳ انتظار الدور';
+                         indicator2.style.background = '#ccc';
+                         indicator2.style.color = '#666';
+                         indicator2.style.animation = 'none';
+                     }
+                 } else {
+                     mic2.style.opacity = '1';
+                     mic2.style.cursor = 'pointer';
+                     mic2.disabled = false;
+                     mic2.innerHTML = '🎤 ابدأ التحدث';
+                     
+                     mic1.style.opacity = '0.5';
+                     mic1.style.cursor = 'not-allowed';
+                     mic1.disabled = true;
+                     mic1.innerHTML = '⏳ انتظار الدور';
+                     
+                     // تحديث المؤشرات
+                     if (indicator2) {
+                         indicator2.innerHTML = '👤 دورك الآن';
+                         indicator2.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
+                         indicator2.style.color = 'white';
+                         indicator2.style.animation = 'pulse 2s infinite';
+                     }
+                     if (indicator1) {
+                         indicator1.innerHTML = '⏳ انتظار الدور';
+                         indicator1.style.background = '#ccc';
+                         indicator1.style.color = '#666';
+                         indicator1.style.animation = 'none';
+                     }
+                 }
+             }
+         }
         
         function playNotificationSound(type) {
             // Create audio context for sound feedback
@@ -2462,19 +2636,23 @@
             updateSpeakerStatus(currentSpeaker, 'processing', 'جاري المعالجة...');
             
             const cleanTranscript = transcript.trim();
-            const lang1 = document.getElementById('lang1').value;
-            const lang2 = document.getElementById('lang2').value;
             
-            // Determine source and target languages
-            let sourceLang = lang1;
-            let targetLang = lang2;
+            // التعرف التلقائي على اللغة في النظام الجديد
+            let sourceLang = await detectLanguage(cleanTranscript);
+            let targetLang;
             
-            if (currentSpeaker === 2) {
-                sourceLang = lang2;
-                targetLang = lang1;
+            // حفظ اللغة المكتشفة للمتحدث
+            detectedLanguages[`speaker${currentSpeaker}`] = sourceLang;
+            
+            // تحديد اللغة الهدف بناءً على اللغة المكتشفة
+            if (sourceLang === 'ar') {
+                targetLang = 'en'; // إذا كانت عربية، ترجم للإنجليزية
+            } else {
+                targetLang = 'ar'; // إذا كانت أي لغة أخرى، ترجم للعربية
             }
             
             console.log(`Processing speech from speaker ${currentSpeaker}: ${cleanTranscript}`);
+            console.log(`Detected language: ${sourceLang}, Target: ${targetLang}`);
             console.log(`Translation: ${sourceLang} → ${targetLang}`);
             
             // Add original message
@@ -2704,6 +2882,42 @@
                     messageElement.remove();
                 }, 300);
             }
+        }
+        
+        // وظيفة التعرف التلقائي على اللغة
+        async function detectLanguage(text) {
+            if (!text || !text.trim()) {
+                return 'ar'; // افتراضي
+            }
+            
+            const cleanText = text.trim();
+            
+            // التعرف على اللغة العربية
+            const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+            if (arabicPattern.test(cleanText)) {
+                return 'ar';
+            }
+            
+            // التعرف على اللغة الإنجليزية
+            const englishPattern = /^[a-zA-Z\s.,!?;:'"-]+$/;
+            if (englishPattern.test(cleanText)) {
+                return 'en';
+            }
+            
+            // التعرف على اللغة الفرنسية
+            const frenchPattern = /[àâäéèêëïîôöùûüÿç]/i;
+            if (frenchPattern.test(cleanText)) {
+                return 'fr';
+            }
+            
+            // التعرف على اللغة الإسبانية
+            const spanishPattern = /[ñáéíóúü]/i;
+            if (spanishPattern.test(cleanText)) {
+                return 'es';
+            }
+            
+            // افتراضي للإنجليزية إذا لم يتم التعرف على اللغة
+            return 'en';
         }
         
         // Google Translate API configuration
@@ -3018,6 +3232,9 @@
          let localUserId = Math.random().toString(36).substring(2, 15);
          let messageListener = null;
          let wsUrl = 'ws://localhost:3000';
+         let reconnectAttempts = 0;
+         let maxReconnectAttempts = 5;
+         let reconnectDelay = 2000; // 2 seconds
          
          function setupWebSocket() {
              // Real-time connection setup for remote conversations
@@ -3027,6 +3244,7 @@
                  ws.onopen = function() {
                      console.log('WebSocket connected');
                      showNotification('تم الاتصال بالخادم', 'success');
+                     reconnectAttempts = 0; // Reset attempts on successful connection
                      hideReconnectButton(); // Hide reconnect button on successful connection
                  };
                  
@@ -3041,16 +3259,31 @@
                  
                  ws.onclose = function() {
                      console.log('WebSocket disconnected');
-                     showNotification('انقطع الاتصال بالخادم', 'warning');
                      isConnected = false;
                      updateConnectionStatus('غير متصل', 0);
-                     showReconnectButton(); // Show reconnect button when connection is lost
+                     
+                     // Attempt to reconnect
+                     if (reconnectAttempts < maxReconnectAttempts) {
+                         reconnectAttempts++;
+                         showNotification(`محاولة إعادة الاتصال (${reconnectAttempts}/${maxReconnectAttempts})...`, 'info');
+                         setTimeout(() => {
+                             setupWebSocket();
+                         }, reconnectDelay);
+                     } else {
+                         showNotification('انقطع الاتصال بالخادم - تأكد من تشغيل الخادم', 'error');
+                         showReconnectButton(); // Show reconnect button when max attempts reached
+                     }
                  };
                  
                  ws.onerror = function(error) {
                      console.error('WebSocket error:', error);
-                     showNotification('خطأ في الاتصال بالخادم', 'error');
-                     showReconnectButton(); // Show reconnect button on connection error
+                     if (reconnectAttempts === 0) {
+                         showNotification('خطأ في الاتصال بالخادم - جاري المحاولة مرة أخرى...', 'warning');
+                     }
+                     // Show reconnect button on connection error
+                     if (reconnectAttempts >= maxReconnectAttempts) {
+                         showReconnectButton();
+                     }
                  };
                  
              } catch (error) {
