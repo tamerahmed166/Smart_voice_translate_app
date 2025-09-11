@@ -3233,8 +3233,8 @@
          let messageListener = null;
          let wsUrl = 'ws://localhost:3000';
          let reconnectAttempts = 0;
-         let maxReconnectAttempts = 5;
-         let reconnectDelay = 2000; // 2 seconds
+         let maxReconnectAttempts = 10; // زيادة عدد المحاولات
+         let reconnectDelay = 2000; // تقليل وقت الانتظار إلى ثانيتين
          
          function setupWebSocket() {
              // Real-time connection setup for remote conversations
@@ -3270,8 +3270,13 @@
                              setupWebSocket();
                          }, reconnectDelay);
                      } else {
-                         showNotification('انقطع الاتصال بالخادم - تأكد من تشغيل الخادم', 'error');
+                         showNotification('فشل الاتصال بالخادم بعد 10 محاولات - اضغط زر إعادة الاتصال', 'error');
                          showReconnectButton(); // Show reconnect button when max attempts reached
+                         
+                         // محاولة إعادة الاتصال التلقائي كل 30 ثانية
+                         setTimeout(() => {
+                             manualReconnect();
+                         }, 30000);
                      }
                  };
                  
@@ -3759,7 +3764,7 @@
          // Manual reconnection function
          function manualReconnect() {
              console.log('Manual reconnection initiated');
-             showNotification('جاري إعادة الاتصال...', 'info');
+             showNotification('جاري إعادة الاتصال بالخادم...', 'info');
              
              // Reset reconnection attempts
              reconnectAttempts = 0;
@@ -3771,6 +3776,9 @@
              
              // Hide reconnect button
              hideReconnectButton();
+             
+             // تحديث حالة الاتصال
+             updateConnectionStatus('جاري الاتصال...', 0);
              
              // Attempt to reconnect
              setTimeout(() => {
