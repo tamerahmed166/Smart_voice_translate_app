@@ -1,0 +1,132 @@
+<svg width="400" height="700" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background -->
+  <rect width="400" height="700" fill="#f5f5f5"/>
+  
+  <!-- Header with Language Selection -->
+  <rect x="0" y="0" width="400" height="60" fill="#2c3e50"/>
+  <text x="50" y="25" fill="white" font-family="Arial" font-size="12" font-weight="bold">🇪🇬 العربية</text>
+  <text x="180" y="35" fill="white" font-family="Arial" font-size="16">↔</text>
+  <text x="250" y="25" fill="white" font-family="Arial" font-size="12" font-weight="bold">🇬🇧 English</text>
+  
+  <!-- Dark/Light Mode Toggle -->
+  <circle cx="360" cy="30" r="15" fill="#34495e" stroke="white" stroke-width="2"/>
+  <text x="355" y="35" fill="white" font-family="Arial" font-size="12">🌙</text>
+  
+  <!-- Person 1 Section (Blue) -->
+  <rect x="0" y="60" width="400" height="320" fill="#e3f2fd"/>
+  <text x="20" y="85" fill="#1976d2" font-family="Arial" font-size="14" font-weight="bold">الشخص الأول</text>
+  
+  <!-- Person 1 Chat Bubbles -->
+  <g>
+    <!-- Bubble 1 -->
+    <rect x="20" y="100" width="280" height="50" rx="20" fill="#2196f3" opacity="0.9"/>
+    <text x="30" y="120" fill="white" font-family="Arial" font-size="12">مرحبا، كيف حالك؟</text>
+    <text x="30" y="135" fill="#e3f2fd" font-family="Arial" font-size="10">Hello, how are you?</text>
+    
+    <!-- Edit button -->
+    <circle cx="310" cy="125" r="8" fill="#1976d2"/>
+    <text x="306" y="129" fill="white" font-family="Arial" font-size="8">✏️</text>
+  </g>
+  
+  <!-- Voice Wave Animation for Person 1 -->
+  <g id="voiceWave1">
+    <rect x="320" y="180" width="3" height="20" fill="#2196f3" opacity="0.7">
+      <animate attributeName="height" values="20;40;20" dur="1s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="325" y="175" width="3" height="30" fill="#2196f3" opacity="0.7">
+      <animate attributeName="height" values="30;50;30" dur="1s" repeatCount="indefinite" begin="0.1s"/>
+    </rect>
+    <rect x="330" y="180" width="3" height="20" fill="#2196f3" opacity="0.7">
+      <animate attributeName="height" values="20;35;20" dur="1s" repeatCount="indefinite" begin="0.2s"/>
+    </rect>
+  </g>
+  
+  <!-- Person 1 Microphone Button -->
+  <circle cx="350" cy="200" r="25" fill="#1976d2" stroke="#0d47a1" stroke-width="3"/>
+  <text x="342" y="208" fill="white" font-family="Arial" font-size="20">🎤</text>
+  
+  <!-- Person 1 Additional Buttons -->
+  <circle cx="300" cy="250" r="15" fill="#42a5f5"/>
+  <text x="295" y="255" fill="white" font-family="Arial" font-size="12">🔊</text>
+  
+  <circle cx="340" cy="250" r="15" fill="#42a5f5"/>
+  <text x="335" y="255" fill="white" font-family="Arial" font-size="12">🔄</text>
+  
+  <!-- Divider Line -->
+  <line x1="0" y1="380" x2="400" y2="380" stroke="#bdbdbd" stroke-width="2" stroke-dasharray="5,5"/>
+  
+  <!-- Person 2 Section (Green) -->
+  <rect x="0" y="380" width="400" height="320" fill="#e8f5e8"/>
+  <text x="20" y="405" fill="#388e3c" font-family="Arial" font-size="14" font-weight="bold">الشخص الثاني</text>
+  
+  <!-- Person 2 Chat Bubbles -->
+  <g>
+    <!-- Bubble 1 -->
+    <rect x="100" y="420" width="280" height="50" rx="20" fill="#4caf50" opacity="0.9"/>
+    <text x="110" y="440" fill="white" font-family="Arial" font-size="12">I'm fine, thank you!</text>
+    <text x="110" y="455" fill="#e8f5e8" font-family="Arial" font-size="10">أنا بخير، شكراً لك!</text>
+    
+    <!-- Edit button -->
+    <circle cx="390" cy="445" r="8" fill="#388e3c"/>
+    <text x="386" y="449" fill="white" font-family="Arial" font-size="8">✏️</text>
+  </g>
+  
+  <!-- Voice Wave Animation for Person 2 -->
+  <g id="voiceWave2">
+    <rect x="70" y="500" width="3" height="20" fill="#4caf50" opacity="0.7">
+      <animate attributeName="height" values="20;40;20" dur="1s" repeatCount="indefinite"/>
+    </rect>
+    <rect x="75" y="495" width="3" height="30" fill="#4caf50" opacity="0.7">
+      <animate attributeName="height" values="30;50;30" dur="1s" repeatCount="indefinite" begin="0.1s"/>
+    </rect>
+    <rect x="80" y="500" width="3" height="20" fill="#4caf50" opacity="0.7">
+      <animate attributeName="height" values="20;35;20" dur="1s" repeatCount="indefinite" begin="0.2s"/>
+    </rect>
+  </g>
+  
+  <!-- Person 2 Microphone Button -->
+  <circle cx="50" cy="520" r="25" fill="#388e3c" stroke="#2e7d32" stroke-width="3"/>
+  <text x="42" y="528" fill="white" font-family="Arial" font-size="20">🎤</text>
+  
+  <!-- Person 2 Additional Buttons -->
+  <circle cx="100" cy="570" r="15" fill="#66bb6a"/>
+  <text x="95" y="575" fill="white" font-family="Arial" font-size="12">🔊</text>
+  
+  <circle cx="60" cy="570" r="15" fill="#66bb6a"/>
+  <text x="55" y="575" fill="white" font-family="Arial" font-size="12">🔄</text>
+  
+  <!-- Bottom Control Bar -->
+  <rect x="0" y="700" width="400" height="60" fill="#37474f"/>
+  
+  <!-- Save Conversation Button -->
+  <rect x="20" y="715" width="80" height="30" rx="15" fill="#607d8b"/>
+  <text x="35" y="735" fill="white" font-family="Arial" font-size="10">💾 حفظ</text>
+  
+  <!-- Clear Conversation Button -->
+  <rect x="120" y="715" width="80" height="30" rx="15" fill="#607d8b"/>
+  <text x="135" y="735" fill="white" font-family="Arial" font-size="10">🗑️ مسح</text>
+  
+  <!-- Back to Normal Mode Button -->
+  <rect x="220" y="715" width="100" height="30" rx="15" fill="#607d8b"/>
+  <text x="235" y="735" fill="white" font-family="Arial" font-size="10">↩️ الوضع العادي</text>
+  
+  <!-- Hands-free Mode Indicator -->
+  <circle cx="360" cy="730" r="12" fill="#ff9800" opacity="0.8">
+    <animate attributeName="opacity" values="0.8;0.3;0.8" dur="2s" repeatCount="indefinite"/>
+  </circle>
+  <text x="355" y="735" fill="white" font-family="Arial" font-size="8">🤲</text>
+  
+  <!-- Notification Sound Indicator -->
+  <g>
+    <circle cx="30" cy="650" r="8" fill="#ff5722" opacity="0.7">
+      <animate attributeName="r" values="8;12;8" dur="1s" repeatCount="3"/>
+      <animate attributeName="opacity" values="0.7;0.3;0.7" dur="1s" repeatCount="3"/>
+    </circle>
+    <text x="26" y="654" fill="white" font-family="Arial" font-size="8">🎵</text>
+  </g>
+  
+  <!-- Labels and Annotations -->
+  <text x="10" y="690" fill="#666" font-family="Arial" font-size="8">• فقاعات محادثة تفاعلية</text>
+  <text x="200" y="690" fill="#666" font-family="Arial" font-size="8">• ترجمة فورية</text>
+  
+</svg>
