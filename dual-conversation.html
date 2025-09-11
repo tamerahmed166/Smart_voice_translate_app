@@ -813,6 +813,18 @@
             background: var(--border-color);
         }
         
+        .btn.reconnect {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            font-size: 14px;
+            padding: 10px 16px;
+        }
+        
+        .btn.reconnect:hover {
+            background: linear-gradient(135deg, #ee5a24, #ff6b6b);
+            transform: translateY(-2px);
+        }
+        
         .chat-container {
             background: var(--bg-primary);
             border-radius: var(--border-radius);
@@ -1429,6 +1441,7 @@
                             <input type="text" class="room-input" id="roomInput" placeholder="أدخل رمز الغرفة أو اتركه فارغاً لإنشاء غرفة جديدة">
                             <button class="btn" id="joinRoomBtn">انضمام للغرفة</button>
                             <button class="btn secondary" id="createRoomBtn">إنشاء غرفة جديدة</button>
+                            <button class="btn reconnect" id="reconnectBtn" style="display: none;">🔄 إعادة الاتصال</button>
                         </div>
                     </div>
                 </div>
@@ -1740,6 +1753,7 @@
             // Remote mode controls
             document.getElementById('joinRoomBtn').addEventListener('click', joinRoom);
             document.getElementById('createRoomBtn').addEventListener('click', createRoom);
+            document.getElementById('reconnectBtn').addEventListener('click', manualReconnect);
             document.getElementById('sendBtn').addEventListener('click', sendMessage);
             document.getElementById('voiceBtn').addEventListener('click', () => startVoiceRecording());
             
@@ -3013,6 +3027,7 @@
                  ws.onopen = function() {
                      console.log('WebSocket connected');
                      showNotification('تم الاتصال بالخادم', 'success');
+                     hideReconnectButton(); // Hide reconnect button on successful connection
                  };
                  
                  ws.onmessage = function(event) {
@@ -3029,16 +3044,19 @@
                      showNotification('انقطع الاتصال بالخادم', 'warning');
                      isConnected = false;
                      updateConnectionStatus('غير متصل', 0);
+                     showReconnectButton(); // Show reconnect button when connection is lost
                  };
                  
                  ws.onerror = function(error) {
                      console.error('WebSocket error:', error);
                      showNotification('خطأ في الاتصال بالخادم', 'error');
+                     showReconnectButton(); // Show reconnect button on connection error
                  };
                  
              } catch (error) {
                  console.error('Error setting up WebSocket:', error);
                  showNotification('فشل في الاتصال بالخادم', 'error');
+                 showReconnectButton(); // Show reconnect button on setup error
              }
          }
          
@@ -3504,6 +3522,44 @@
              // Initialize WebSocket connection for remote mode
              setupWebSocket();
          });
+         
+         // Manual reconnection function
+         function manualReconnect() {
+             console.log('Manual reconnection initiated');
+             showNotification('جاري إعادة الاتصال...', 'info');
+             
+             // Reset reconnection attempts
+             reconnectAttempts = 0;
+             
+             // Close existing connection if any
+             if (ws) {
+                 ws.close();
+             }
+             
+             // Hide reconnect button
+             hideReconnectButton();
+             
+             // Attempt to reconnect
+             setTimeout(() => {
+                 setupWebSocket();
+             }, 1000);
+         }
+         
+         // Show reconnect button
+         function showReconnectButton() {
+             const reconnectBtn = document.getElementById('reconnectBtn');
+             if (reconnectBtn) {
+                 reconnectBtn.style.display = 'inline-block';
+             }
+         }
+         
+         // Hide reconnect button
+         function hideReconnectButton() {
+             const reconnectBtn = document.getElementById('reconnectBtn');
+             if (reconnectBtn) {
+                 reconnectBtn.style.display = 'none';
+             }
+         }
      </script>
  </body>
  </html>
