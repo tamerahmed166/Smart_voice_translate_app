@@ -405,22 +405,63 @@
             color: var(--person2-color);
         }
         
-        /* Essential Buttons - Simplified Design */
-        .essential-buttons {
+        /* Enhanced User Panel Controls */
+        .user-controls {
             display: flex;
+            flex-direction: column;
             gap: 15px;
-            justify-content: center;
-            align-items: center;
             margin-top: 15px;
         }
         
+        .input-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .text-input-enhanced {
+            width: 100%;
+            min-height: 80px;
+            padding: 12px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .text-input-enhanced:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: var(--bg-primary);
+        }
+        
+        .text-input-enhanced::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        
+        /* Essential Buttons - Enhanced Design */
+        .essential-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
         .action-button {
-            width: 70px;
-            height: 70px;
+            width: 60px;
+            height: 60px;
             border: none;
             border-radius: 50%;
             color: white;
-            font-size: 1.8rem;
+            font-size: 1.5rem;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
@@ -429,12 +470,12 @@
             justify-content: center;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
         }
         
         .action-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 18px rgba(0, 0, 0, 0.3);
         }
         
         .mic-button {
@@ -1663,25 +1704,27 @@
                             </div>
                         </div>
                         
-                        <!-- Text Input Area -->
-                        <div class="text-input-container">
-                            <textarea class="text-input" id="textArea1" placeholder="اكتب رسالتك هنا أو استخدم الميكروفون للتحدث..." data-translate-placeholder="write_message_placeholder"></textarea>
-                        </div>
-                        
-                        <!-- Essential Buttons -->
-                        <div class="essential-buttons">
-                            <button class="action-button mic-button" id="mic1" title="اضغط للتحدث">
-                                🎤
-                                <div class="button-label">تحدث</div>
-                            </button>
-                            <button class="action-button send-button" id="sendBtn1" title="إرسال الرسالة">
-                                📤
-                                <div class="button-label">إرسال</div>
-                            </button>
-                            <button class="action-button speaker-button" id="speakerBtn1" title="تشغيل الترجمة">
-                                🔊
-                                <div class="button-label">استماع</div>
-                            </button>
+                        <!-- Enhanced User Controls -->
+                        <div class="user-controls">
+                            <div class="input-section">
+                                <textarea class="text-input-enhanced" id="textArea1" placeholder="اكتب هنا أو استخدم الميكروفون" data-translate-placeholder="write_message_placeholder"></textarea>
+                                
+                                <!-- Essential Buttons -->
+                                <div class="essential-buttons">
+                                    <button class="action-button mic-button" id="mic1" title="اضغط للتحدث">
+                                        🎤
+                                        <div class="button-label">تحدث</div>
+                                    </button>
+                                    <button class="action-button send-button" id="sendBtn1" title="إرسال النص">
+                                        📤
+                                        <div class="button-label">إرسال</div>
+                                    </button>
+                                    <button class="action-button speaker-button" id="speakerBtn1" title="تشغيل الترجمة">
+                                        🔊
+                                        <div class="button-label">استماع</div>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="conversation-area" id="conversation1">
@@ -1708,25 +1751,27 @@
                             <div class="tts-indicator" id="ttsIndicator"><span data-translate="reading_indicator">🔊 جاري القراءة...</span></div>
                         </div>
                         
-                        <!-- Text Input Area -->
-                        <div class="text-input-container">
-                            <textarea class="text-input" id="textArea2" placeholder="اكتب رسالتك هنا أو استخدم الميكروفون للتحدث..." data-translate-placeholder="write_message_placeholder"></textarea>
-                        </div>
-                        
-                        <!-- Essential Buttons -->
-                        <div class="essential-buttons">
-                            <button class="action-button mic-button" id="mic2" title="اضغط للتحدث">
-                                🎤
-                                <div class="button-label">تحدث</div>
-                            </button>
-                            <button class="action-button send-button" id="sendBtn2" title="إرسال الرسالة">
-                                📤
-                                <div class="button-label">إرسال</div>
-                            </button>
-                            <button class="action-button speaker-button" id="speakerBtn2" title="تشغيل الترجمة">
-                                🔊
-                                <div class="button-label">استماع</div>
-                            </button>
+                        <!-- Enhanced User Controls -->
+                        <div class="user-controls">
+                            <div class="input-section">
+                                <textarea class="text-input-enhanced" id="textArea2" placeholder="اكتب هنا أو استخدم الميكروفون" data-translate-placeholder="write_message_placeholder"></textarea>
+                                
+                                <!-- Essential Buttons -->
+                                <div class="essential-buttons">
+                                    <button class="action-button mic-button" id="mic2" title="اضغط للتحدث">
+                                        🎤
+                                        <div class="button-label">تحدث</div>
+                                    </button>
+                                    <button class="action-button send-button" id="sendBtn2" title="إرسال النص">
+                                        📤
+                                        <div class="button-label">إرسال</div>
+                                    </button>
+                                    <button class="action-button speaker-button" id="speakerBtn2" title="تشغيل الترجمة">
+                                        🔊
+                                        <div class="button-label">استماع</div>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="conversation-area" id="conversation2">
@@ -3496,48 +3541,117 @@
             return langNames[langCode] || langCode;
         }
          
-         // TTS Settings
+         // Enhanced TTS Settings for each user (inspired by Flutter code)
          let ttsSettings = {
              enabled: true,
              autoPlay: true,
-             rate: 0.9,
+             rate: 0.95,
              pitch: 1.0,
-             volume: 0.8
+             volume: 1.0,
+             userA: {
+                 enabled: true,
+                 rate: 0.95,
+                 pitch: 1.0,
+                 volume: 1.0,
+                 voice: null
+             },
+             userB: {
+                 enabled: true,
+                 rate: 0.95,
+                 pitch: 1.0,
+                 volume: 1.0,
+                 voice: null
+             }
          };
          
-         function speakText(text, lang, options = {}) {
+         // Enhanced speak function with user-specific settings
+         async function speakText(text, lang, options = {}) {
              if (!ttsSettings.enabled || !('speechSynthesis' in window)) {
-                 return;
+                 return Promise.resolve();
              }
              
-             // Stop any ongoing speech
-             speechSynthesis.cancel();
-             
-             const utterance = new SpeechSynthesisUtterance(text);
-             utterance.lang = getTTSLanguage(lang);
-             utterance.rate = options.rate || ttsSettings.rate;
-             utterance.pitch = options.pitch || ttsSettings.pitch;
-             utterance.volume = options.volume || ttsSettings.volume;
-             
-             // Add visual feedback during speech
-             utterance.onstart = function() {
-                 showTTSIndicator(true);
-                 if (navigator.vibrate) {
-                     navigator.vibrate(50);
+             return new Promise((resolve, reject) => {
+                 // Stop any ongoing speech
+                 speechSynthesis.cancel();
+                 
+                 const utterance = new SpeechSynthesisUtterance(text);
+                 utterance.lang = getTTSLanguage(lang);
+                 
+                 // Apply user-specific or global settings
+                 const userSettings = options.user ? ttsSettings[`user${options.user === 1 ? 'A' : 'B'}`] : ttsSettings;
+                 utterance.rate = options.rate || userSettings.rate;
+                 utterance.pitch = options.pitch || userSettings.pitch;
+                 utterance.volume = options.volume || userSettings.volume;
+                 
+                 // Set voice if specified
+                 if (userSettings.voice) {
+                     utterance.voice = userSettings.voice;
                  }
-             };
+                 
+                 // Enhanced visual feedback
+                 utterance.onstart = function() {
+                     showTTSIndicator(true, options.user);
+                     updateSpeakerStatus(options.user, 'speaking');
+                     if (navigator.vibrate) {
+                         navigator.vibrate(50);
+                     }
+                 };
+                 
+                 utterance.onend = function() {
+                     showTTSIndicator(false, options.user);
+                     updateSpeakerStatus(options.user, 'idle');
+                     resolve();
+                 };
+                 
+                 utterance.onerror = function(event) {
+                     console.error('Speech synthesis error:', event.error);
+                     showTTSIndicator(false, options.user);
+                     updateSpeakerStatus(options.user, 'error');
+                     showNotification('❌ خطأ في تشغيل الصوت', 'error');
+                     reject(event.error);
+                 };
+                 
+                 speechSynthesis.speak(utterance);
+             });
+         }
+         
+         // Enhanced TTS indicator with user-specific feedback
+         function showTTSIndicator(isActive, user = null) {
+             const indicator = document.getElementById('ttsIndicator');
+             if (indicator) {
+                 if (isActive) {
+                     indicator.classList.add('visible');
+                 } else {
+                     indicator.classList.remove('visible');
+                 }
+             }
              
-             utterance.onend = function() {
-                 showTTSIndicator(false);
-             };
+             // Show user-specific speaker button feedback
+             if (user) {
+                 const speakerBtn = document.getElementById(`speakerBtn${user}`);
+                 if (speakerBtn) {
+                     if (isActive) {
+                         speakerBtn.classList.add('speaking');
+                     } else {
+                         speakerBtn.classList.remove('speaking');
+                     }
+                 }
+             }
+         }
+         
+         // Update speaker status for visual feedback
+         function updateSpeakerStatus(user, status) {
+             if (!user) return;
              
-             utterance.onerror = function(event) {
-                 console.error('Speech synthesis error:', event.error);
-                 showTTSIndicator(false);
-                 showNotification('خطأ في تشغيل الصوت', 'error');
-             };
-             
-             speechSynthesis.speak(utterance);
+             const speakerStatus = document.querySelector(`#person${user} .speaker-status`);
+             if (speakerStatus) {
+                 speakerStatus.className = `speaker-status ${status}`;
+                 speakerStatus.textContent = {
+                     'speaking': '🔊 يتحدث',
+                     'idle': '⏸️ صامت',
+                     'error': '❌ خطأ'
+                 }[status] || '⏸️ صامت';
+             }
          }
          
          function showTTSIndicator(isActive) {
@@ -4304,50 +4418,110 @@
              showNotification(`تم إلغاء إدخال النص للمتحدث ${speaker}`, 'info');
          }
          
-         async function sendTextMessage(speaker) {
+         // Enhanced input handling inspired by Flutter code
+         async function handleInputForUser(speaker, typedText = null) {
              const textArea = document.getElementById(`textArea${speaker}`);
-             const text = textArea.value.trim();
+             const input = typedText || textArea.value.trim();
              
-             if (!text) {
+             if (!input) {
                  showNotification('يرجى كتابة نص قبل الإرسال', 'warning');
                  return;
              }
              
              try {
-                 // تحديد اللغات
-                 const sourceLang = document.getElementById('lang1').value;
-                 const targetLang = document.getElementById('lang2').value;
+                 // Update UI to show processing state
+                 updateUserState(speaker, 'processing');
                  
-                 // إضافة الرسالة الأصلية
-                 const originalMessageId = addMessageToConversation(speaker, text, 'original');
+                 // Set text and show translation loading
+                 textArea.value = input;
+                 const otherSpeaker = speaker === 1 ? 2 : 1;
+                 showTranslationLoading(otherSpeaker);
                  
-                 // ترجمة النص
-                 showNotification('جاري ترجمة النص...', 'info');
-                 const translatedText = await translateText(text, sourceLang, targetLang);
+                 // Determine languages based on speaker
+                 const sourceLang = speaker === 1 ? document.getElementById('lang1').value : document.getElementById('lang2').value;
+                 const targetLang = speaker === 1 ? document.getElementById('lang2').value : document.getElementById('lang1').value;
                  
-                 // إضافة الترجمة
-                 const translatedMessageId = addMessageToConversation(speaker === 1 ? 2 : 1, translatedText, 'translated');
+                 // Add original message
+                 const originalMessageId = addMessageToConversation(speaker, input, 'original');
                  
-                 // تشغيل الصوت للترجمة إذا كان مفعلاً
+                 // Translate text with enhanced error handling
+                 showNotification('⏳ جاري الترجمة...', 'info');
+                 const translatedText = await translateTextWithRetry(input, sourceLang, targetLang);
+                 
+                 // Add translated message
+                 const translatedMessageId = addMessageToConversation(otherSpeaker, translatedText, 'translated');
+                 
+                 // Auto-speak translation if enabled with user-specific settings
                  if (ttsSettings.enabled && ttsSettings.autoPlay) {
                      setTimeout(async () => {
                          try {
-                             await speakTranslationWithEnhancement(translatedText, targetLang, speaker === 1 ? 2 : 1);
+                             await speakText(translatedText, targetLang, { user: otherSpeaker });
                          } catch (error) {
                              console.error('TTS Error:', error);
                          }
-                     }, 500);
+                     }, 300);
                  }
                  
-                 // مسح النص وإخفاء منطقة الإدخال
+                 // Clear input and reset state
                  textArea.value = '';
-                 cancelTextInput(speaker);
+                 updateUserState(speaker, 'idle');
+                 hideTranslationLoading(otherSpeaker);
                  
-                 showNotification('تم إرسال الرسالة بنجاح', 'success');
+                 showNotification('✅ تم إرسال الرسالة بنجاح', 'success');
                  
              } catch (error) {
-                 console.error('Error sending text message:', error);
-                 showNotification('خطأ في إرسال الرسالة', 'error');
+                 console.error('Error handling input:', error);
+                 updateUserState(speaker, 'error');
+                 showNotification('❌ خطأ في معالجة النص', 'error');
+             }
+         }
+         
+         // Legacy function for backward compatibility
+         async function sendTextMessage(speaker) {
+             await handleInputForUser(speaker);
+         }
+         
+         // Enhanced translation with retry mechanism
+         async function translateTextWithRetry(text, sourceLang, targetLang, maxRetries = 3) {
+             for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                 try {
+                     const result = await translateText(text, sourceLang, targetLang);
+                     return result;
+                 } catch (error) {
+                     console.warn(`Translation attempt ${attempt} failed:`, error);
+                     if (attempt === maxRetries) {
+                         throw new Error(`Translation failed after ${maxRetries} attempts`);
+                     }
+                     // Wait before retry with exponential backoff
+                     await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000));
+                 }
+             }
+         }
+         
+         // UI state management functions
+         function updateUserState(speaker, state) {
+             const panel = document.querySelector(`#person${speaker}`);
+             if (panel) {
+                 panel.classList.remove('idle', 'processing', 'error', 'listening');
+                 panel.classList.add(state);
+             }
+         }
+         
+         function showTranslationLoading(speaker) {
+             const conversationArea = document.querySelector(`#conversation${speaker}`);
+             if (conversationArea) {
+                 const loadingDiv = document.createElement('div');
+                 loadingDiv.className = 'message processing-message';
+                 loadingDiv.id = `loading-${speaker}`;
+                 loadingDiv.innerHTML = '<div class="loading-dots">⏳ جاري الترجمة...</div>';
+                 conversationArea.appendChild(loadingDiv);
+             }
+         }
+         
+         function hideTranslationLoading(speaker) {
+             const loadingElement = document.getElementById(`loading-${speaker}`);
+             if (loadingElement) {
+                 loadingElement.remove();
              }
          }
          
@@ -4498,23 +4672,69 @@
                  cancelBtn2.addEventListener('click', () => cancelTextInput(2));
              }
              
-             // إضافة دعم Enter للإرسال
+             // Enhanced text input handling with auto-translation
              const textArea1 = document.getElementById('textArea1');
              if (textArea1) {
+                 let inputTimeout1;
+                 
+                 // Auto-translate on input (debounced)
+                 textArea1.addEventListener('input', function(e) {
+                     clearTimeout(inputTimeout1);
+                     const text = e.target.value.trim();
+                     
+                     if (text.length > 3) { // Only auto-translate if text is meaningful
+                         inputTimeout1 = setTimeout(() => {
+                             handleInputForUser(1, text);
+                         }, 2000); // Wait 2 seconds after user stops typing
+                     }
+                 });
+                 
+                 // Submit on Enter
                  textArea1.addEventListener('keydown', function(e) {
                      if (e.key === 'Enter' && !e.shiftKey) {
                          e.preventDefault();
-                         sendTextMessage(1);
+                         clearTimeout(inputTimeout1);
+                         handleInputForUser(1);
+                     }
+                 });
+                 
+                 // Submit on Enter in Arabic (for RTL support)
+                 textArea1.addEventListener('keyup', function(e) {
+                     if (e.key === 'Enter' && e.target.value.trim()) {
+                         e.target.style.direction = /[\u0600-\u06FF]/.test(e.target.value) ? 'rtl' : 'ltr';
                      }
                  });
              }
              
              const textArea2 = document.getElementById('textArea2');
              if (textArea2) {
+                 let inputTimeout2;
+                 
+                 // Auto-translate on input (debounced)
+                 textArea2.addEventListener('input', function(e) {
+                     clearTimeout(inputTimeout2);
+                     const text = e.target.value.trim();
+                     
+                     if (text.length > 3) { // Only auto-translate if text is meaningful
+                         inputTimeout2 = setTimeout(() => {
+                             handleInputForUser(2, text);
+                         }, 2000); // Wait 2 seconds after user stops typing
+                     }
+                 });
+                 
+                 // Submit on Enter
                  textArea2.addEventListener('keydown', function(e) {
                      if (e.key === 'Enter' && !e.shiftKey) {
                          e.preventDefault();
-                         sendTextMessage(2);
+                         clearTimeout(inputTimeout2);
+                         handleInputForUser(2);
+                     }
+                 });
+                 
+                 // RTL/LTR direction support
+                 textArea2.addEventListener('keyup', function(e) {
+                     if (e.key === 'Enter' && e.target.value.trim()) {
+                         e.target.style.direction = /[\u0600-\u06FF]/.test(e.target.value) ? 'rtl' : 'ltr';
                      }
                  });
              }
