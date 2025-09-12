@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الترجمة الثنائية - مترجم صوتي</title>
+    <title data-translate="dual_conversation_title">الترجمة الثنائية - مترجم صوتي</title>
     <!-- 
         تعليمات استخدام Google Translate API:
         1. احصل على مفتاح API من Google Cloud Console
@@ -461,6 +461,132 @@
             font-size: 0.7rem;
             font-weight: 500;
             opacity: 0.9;
+        }
+        
+        /* أنماط التحكم في الإدخال */
+        .input-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .text-button {
+            background: linear-gradient(135deg, var(--success-color), #45a049);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            width: 80px;
+            height: 80px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .text-button .text-icon {
+            font-size: 1.8rem;
+        }
+        
+        .text-button .text-text {
+            font-size: 0.7rem;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+        
+        .text-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #45a049, var(--success-color));
+        }
+        
+        .text-input-area {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            animation: slideDown 0.3s ease-out;
+        }
+        
+        .text-input-area textarea {
+            width: 100%;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+            background: white;
+            color: var(--text-color);
+            box-sizing: border-box;
+        }
+        
+        .text-input-area textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+        }
+        
+        .text-controls {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .text-controls button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .text-controls button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .text-controls button:nth-child(1) {
+            background: var(--success-color);
+        }
+        
+        .text-controls button:nth-child(2) {
+            background: var(--info-color);
+        }
+        
+        .text-controls button:nth-child(3) {
+            background: var(--danger-color);
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
         
         /* مؤشرات حالة المتحدث */
@@ -1193,24 +1319,24 @@
     <div class="container">
         <!-- Header Navigation -->
         <div class="header-nav">
-            <a href="index.html" class="home-btn">🏠 الرئيسية</a>
-            <a href="settings.html" class="settings-btn">⚙️ الإعدادات</a>
+            <a href="index.html" class="home-btn"><span data-translate="home_button">🏠 الرئيسية</span></a>
+            <a href="settings.html" class="settings-btn"><span data-translate="settings_button">⚙️ الإعدادات</span></a>
         </div>
         
         <!-- App Header -->
         <div class="app-header">
             <img src="logo-new.svg" alt="Logo" class="logo">
-            <h1>الترجمة الثنائية</h1>
+            <h1 data-translate="dual_conversation_header">الترجمة الثنائية</h1>
         </div>
         
         <!-- Mode Selector -->
         <div class="mode-selector-container">
             <div class="mode-selector">
                 <button class="mode-btn active" data-mode="face-to-face">
-                    🤝 وجهاً لوجه
+                    <span data-translate="face_to_face_mode">🤝 وجهاً لوجه</span>
                 </button>
                 <button class="mode-btn" data-mode="remote">
-                    🌐 عن بُعد
+                    <span data-translate="remote_mode">🌐 عن بُعد</span>
                 </button>
             </div>
         </div>
@@ -1218,7 +1344,7 @@
         <!-- Language Bar -->
         <div class="language-bar">
             <div class="language-section">
-                <label class="language-label">اللغة الأولى</label>
+                <label class="language-label" data-translate="first_language_label">اللغة الأولى</label>
                 <select class="language-select" id="lang1">
                     <option value="auto">🔍 اكتشاف تلقائي</option>
                     <option value="ar">🇸🇦 العربية</option>
@@ -1297,19 +1423,19 @@
                     <option value="mn">🇲🇳 المنغولية</option>
                 </select>
                 <div class="auto-detect-toggle">
-                    <span>اكتشاف تلقائي</span>
+                    <span data-translate="auto_detect_label">اكتشاف تلقائي</span>
                     <div class="toggle-switch active" id="autoDetectToggle">
                         <div class="toggle-slider"></div>
                     </div>
                 </div>
             </div>
             
-            <button class="swap-btn" id="swapLanguages" title="تبديل اللغات">
+            <button class="swap-btn" id="swapLanguages" data-translate-tooltip="swap_languages_tooltip" title="تبديل اللغات">
                 ⇄
             </button>
             
             <div class="language-section">
-                <label class="language-label">اللغة الثانية</label>
+                <label class="language-label" data-translate="second_language_label">اللغة الثانية</label>
                 <select class="language-select" id="lang2">
                     <option value="ar" selected>🇸🇦 العربية</option>
                     <option value="en">🇺🇸 الإنجليزية</option>
@@ -1397,12 +1523,12 @@
                     <!-- Person 1 Panel -->
                     <div class="person-panel person1">
                         <div class="person-header">
-                            <h3 class="person-title">👤 المتحدث الأول</h3>
+                            <h3 class="person-title" data-translate="first_speaker_title">👤 المتحدث الأول</h3>
                             <div class="speaker-status" id="speakerStatus1">
-                                <span class="status-text">جاهز للتحدث</span>
+                                <span class="status-text" data-translate="ready_to_speak">جاهز للتحدث</span>
                                 <div class="status-indicator ready"></div>
                             </div>
-                            <div class="recording-indicator" id="recordingIndicator1">🔴 جاري التسجيل</div>
+                            <div class="recording-indicator" id="recordingIndicator1"><span data-translate="recording_indicator">🔴 جاري التسجيل</span></div>
                             <div class="voice-visualizer" id="voiceVisualizer1">
                                 <div class="voice-bar"></div>
                                 <div class="voice-bar"></div>
@@ -1415,10 +1541,24 @@
                                 <button class="tts-btn" id="ttsToggleBtn" title="تفعيل/إلغاء TTS">🗣️</button>
                                 <button class="tts-btn" id="ttsSpeedBtn" title="سرعة القراءة">⚡</button>
                             </div>
-                            <button class="mic-button enhanced" id="mic1" title="اضغط للتحدث">
-                                <span class="mic-icon">🎤</span>
-                                <span class="mic-text">اضغط للتحدث</span>
-                            </button>
+                            <div class="input-controls">
+                                <button class="mic-button enhanced" id="mic1" title="اضغط للتحدث">
+                                    <span class="mic-icon">🎤</span>
+                                    <span class="mic-text" data-translate="press_to_speak">اضغط للتحدث</span>
+                                </button>
+                                <button class="text-button" id="textBtn1" onclick="toggleTextInput(1)" title="اكتب نص">
+                                    <span class="text-icon">✏️</span>
+                                    <span class="text-text" data-translate="write_text">اكتب نص</span>
+                                </button>
+                            </div>
+                            <div class="text-input-area" id="textInput1" style="display: none;">
+                                <textarea id="textArea1" placeholder="اكتب رسالتك هنا..." rows="3" data-translate-placeholder="write_message_placeholder"></textarea>
+                                <div class="text-controls">
+                                    <button onclick="sendTextMessage(1)" data-translate="send_button">📤 إرسال</button>
+                                    <button onclick="speakTextInput(1)" data-translate="speak_button">🔊 نطق</button>
+                                    <button onclick="cancelTextInput(1)" data-translate="cancel_button">❌ إلغاء</button>
+                                </div>
+                            </div>
                         </div>
                         <div class="conversation-area" id="conversation1">
                             <!-- Messages will be added here dynamically -->
@@ -1428,12 +1568,12 @@
                     <!-- Person 2 Panel -->
                     <div class="person-panel person2">
                         <div class="person-header">
-                            <h3 class="person-title">👤 المتحدث الثاني</h3>
+                            <h3 class="person-title" data-translate="second_speaker_title">👤 المتحدث الثاني</h3>
                             <div class="speaker-status" id="speakerStatus2">
                                 <span class="status-text">جاهز للتحدث</span>
                                 <div class="status-indicator ready"></div>
                             </div>
-                            <div class="recording-indicator" id="recordingIndicator2">🔴 جاري التسجيل</div>
+                            <div class="recording-indicator" id="recordingIndicator2"><span data-translate="recording_indicator">🔴 جاري التسجيل</span></div>
                             <div class="voice-visualizer" id="voiceVisualizer2">
                                 <div class="voice-bar"></div>
                                 <div class="voice-bar"></div>
@@ -1442,12 +1582,26 @@
                                 <div class="voice-bar"></div>
                             </div>
                             <div class="tts-controls">
-                                <div class="tts-indicator" id="ttsIndicator">🔊 جاري القراءة...</div>
+                                <div class="tts-indicator" id="ttsIndicator"><span data-translate="reading_indicator">🔊 جاري القراءة...</span></div>
                             </div>
-                            <button class="mic-button enhanced" id="mic2" title="اضغط للتحدث">
-                                <span class="mic-icon">🎤</span>
-                                <span class="mic-text">اضغط للتحدث</span>
-                            </button>
+                            <div class="input-controls">
+                                <button class="mic-button enhanced" id="mic2" title="اضغط للتحدث">
+                                    <span class="mic-icon">🎤</span>
+                                    <span class="mic-text">اضغط للتحدث</span>
+                                </button>
+                                <button class="text-button" id="textBtn2" onclick="toggleTextInput(2)" title="اكتب نص">
+                                    <span class="text-icon">✏️</span>
+                                    <span class="text-text" data-translate="write_text">اكتب نص</span>
+                                </button>
+                            </div>
+                            <div class="text-input-area" id="textInput2" style="display: none;">
+                                <textarea id="textArea2" placeholder="اكتب رسالتك هنا..." rows="3" data-translate-placeholder="write_message_placeholder"></textarea>
+                                <div class="text-controls">
+                                    <button onclick="sendTextMessage(2)" data-translate="send_button">📤 إرسال</button>
+                                    <button onclick="speakTextInput(2)" data-translate="speak_button">🔊 نطق</button>
+                                    <button onclick="cancelTextInput(2)" data-translate="cancel_button">❌ إلغاء</button>
+                                </div>
+                            </div>
                         </div>
                         <div class="conversation-area" id="conversation2">
                             <!-- Messages will be added here dynamically -->
@@ -1463,13 +1617,13 @@
                     <div class="connection-status">
                         <div class="status-indicator">
                             <div class="status-dot" id="connectionDot"></div>
-                            <span id="connectionStatus">غير متصل</span>
+                            <span id="connectionStatus" data-translate="disconnected_status">غير متصل</span>
                         </div>
                         <div class="room-controls">
-                            <input type="text" class="room-input" id="roomInput" placeholder="أدخل رمز الغرفة أو اتركه فارغاً لإنشاء غرفة جديدة">
-                            <button class="btn" id="joinRoomBtn">انضمام للغرفة</button>
-                            <button class="btn secondary" id="createRoomBtn">إنشاء غرفة جديدة</button>
-                            <button class="btn reconnect" id="reconnectBtn" style="display: none;">🔄 إعادة الاتصال</button>
+                            <input type="text" class="room-input" id="roomInput" data-translate-placeholder="room_input_placeholder" placeholder="أدخل رمز الغرفة أو اتركه فارغاً لإنشاء غرفة جديدة">
+                            <button class="btn" id="joinRoomBtn" data-translate="join_room_button">انضمام للغرفة</button>
+                            <button class="btn secondary" id="createRoomBtn" data-translate="create_room_button">إنشاء غرفة جديدة</button>
+                            <button class="btn reconnect" id="reconnectBtn" style="display: none;" data-translate="reconnect_button">🔄 إعادة الاتصال</button>
                         </div>
                     </div>
                 </div>
@@ -1477,15 +1631,15 @@
                 <!-- Chat Container -->
                 <div class="chat-container">
                     <div class="chat-header">
-                        <h3 class="chat-title">💬 المحادثة المترجمة</h3>
+                        <h3 class="chat-title" data-translate="translated_chat_title">💬 المحادثة المترجمة</h3>
                         <div class="remote-tts-controls">
-                            <button class="tts-btn" id="remoteAutoPlayBtn" title="تشغيل تلقائي للرسائل">🔊</button>
-                            <button class="tts-btn" id="remoteTtsToggleBtn" title="تفعيل/إلغاء TTS">🗣️</button>
-                            <button class="tts-btn" id="remoteTtsSpeedBtn" title="سرعة القراءة">⚡</button>
-                            <div class="tts-indicator" id="remoteTtsIndicator">🔊 جاري القراءة...</div>
+                            <button class="tts-btn" id="remoteAutoPlayBtn" data-translate-tooltip="auto_play_messages_tooltip" title="تشغيل تلقائي للرسائل">🔊</button>
+                            <button class="tts-btn" id="remoteTtsToggleBtn" data-translate-tooltip="toggle_tts_tooltip" title="تفعيل/إلغاء TTS">🗣️</button>
+                            <button class="tts-btn" id="remoteTtsSpeedBtn" data-translate-tooltip="reading_speed_tooltip" title="سرعة القراءة">⚡</button>
+                            <div class="tts-indicator" id="remoteTtsIndicator"><span data-translate="reading_indicator">🔊 جاري القراءة...</span></div>
                         </div>
                         <div class="status-indicator">
-                            <span id="participantCount">0 مشارك</span>
+                            <span id="participantCount" data-translate="participant_count">0 مشارك</span>
                         </div>
                     </div>
                     
@@ -1494,11 +1648,11 @@
                     </div>
                     
                     <div class="chat-input-area">
-                        <button class="voice-btn" id="voiceBtn" title="اضغط للتحدث">
+                        <button class="voice-btn" id="voiceBtn" data-translate-tooltip="press_to_speak_tooltip" title="اضغط للتحدث">
                             🎤
                         </button>
-                        <textarea class="chat-input" id="chatInput" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>
-                        <button class="send-btn" id="sendBtn" title="إرسال">
+                        <textarea class="chat-input" id="chatInput" data-translate-placeholder="chat_input_placeholder" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>
+                        <button class="send-btn" id="sendBtn" data-translate-tooltip="send_tooltip" title="إرسال">
                             ➤
                         </button>
                     </div>
@@ -1524,6 +1678,7 @@
         const maxReconnectDelay = 30000; // Max 30 seconds
         let heartbeatInterval = null;
         let heartbeatTimeout = null;
+        let useWebSocket = false; // تعطيل WebSocket في الوضع المحلي
         const heartbeatIntervalTime = 30000; // 30 seconds
         const heartbeatTimeoutTime = 5000; // 5 seconds
         let messageQueue = [];
@@ -3934,6 +4089,120 @@
              }, 3000);
          }
          
+         // وظائف التعامل مع إدخال النص
+         function toggleTextInput(speaker) {
+             const textInput = document.getElementById(`textInput${speaker}`);
+             const textBtn = document.getElementById(`textBtn${speaker}`);
+             const micBtn = document.getElementById(`mic${speaker}`);
+             
+             if (textInput.style.display === 'none') {
+                 // إظهار منطقة إدخال النص
+                 textInput.style.display = 'block';
+                 textBtn.style.background = 'linear-gradient(135deg, #ff6b6b, #ee5a52)';
+                 textBtn.querySelector('.text-text').textContent = 'إخفاء النص';
+                 
+                 // تعطيل زر الميكروفون
+                 micBtn.style.opacity = '0.5';
+                 micBtn.style.pointerEvents = 'none';
+                 
+                 // التركيز على منطقة النص
+                 setTimeout(() => {
+                     document.getElementById(`textArea${speaker}`).focus();
+                 }, 100);
+                 
+                 showNotification(`تم تفعيل إدخال النص للمتحدث ${speaker}`, 'info');
+             } else {
+                 // إخفاء منطقة إدخال النص
+                 cancelTextInput(speaker);
+             }
+         }
+         
+         function cancelTextInput(speaker) {
+             const textInput = document.getElementById(`textInput${speaker}`);
+             const textBtn = document.getElementById(`textBtn${speaker}`);
+             const micBtn = document.getElementById(`mic${speaker}`);
+             const textArea = document.getElementById(`textArea${speaker}`);
+             
+             textInput.style.display = 'none';
+             textBtn.style.background = 'linear-gradient(135deg, var(--success-color), #45a049)';
+             textBtn.querySelector('.text-text').textContent = 'اكتب نص';
+             
+             // إعادة تفعيل زر الميكروفون
+             micBtn.style.opacity = '1';
+             micBtn.style.pointerEvents = 'auto';
+             
+             // مسح النص
+             textArea.value = '';
+             
+             showNotification(`تم إلغاء إدخال النص للمتحدث ${speaker}`, 'info');
+         }
+         
+         async function sendTextMessage(speaker) {
+             const textArea = document.getElementById(`textArea${speaker}`);
+             const text = textArea.value.trim();
+             
+             if (!text) {
+                 showNotification('يرجى كتابة نص قبل الإرسال', 'warning');
+                 return;
+             }
+             
+             try {
+                 // تحديد اللغات
+                 const sourceLang = document.getElementById('lang1').value;
+                 const targetLang = document.getElementById('lang2').value;
+                 
+                 // إضافة الرسالة الأصلية
+                 const originalMessageId = addMessageToConversation(speaker, text, 'original');
+                 
+                 // ترجمة النص
+                 showNotification('جاري ترجمة النص...', 'info');
+                 const translatedText = await translateText(text, sourceLang, targetLang);
+                 
+                 // إضافة الترجمة
+                 const translatedMessageId = addMessageToConversation(speaker === 1 ? 2 : 1, translatedText, 'translated');
+                 
+                 // تشغيل الصوت للترجمة إذا كان مفعلاً
+                 if (ttsSettings.enabled && ttsSettings.autoPlay) {
+                     setTimeout(async () => {
+                         try {
+                             await speakTranslationWithEnhancement(translatedText, targetLang, speaker === 1 ? 2 : 1);
+                         } catch (error) {
+                             console.error('TTS Error:', error);
+                         }
+                     }, 500);
+                 }
+                 
+                 // مسح النص وإخفاء منطقة الإدخال
+                 textArea.value = '';
+                 cancelTextInput(speaker);
+                 
+                 showNotification('تم إرسال الرسالة بنجاح', 'success');
+                 
+             } catch (error) {
+                 console.error('Error sending text message:', error);
+                 showNotification('خطأ في إرسال الرسالة', 'error');
+             }
+         }
+         
+         async function speakTextInput(speaker) {
+             const textArea = document.getElementById(`textArea${speaker}`);
+             const text = textArea.value.trim();
+             
+             if (!text) {
+                 showNotification('يرجى كتابة نص قبل النطق', 'warning');
+                 return;
+             }
+             
+             try {
+                 const sourceLang = document.getElementById('lang1').value;
+                 await speakTranslationWithEnhancement(text, sourceLang, speaker);
+                 showNotification('تم تشغيل النص بالصوت', 'success');
+             } catch (error) {
+                 console.error('TTS Error:', error);
+                 showNotification('خطأ في تشغيل الصوت', 'error');
+             }
+         }
+         
          // Initialize TTS controls when page loads
          document.addEventListener('DOMContentLoaded', function() {
              // Auto Play Button
@@ -4018,6 +4287,70 @@
              
              // Initialize WebSocket connection for remote mode
              setupWebSocket();
+             
+             // إضافة أحداث النقر لأزرار النص الجديدة
+             // أزرار النص للمتحدث الأول
+             const textBtn1 = document.getElementById('textBtn1');
+             if (textBtn1) {
+                 textBtn1.addEventListener('click', () => toggleTextInput(1));
+             }
+             
+             const sendBtn1 = document.getElementById('sendBtn1');
+             if (sendBtn1) {
+                 sendBtn1.addEventListener('click', () => sendTextMessage(1));
+             }
+             
+             const speakBtn1 = document.getElementById('speakBtn1');
+             if (speakBtn1) {
+                 speakBtn1.addEventListener('click', () => speakTextInput(1));
+             }
+             
+             const cancelBtn1 = document.getElementById('cancelBtn1');
+             if (cancelBtn1) {
+                 cancelBtn1.addEventListener('click', () => cancelTextInput(1));
+             }
+             
+             // أزرار النص للمتحدث الثاني
+             const textBtn2 = document.getElementById('textBtn2');
+             if (textBtn2) {
+                 textBtn2.addEventListener('click', () => toggleTextInput(2));
+             }
+             
+             const sendBtn2 = document.getElementById('sendBtn2');
+             if (sendBtn2) {
+                 sendBtn2.addEventListener('click', () => sendTextMessage(2));
+             }
+             
+             const speakBtn2 = document.getElementById('speakBtn2');
+             if (speakBtn2) {
+                 speakBtn2.addEventListener('click', () => speakTextInput(2));
+             }
+             
+             const cancelBtn2 = document.getElementById('cancelBtn2');
+             if (cancelBtn2) {
+                 cancelBtn2.addEventListener('click', () => cancelTextInput(2));
+             }
+             
+             // إضافة دعم Enter للإرسال
+             const textArea1 = document.getElementById('textArea1');
+             if (textArea1) {
+                 textArea1.addEventListener('keydown', function(e) {
+                     if (e.key === 'Enter' && !e.shiftKey) {
+                         e.preventDefault();
+                         sendTextMessage(1);
+                     }
+                 });
+             }
+             
+             const textArea2 = document.getElementById('textArea2');
+             if (textArea2) {
+                 textArea2.addEventListener('keydown', function(e) {
+                     if (e.key === 'Enter' && !e.shiftKey) {
+                         e.preventDefault();
+                         sendTextMessage(2);
+                     }
+                 });
+             }
          });
          
          // Manual reconnection function
@@ -4071,6 +4404,20 @@
                  reconnectBtn.style.display = 'none';
              }
          }
-     </script>
+
+        // Initialize Language Manager
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof LanguageManager !== 'undefined') {
+                 // LanguageManager.init(); // تم تعطيله مؤقتاً
+                 // LanguageManager.applyLanguage(); // تم تعطيله مؤقتاً
+                
+                // Listen for language changes
+                document.addEventListener('languageChanged', function(event) {
+                    console.log('Language changed to:', event.detail.language);
+                });
+            }
+        });
+    </script>
+    <script src="language-manager.js"></script>
  </body>
  </html>
