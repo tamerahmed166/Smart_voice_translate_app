@@ -830,6 +830,39 @@
             100% { left: 100%; }
         }
         
+        .message.progressive-translation {
+            background: linear-gradient(135deg, #fff3e0, #ffeaa7);
+            border-left: 4px solid #ff9800;
+            box-shadow: 0 2px 8px rgba(255, 152, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .message.progressive-translation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: progressiveShimmer 2s infinite;
+        }
+        
+        @keyframes progressiveShimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .message.progressive-translation .message-text {
+            animation: progressiveTyping 0.5s ease-in-out;
+        }
+        
+        @keyframes progressiveTyping {
+            from { opacity: 0.7; transform: translateY(2px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
         .message.processing {
             background: var(--warning-color);
             color: white;
@@ -928,17 +961,44 @@
             position: absolute;
             top: 8px;
             left: 8px;
-            width: 30px;
-            height: 30px;
+            width: 35px;
+            height: 35px;
             border: none;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.9);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(240, 240, 240, 0.9));
             color: var(--primary-color);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.8rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
+        
+        .play-button:hover {
+            transform: scale(1.1);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+        }
+        
+        .play-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+        }
+        
+        .play-button.playing {
+            background: linear-gradient(135deg, var(--success-color), #10b981);
+            color: white;
+            animation: playingPulse 1.5s infinite;
+        }
+        
+        @keyframes playingPulse {
+            0% { transform: scale(1); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); }
+            50% { transform: scale(1.05); box-shadow: 0 4px 15px rgba(16, 185, 129, 0.5); }
+            100% { transform: scale(1); box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3); }
         }
         
         /* Remote Conversation Mode */
@@ -1098,17 +1158,25 @@
         }
         
         .bubble-text {
-            font-size: 1rem;
-            line-height: 1.4;
+            font-size: 0.9rem;
+            line-height: 1.3;
+            opacity: 0.8;
         }
         
         .bubble-translation {
-            font-size: 0.9rem;
-            opacity: 0.8;
-            font-style: italic;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            padding-top: 5px;
-            margin-top: 5px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            opacity: 1;
+            color: var(--text-primary);
+            border-top: 2px solid var(--primary-color);
+            padding-top: 8px;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+        
+        .chat-bubble.sent .bubble-translation {
+            color: #ffffff;
+            border-top-color: rgba(255, 255, 255, 0.4);
         }
         
         .chat-bubble.received .bubble-translation {
@@ -1125,8 +1193,53 @@
             padding: 15px 20px;
             border-top: 1px solid var(--border-color);
             display: flex;
-            gap: 10px;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .input-controls {
+            display: flex;
             align-items: center;
+            gap: 15px;
+        }
+        
+        .input-mode-toggle {
+            display: flex;
+            background: var(--bg-secondary);
+            border-radius: 25px;
+            padding: 4px;
+            gap: 2px;
+            border: 1px solid var(--border-color);
+        }
+        
+        .mode-btn {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .mode-btn.active {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+        }
+        
+        .mode-btn:hover:not(.active) {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+        
+        .input-container {
+            display: flex;
+            align-items: flex-end;
+            gap: 10px;
+            position: relative;
         }
         
         .chat-input {
@@ -1137,12 +1250,45 @@
             background: var(--bg-secondary);
             color: var(--text-primary);
             resize: none;
-            max-height: 100px;
+            max-height: 120px;
+            min-height: 45px;
+            font-family: inherit;
+            font-size: 1rem;
+            line-height: 1.4;
+            transition: all 0.3s ease;
         }
         
         .chat-input:focus {
             outline: none;
             border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        
+        .input-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            background: var(--border-color);
+            color: var(--text-primary);
+            transform: scale(1.1);
         }
         
         .send-btn {
@@ -1763,13 +1909,25 @@
                     </div>
                     
                     <div class="chat-input-area">
-                        <button class="voice-btn" id="voiceBtn" data-translate-tooltip="press_to_speak_tooltip" title="اضغط للتحدث">
-                            🎤
-                        </button>
-                        <textarea class="chat-input" id="chatInput" data-translate-placeholder="chat_input_placeholder" placeholder="اكتب رسالتك هنا..." rows="1"></textarea>
-                        <button class="send-btn" id="sendBtn" data-translate-tooltip="send_tooltip" title="إرسال">
-                            ➤
-                        </button>
+                        <div class="input-controls">
+                            <button class="voice-btn" id="voiceBtn" data-translate-tooltip="press_to_speak_tooltip" title="اضغط للتحدث">
+                                🎤
+                            </button>
+                            <div class="input-mode-toggle">
+                                <button class="mode-btn active" id="voiceModeBtn" title="وضع الصوت">🎤</button>
+                                <button class="mode-btn" id="textModeBtn" title="وضع النص">✏️</button>
+                                <button class="mode-btn" id="mixedModeBtn" title="وضع مختلط">🎤✏️</button>
+                            </div>
+                        </div>
+                        <div class="input-container">
+                            <textarea class="chat-input" id="chatInput" data-translate-placeholder="chat_input_placeholder" placeholder="اكتب رسالتك هنا أو استخدم الميكروفون..." rows="1"></textarea>
+                            <div class="input-actions">
+                                <button class="action-btn" id="clearBtn" title="مسح النص">🗑️</button>
+                                <button class="send-btn" id="sendBtn" data-translate-tooltip="send_tooltip" title="إرسال">
+                                    ➤
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1805,6 +1963,67 @@
         let speakerTurnActive = false; // متغير لتتبع حالة الدور النشط
         let lastTranscript = ''; // لحفظ آخر نص مسجل
         let isProcessingTurn = false; // لمنع التداخل أثناء المعالجة
+        
+        // Translation Cache System
+        const translationCache = new Map(); // Cache للترجمات
+        const commonWordsCache = new Map(); // Cache للكلمات الشائعة
+        const maxCacheSize = 1000; // الحد الأقصى لحجم Cache
+        const cacheExpiryTime = 24 * 60 * 60 * 1000; // 24 ساعة بالميلي ثانية
+        
+        // Common words for instant translation (Arabic-English)
+        const commonWords = {
+            'مرحبا': 'hello',
+            'شكرا': 'thank you',
+            'نعم': 'yes',
+            'لا': 'no',
+            'من فضلك': 'please',
+            'عذرا': 'sorry',
+            'كيف حالك': 'how are you',
+            'أهلا وسهلا': 'welcome',
+            'مع السلامة': 'goodbye',
+            'صباح الخير': 'good morning',
+            'مساء الخير': 'good evening',
+            'تصبح على خير': 'good night',
+            'اسمي': 'my name is',
+            'أين': 'where',
+            'متى': 'when',
+            'ماذا': 'what',
+            'كيف': 'how',
+            'لماذا': 'why',
+            'من': 'who',
+            'hello': 'مرحبا',
+            'thank you': 'شكرا',
+            'yes': 'نعم',
+            'no': 'لا',
+            'please': 'من فضلك',
+            'sorry': 'عذرا',
+            'how are you': 'كيف حالك',
+            'welcome': 'أهلا وسهلا',
+            'goodbye': 'مع السلامة',
+            'good morning': 'صباح الخير',
+            'good evening': 'مساء الخير',
+            'good night': 'تصبح على خير',
+            'my name is': 'اسمي',
+            'where': 'أين',
+            'when': 'متى',
+            'what': 'ماذا',
+            'how': 'كيف',
+            'why': 'لماذا',
+            'who': 'من'
+        };
+        
+        // Initialize common words cache
+        function initializeCommonWordsCache() {
+            for (const [word, translation] of Object.entries(commonWords)) {
+                const cacheKey = `${word.toLowerCase()}_auto_ar`;
+                commonWordsCache.set(cacheKey, {
+                    translation: translation,
+                    timestamp: Date.now(),
+                    isCommon: true
+                });
+            }
+            console.log('Common words cache initialized with', commonWordsCache.size, 'entries');
+        }
         
         // Language mappings
         const languageNames = {
@@ -2014,6 +2233,17 @@
         function initializeApp() {
             setupEventListeners();
             checkBrowserCompatibility();
+            
+            // Initialize translation cache system
+            initializeCommonWordsCache();
+            
+            // Clear expired cache entries on startup
+            clearExpiredCache();
+            
+            // Initialize input mode from saved preference
+            const savedInputMode = localStorage.getItem('inputMode') || 'voice';
+            setInputMode(savedInputMode);
+            
             // Add delay for speech recognition initialization
             setTimeout(() => {
                 initializeSpeechRecognition();
@@ -2024,6 +2254,11 @@
             if (turnBasedMode) {
                 initializeTurnBasedMode();
             }
+            
+            // Set up periodic cache cleanup (every hour)
+            setInterval(() => {
+                clearExpiredCache();
+            }, 60 * 60 * 1000); // 1 hour
         }
         
         // تهيئة النظام الجديد للأدوار
@@ -2146,6 +2381,14 @@
             document.getElementById('sendBtn').addEventListener('click', sendMessage);
             document.getElementById('voiceBtn').addEventListener('click', () => startVoiceRecording());
             
+            // Input mode toggle buttons
+            document.getElementById('voiceModeBtn').addEventListener('click', () => setInputMode('voice'));
+            document.getElementById('textModeBtn').addEventListener('click', () => setInputMode('text'));
+            document.getElementById('mixedModeBtn').addEventListener('click', () => setInputMode('mixed'));
+            
+            // Clear button
+            document.getElementById('clearBtn').addEventListener('click', clearChatInput);
+            
             // Chat input
             const chatInput = document.getElementById('chatInput');
             chatInput.addEventListener('keypress', function(e) {
@@ -2158,7 +2401,7 @@
             // Auto-resize chat input
             chatInput.addEventListener('input', function() {
                 this.style.height = 'auto';
-                this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
             });
         }
         
@@ -2199,6 +2442,60 @@
             } else if (lang1.value === 'auto') {
                 lang1.value = 'en';
             }
+        }
+        
+        // Input mode management
+        let currentInputMode = 'voice';
+        
+        function setInputMode(mode) {
+            currentInputMode = mode;
+            
+            // Update mode buttons
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const activeBtn = document.getElementById(mode + 'ModeBtn');
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+            
+            // Update UI based on mode
+            const chatInput = document.getElementById('chatInput');
+            const voiceBtn = document.getElementById('voiceBtn');
+            
+            switch(mode) {
+                case 'voice':
+                    chatInput.style.display = 'none';
+                    voiceBtn.style.display = 'flex';
+                    break;
+                case 'text':
+                    chatInput.style.display = 'block';
+                    voiceBtn.style.display = 'none';
+                    chatInput.focus();
+                    break;
+                case 'mixed':
+                    chatInput.style.display = 'block';
+                    voiceBtn.style.display = 'flex';
+                    break;
+            }
+            
+            // Save preference
+            localStorage.setItem('inputMode', mode);
+        }
+        
+        function clearChatInput() {
+            const chatInput = document.getElementById('chatInput');
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            chatInput.focus();
+            
+            // Add visual feedback
+            const clearBtn = document.getElementById('clearBtn');
+            clearBtn.style.transform = 'scale(0.9)';
+            setTimeout(() => {
+                clearBtn.style.transform = 'scale(1)';
+            }, 150);
         }
         
         function initializeSpeechRecognition() {
@@ -2572,6 +2869,168 @@
              };
          }
         
+        // متغيرات معالجة الصوت المتقدمة
+        let audioContext = null;
+        let audioStream = null;
+        let audioProcessor = null;
+        let noiseGate = null;
+        let compressor = null;
+        let highPassFilter = null;
+        let lowPassFilter = null;
+        
+        // إعداد معالجة الصوت المتقدمة
+        function setupAdvancedAudioProcessing(stream) {
+            try {
+                console.log('🔧 Setting up advanced audio processing...');
+                
+                // إنشاء Audio Context
+                audioContext = new (window.AudioContext || window.webkitAudioContext)({
+                    sampleRate: 48000,
+                    latencyHint: 'interactive'
+                });
+                
+                // إنشاء مصدر الصوت من الميكروفون
+                const source = audioContext.createMediaStreamSource(stream);
+                
+                // إنشاء High-Pass Filter لإزالة الترددات المنخفضة (الضوضاء)
+                highPassFilter = audioContext.createBiquadFilter();
+                highPassFilter.type = 'highpass';
+                highPassFilter.frequency.setValueAtTime(85, audioContext.currentTime); // إزالة الترددات أقل من 85Hz
+                highPassFilter.Q.setValueAtTime(0.7, audioContext.currentTime);
+                
+                // إنشاء Low-Pass Filter لإزالة الترددات العالية غير المرغوبة
+                lowPassFilter = audioContext.createBiquadFilter();
+                lowPassFilter.type = 'lowpass';
+                lowPassFilter.frequency.setValueAtTime(8000, audioContext.currentTime); // إزالة الترددات أعلى من 8kHz
+                lowPassFilter.Q.setValueAtTime(0.7, audioContext.currentTime);
+                
+                // إنشاء Compressor لتحسين مستوى الصوت وتقليل التشويه
+                compressor = audioContext.createDynamicsCompressor();
+                compressor.threshold.setValueAtTime(-18, audioContext.currentTime);
+                compressor.knee.setValueAtTime(25, audioContext.currentTime);
+                compressor.ratio.setValueAtTime(8, audioContext.currentTime);
+                compressor.attack.setValueAtTime(0.002, audioContext.currentTime);
+                compressor.release.setValueAtTime(0.2, audioContext.currentTime);
+                
+                // إنشاء Noise Gate لإزالة الضوضاء الخلفية
+                noiseGate = audioContext.createGain();
+                noiseGate.gain.setValueAtTime(1, audioContext.currentTime);
+                
+                // إنشاء Audio Processor للمعالجة المتقدمة
+                const bufferSize = 2048;
+                audioProcessor = audioContext.createScriptProcessor(bufferSize, 1, 1);
+                
+                let noiseThreshold = 0.008; // عتبة الضوضاء المحسنة
+                let silenceCounter = 0;
+                const silenceLimit = 8; // عدد العينات الصامتة المسموحة
+                let volumeHistory = [];
+                const historySize = 20;
+                
+                audioProcessor.onaudioprocess = function(event) {
+                    const inputBuffer = event.inputBuffer;
+                    const outputBuffer = event.outputBuffer;
+                    const inputData = inputBuffer.getChannelData(0);
+                    const outputData = outputBuffer.getChannelData(0);
+                    
+                    // حساب مستوى الصوت الحالي (RMS)
+                    let sum = 0;
+                    for (let i = 0; i < inputData.length; i++) {
+                        sum += inputData[i] * inputData[i];
+                    }
+                    const rms = Math.sqrt(sum / inputData.length);
+                    
+                    // إضافة إلى تاريخ الصوت
+                    volumeHistory.push(rms);
+                    if (volumeHistory.length > historySize) {
+                        volumeHistory.shift();
+                    }
+                    
+                    // حساب متوسط مستوى الصوت
+                    const avgVolume = volumeHistory.reduce((a, b) => a + b, 0) / volumeHistory.length;
+                    
+                    // تطبيق Adaptive Noise Gate
+                    const adaptiveThreshold = Math.max(noiseThreshold, avgVolume * 0.3);
+                    
+                    if (rms < adaptiveThreshold) {
+                        silenceCounter++;
+                        if (silenceCounter > silenceLimit) {
+                            // تطبيق تقليل تدريجي للضوضاء
+                            const reductionFactor = Math.max(0.05, 1 - (silenceCounter - silenceLimit) * 0.1);
+                            for (let i = 0; i < inputData.length; i++) {
+                                outputData[i] = inputData[i] * reductionFactor;
+                            }
+                        } else {
+                            for (let i = 0; i < inputData.length; i++) {
+                                outputData[i] = inputData[i];
+                            }
+                        }
+                    } else {
+                        silenceCounter = 0;
+                        // تطبيق تحسين طفيف للصوت النشط
+                        const enhancementFactor = Math.min(1.2, 1 + (rms - adaptiveThreshold) * 0.5);
+                        for (let i = 0; i < inputData.length; i++) {
+                            outputData[i] = inputData[i] * enhancementFactor;
+                        }
+                    }
+                };
+                
+                // ربط العقد في سلسلة المعالجة
+                source.connect(highPassFilter);
+                highPassFilter.connect(lowPassFilter);
+                lowPassFilter.connect(compressor);
+                compressor.connect(noiseGate);
+                noiseGate.connect(audioProcessor);
+                audioProcessor.connect(audioContext.destination);
+                
+                console.log('✅ Advanced audio processing setup completed successfully');
+                console.log('🔧 Audio processing chain: Microphone → High-Pass → Low-Pass → Compressor → Noise Gate → Processor');
+                return true;
+            } catch (error) {
+                console.error('❌ Error setting up advanced audio processing:', error);
+                return false;
+            }
+        }
+        
+        // تنظيف معالجة الصوت
+        function cleanupAudioProcessing() {
+            try {
+                console.log('🧹 Cleaning up audio processing...');
+                
+                if (audioProcessor) {
+                    audioProcessor.disconnect();
+                    audioProcessor = null;
+                }
+                if (noiseGate) {
+                    noiseGate.disconnect();
+                    noiseGate = null;
+                }
+                if (compressor) {
+                    compressor.disconnect();
+                    compressor = null;
+                }
+                if (lowPassFilter) {
+                    lowPassFilter.disconnect();
+                    lowPassFilter = null;
+                }
+                if (highPassFilter) {
+                    highPassFilter.disconnect();
+                    highPassFilter = null;
+                }
+                if (audioContext && audioContext.state !== 'closed') {
+                    audioContext.close();
+                    audioContext = null;
+                }
+                if (audioStream) {
+                    audioStream.getTracks().forEach(track => track.stop());
+                    audioStream = null;
+                }
+                
+                console.log('✅ Audio processing cleanup completed');
+            } catch (error) {
+                console.error('❌ Error during audio cleanup:', error);
+            }
+        }
+
         function startRecording(speaker = null) {
             // في النظام الجديد، نستخدم currentSpeaker إذا لم يتم تحديد متحدث
             if (turnBasedMode && !speaker) {
@@ -2618,18 +3077,34 @@
             const otherSpeaker = speaker === 1 ? 2 : 1;
             updateSpeakerStatus(otherSpeaker, 'waiting', 'في انتظار دورك...');
             
-            console.log('🎤 Requesting microphone permission...');
-            // طلب إذن الميكروفون أولاً
+            console.log('🎤 Requesting microphone permission with advanced audio processing...');
+            // طلب إذن الميكروفون مع إعدادات متقدمة
             navigator.mediaDevices.getUserMedia({ 
                 audio: {
                     echoCancellation: true,
                     noiseSuppression: true,
                     autoGainControl: true,
-                    sampleRate: 44100
+                    sampleRate: 48000, // زيادة معدل العينة لجودة أفضل
+                    channelCount: 1, // قناة واحدة لتوفير الموارد
+                    latency: 0.01, // تقليل التأخير
+                    volume: 1.0 // مستوى الصوت الكامل
                 }
             })
-                .then(() => {
+                .then((stream) => {
                     console.log('✅ Microphone permission granted');
+                    
+                    // حفظ مرجع للـ stream
+                    audioStream = stream;
+                    
+                    // إعداد معالجة الصوت المتقدمة
+                    const audioProcessingSuccess = setupAdvancedAudioProcessing(stream);
+                    if (audioProcessingSuccess) {
+                        console.log('🔧 Advanced audio processing enabled');
+                        showNotification('تم تفعيل معالجة الصوت المتقدمة', 'success');
+                    } else {
+                         console.log('⚠️ Falling back to basic audio processing');
+                         showNotification('تم استخدام معالجة الصوت الأساسية', 'warning');
+                     }
                     currentSpeaker = speaker;
                     isRecording = true;
                     console.log('📝 Recording state updated:', { currentSpeaker, isRecording });
@@ -2773,7 +3248,7 @@
                 if (currentMode === 'remote') {
                     handleRemoteSpeech(transcript);
                 } else {
-                    // For face-to-face mode, add text directly to input
+                    // For face-to-face mode, also add text to chat input
                     const chatInput = document.getElementById('chatInput');
                     if (chatInput) {
                         chatInput.value = transcript;
@@ -2800,6 +3275,10 @@
             if (!isRecording) return;
             
             console.log('🛑 Stopping recording for speaker:', currentSpeaker);
+            
+            // تنظيف معالجة الصوت المتقدمة
+            cleanupAudioProcessing();
+            
             isRecording = false;
             isProcessingTurn = true; // بدء معالجة الدور
             
@@ -2945,6 +3424,20 @@
              }
          }
         
+        // دالة الاهتزاز للأجهزة المحمولة
+        function triggerVibration(pattern) {
+            if ('vibrate' in navigator) {
+                try {
+                    navigator.vibrate(pattern);
+                    console.log('Vibration triggered:', pattern);
+                } catch (error) {
+                    console.warn('Vibration failed:', error);
+                }
+            } else {
+                console.log('Vibration not supported on this device');
+            }
+        }
+        
         function playNotificationSound(type) {
             // Create audio context for sound feedback
             if (typeof AudioContext !== 'undefined' || typeof webkitAudioContext !== 'undefined') {
@@ -2958,13 +3451,24 @@
                 if (type === 'start') {
                     oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
                     oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.1);
+                    // اهتزاز قصير عند البدء
+                    triggerVibration(100);
                 } else if (type === 'stop') {
                     oscillator.frequency.setValueAtTime(1000, audioContext.currentTime);
                     oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1);
+                    // اهتزاز مزدوج عند التوقف
+                    triggerVibration([100, 50, 100]);
                 } else if (type === 'success') {
                     oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
                     oscillator.frequency.setValueAtTime(800, audioContext.currentTime + 0.1);
                     oscillator.frequency.setValueAtTime(1000, audioContext.currentTime + 0.2);
+                    // اهتزاز ثلاثي عند النجاح
+                    triggerVibration([50, 30, 50, 30, 100]);
+                } else if (type === 'translation-complete') {
+                    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+                    oscillator.frequency.setValueAtTime(1200, audioContext.currentTime + 0.15);
+                    // اهتزاز مميز عند اكتمال الترجمة
+                    triggerVibration([200, 100, 200]);
                 }
                 
                 gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
@@ -2972,6 +3476,17 @@
                 
                 oscillator.start(audioContext.currentTime);
                 oscillator.stop(audioContext.currentTime + 0.2);
+            } else {
+                // إذا لم يكن الصوت متاحاً، استخدم الاهتزاز فقط
+                if (type === 'start') {
+                    triggerVibration(100);
+                } else if (type === 'stop') {
+                    triggerVibration([100, 50, 100]);
+                } else if (type === 'success') {
+                    triggerVibration([50, 30, 50, 30, 100]);
+                } else if (type === 'translation-complete') {
+                    triggerVibration([200, 100, 200]);
+                }
             }
         }
         
@@ -3039,6 +3554,19 @@
             });
         }
         
+        // تقسيم النص إلى جمل للترجمة التدريجية
+        function splitIntoSentences(text) {
+            // تقسيم النص بناءً على علامات الترقيم والفواصل الطبيعية
+            const sentences = text.split(/[.!?؟!。]+/).filter(s => s.trim().length > 0);
+            
+            // إذا لم يتم العثور على جمل، قسم بناءً على الفواصل
+            if (sentences.length <= 1) {
+                return text.split(/[,،;؛]+/).filter(s => s.trim().length > 0);
+            }
+            
+            return sentences;
+        }
+        
         async function handleFaceToFaceSpeech(transcript) {
             if (!currentSpeaker || !transcript.trim()) {
                 console.warn('No current speaker or empty transcript');
@@ -3071,61 +3599,22 @@
             // Add original message
             const originalId = addMessageToConversation(currentSpeaker, cleanTranscript, 'original');
             
-            // Add processing message with visual feedback
-            const processingId = addMessageToConversation(currentSpeaker, 'جاري الترجمة...', 'processing');
-            
             try {
-                // تحسين الترجمة مع إعادة المحاولة في حالة الفشل
-                let translatedText;
-                let attempts = 0;
-                const maxAttempts = 3;
+                // تقسيم النص إلى جمل للترجمة التدريجية
+                const sentences = splitIntoSentences(cleanTranscript);
+                console.log(`Split into ${sentences.length} sentences for progressive translation`);
                 
-                while (attempts < maxAttempts) {
-                    try {
-                        translatedText = await translateText(cleanTranscript, sourceLang, targetLang);
-                        if (translatedText && translatedText.trim() !== '') {
-                            break; // نجحت الترجمة
-                        }
-                    } catch (translateError) {
-                        console.warn(`Translation attempt ${attempts + 1} failed:`, translateError);
-                    }
-                    attempts++;
-                    
-                    // انتظار قصير قبل إعادة المحاولة
-                    if (attempts < maxAttempts) {
-                        await new Promise(resolve => setTimeout(resolve, 500));
-                    }
-                }
-                
-                if (!translatedText || translatedText.trim() === '') {
-                    throw new Error('Translation failed after multiple attempts');
-                }
-                
-                // Remove processing message
-                removeMessageFromConversation(processingId);
-                
-                // Add translated message with enhanced formatting
-                const translatedId = addMessageToConversation(currentSpeaker, translatedText, 'translated');
-                
-                // Success feedback
-                playNotificationSound('success');
-                showNotification('تمت الترجمة بنجاح', 'success');
-                
-                // تشغيل الترجمة الصوتية تلقائياً مع تحسينات
-                if (ttsSettings.autoPlay) {
-                    try {
-                        // إضافة تأخير قصير لضمان وضوح الصوت
-                        setTimeout(async () => {
-                            await speakTranslationWithEnhancement(translatedText, targetLang, currentSpeaker);
-                        }, 500);
-                    } catch (ttsError) {
-                        console.warn('TTS failed:', ttsError);
-                        showNotification('فشل في تشغيل الصوت', 'warning');
-                    }
+                if (sentences.length > 1) {
+                    // ترجمة تدريجية للنصوص الطويلة
+                    await handleProgressiveTranslation(sentences, sourceLang, targetLang, currentSpeaker);
                 } else {
-                    // إضافة إشعار للمستخدم بإمكانية تشغيل الصوت
-                    showNotification('اضغط على زر التشغيل لسماع الترجمة', 'info');
+                    // ترجمة عادية للنصوص القصيرة
+                    await handleSingleTranslation(cleanTranscript, sourceLang, targetLang, currentSpeaker);
                 }
+                
+                // Success feedback with vibration
+                playNotificationSound('translation-complete');
+                showNotification('تمت الترجمة بنجاح', 'success');
                 
                 console.log('Translation completed successfully');
                 
@@ -3134,8 +3623,6 @@
                 
             } catch (error) {
                 console.error('Translation error:', error);
-                // Remove processing message
-                removeMessageFromConversation(processingId);
                 
                 // Add error message
                 addMessageToConversation(currentSpeaker, 'فشل في الترجمة، يرجى المحاولة مرة أخرى', 'error');
@@ -3143,6 +3630,137 @@
                 
                 // إنهاء معالجة الدور حتى في حالة الخطأ
                 finishSpeakerTurn();
+            }
+        }
+        
+        // ترجمة تدريجية للنصوص الطويلة
+        async function handleProgressiveTranslation(sentences, sourceLang, targetLang, speaker) {
+            const progressContainer = addMessageToConversation(speaker, '', 'progressive-translation');
+            let fullTranslation = '';
+            
+            for (let i = 0; i < sentences.length; i++) {
+                const sentence = sentences[i].trim();
+                if (!sentence) continue;
+                
+                // إضافة مؤشر التقدم
+                updateProgressiveTranslation(progressContainer, `جاري ترجمة الجملة ${i + 1}/${sentences.length}...`);
+                
+                try {
+                    const translatedSentence = await translateTextWithRetry(sentence, sourceLang, targetLang);
+                    fullTranslation += translatedSentence + ' ';
+                    
+                    // تحديث الترجمة التدريجية
+                    updateProgressiveTranslation(progressContainer, fullTranslation.trim());
+                    
+                    // تشغيل صوتي تدريجي للجملة المترجمة مع اهتزاز خفيف
+                    if (ttsSettings.autoPlay && translatedSentence.trim()) {
+                        try {
+                            await speakTranslationWithEnhancement(translatedSentence, targetLang, speaker);
+                            // اهتزاز خفيف عند اكتمال كل جملة
+                            triggerVibration(50);
+                        } catch (ttsError) {
+                            console.warn('TTS failed for sentence:', ttsError);
+                        }
+                    } else {
+                        // اهتزاز خفيف حتى لو لم يكن التشغيل التلقائي مفعلاً
+                        triggerVibration(50);
+                    }
+                    
+                    // تأخير قصير بين الجمل
+                    await new Promise(resolve => setTimeout(resolve, 300));
+                    
+                } catch (error) {
+                    console.warn(`Failed to translate sentence ${i + 1}:`, error);
+                    fullTranslation += `[خطأ في ترجمة الجملة ${i + 1}] `;
+                    updateProgressiveTranslation(progressContainer, fullTranslation.trim());
+                }
+            }
+            
+            // تحديث الرسالة النهائية
+            updateProgressiveTranslation(progressContainer, fullTranslation.trim(), true);
+        }
+        
+        // ترجمة عادية للنصوص القصيرة
+        async function handleSingleTranslation(text, sourceLang, targetLang, speaker) {
+            const processingId = addMessageToConversation(speaker, 'جاري الترجمة...', 'processing');
+            
+            try {
+                const translatedText = await translateTextWithRetry(text, sourceLang, targetLang);
+                
+                // Remove processing message
+                removeMessageFromConversation(processingId);
+                
+                // Add translated message
+                addMessageToConversation(speaker, translatedText, 'translated');
+                
+                // تشغيل الترجمة الصوتية
+                if (ttsSettings.autoPlay) {
+                    try {
+                        setTimeout(async () => {
+                            await speakTranslationWithEnhancement(translatedText, targetLang, speaker);
+                        }, 500);
+                    } catch (ttsError) {
+                        console.warn('TTS failed:', ttsError);
+                        showNotification('فشل في تشغيل الصوت', 'warning');
+                    }
+                } else {
+                    showNotification('اضغط على زر التشغيل لسماع الترجمة', 'info');
+                }
+                
+            } catch (error) {
+                removeMessageFromConversation(processingId);
+                throw error;
+            }
+        }
+        
+        // ترجمة مع إعادة المحاولة
+        async function translateTextWithRetry(text, sourceLang, targetLang, maxAttempts = 3) {
+            let attempts = 0;
+            
+            while (attempts < maxAttempts) {
+                try {
+                    const translatedText = await translateText(text, sourceLang, targetLang);
+                    if (translatedText && translatedText.trim() !== '') {
+                        return translatedText;
+                    }
+                } catch (translateError) {
+                    console.warn(`Translation attempt ${attempts + 1} failed:`, translateError);
+                }
+                attempts++;
+                
+                if (attempts < maxAttempts) {
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+            }
+            
+            throw new Error('Translation failed after multiple attempts');
+        }
+        
+        // تحديث الترجمة التدريجية
+        function updateProgressiveTranslation(containerId, text, isComplete = false) {
+            const messageElement = document.querySelector(`[data-message-id="${containerId}"]`);
+            if (!messageElement) return;
+            
+            const textElement = messageElement.querySelector('.message-text');
+            if (textElement) {
+                textElement.textContent = text;
+                
+                if (isComplete) {
+                    messageElement.classList.remove('progressive-translation');
+                    messageElement.classList.add('translated');
+                    
+                    // إضافة زر التشغيل للترجمة المكتملة
+                    if (!messageElement.querySelector('.play-button')) {
+                        const playButton = document.createElement('button');
+                        playButton.className = 'play-button';
+                        playButton.innerHTML = '🔊';
+                        playButton.onclick = () => {
+                            const targetLang = detectedLanguages[`speaker${currentSpeaker}`] === 'ar' ? 'en' : 'ar';
+                            speakTranslationWithEnhancement(text, targetLang, currentSpeaker);
+                        };
+                        messageElement.appendChild(playButton);
+                    }
+                }
             }
         }
         
@@ -3191,23 +3809,7 @@
                 
             } catch (error) {
                 console.error('Error handling remote speech:', error);
-                showNotification('خطأ في إرسال الرسالة الصوتية', 'error');
-                
-                // Fallback: send original transcript
-                try {
-                    addChatBubble(transcript, 'sent');
-                    
-                    const fallbackData = {
-                        type: 'voice_message',
-                        transcript: transcript,
-                        translatedText: transcript,
-                        language: 'ar'
-                    };
-                    
-                    sendMessageSafely(fallbackData);
-                } catch (fallbackError) {
-                    console.error('Fallback voice message failed:', fallbackError);
-                }
+                showNotification('خطأ في معالجة النص المنطوق', 'error');
             }
         }
         
@@ -3338,6 +3940,79 @@
         const GOOGLE_API_KEY = 'YOUR_GOOGLE_TRANSLATE_API_KEY'; // يجب استبدالها بمفتاح API حقيقي
         const TRANSLATE_API_URL = 'https://translation.googleapis.com/language/translate/v2';
         
+        // Cache management functions
+        function getCacheKey(text, sourceLang, targetLang) {
+            return `${text.toLowerCase().trim()}_${sourceLang}_${targetLang}`;
+        }
+        
+        function getFromCache(text, sourceLang, targetLang) {
+            const cacheKey = getCacheKey(text, sourceLang, targetLang);
+            
+            // Check common words cache first
+            if (commonWordsCache.has(cacheKey)) {
+                const cached = commonWordsCache.get(cacheKey);
+                console.log(`📋 Found in common words cache: "${text}" -> "${cached.translation}"`);
+                return cached.translation;
+            }
+            
+            // Check regular translation cache
+            if (translationCache.has(cacheKey)) {
+                const cached = translationCache.get(cacheKey);
+                const now = Date.now();
+                
+                // Check if cache entry is still valid
+                if (now - cached.timestamp < cacheExpiryTime) {
+                    console.log(`📋 Found in cache: "${text}" -> "${cached.translation}"`);
+                    return cached.translation;
+                } else {
+                    // Remove expired entry
+                    translationCache.delete(cacheKey);
+                    console.log(`🗑️ Removed expired cache entry for: "${text}"`);
+                }
+            }
+            
+            return null;
+        }
+        
+        function saveToCache(text, sourceLang, targetLang, translation) {
+            const cacheKey = getCacheKey(text, sourceLang, targetLang);
+            
+            // Don't cache if it's already in common words
+            if (commonWordsCache.has(cacheKey)) {
+                return;
+            }
+            
+            // Clean old entries if cache is full
+            if (translationCache.size >= maxCacheSize) {
+                const oldestKey = translationCache.keys().next().value;
+                translationCache.delete(oldestKey);
+                console.log(`🧹 Cache cleanup: removed oldest entry`);
+            }
+            
+            translationCache.set(cacheKey, {
+                translation: translation,
+                timestamp: Date.now()
+            });
+            
+            console.log(`💾 Saved to cache: "${text}" -> "${translation}"`);
+        }
+        
+        function clearExpiredCache() {
+            const now = Date.now();
+            let removedCount = 0;
+            
+            for (const [key, value] of translationCache.entries()) {
+                if (now - value.timestamp >= cacheExpiryTime) {
+                    translationCache.delete(key);
+                    removedCount++;
+                }
+            }
+            
+            if (removedCount > 0) {
+                console.log(`🧹 Cleared ${removedCount} expired cache entries`);
+            }
+        }
+        
         async function translateText(text, sourceLang, targetLang) {
             if (!text || !text.trim()) {
                 console.warn('Empty text provided for translation');
@@ -3346,6 +4021,13 @@
             
             const cleanText = text.trim();
             console.log(`🔄 Starting translation: "${cleanText}" from ${sourceLang} to ${targetLang}`);
+            
+            // Check cache first
+            const cachedResult = getFromCache(cleanText, sourceLang, targetLang);
+            if (cachedResult) {
+                return cachedResult;
+            }
+            
             console.log(`🌍 Environment: isProduction = ${isProduction}`);
             console.log(`🔑 Google API Key status: ${GOOGLE_API_KEY !== 'YOUR_GOOGLE_TRANSLATE_API_KEY' ? 'Valid' : 'Not configured'}`);
             
@@ -3368,6 +4050,8 @@
                 }
                 
                 console.log(`✅ Translation successful: "${result}"`);
+                // Save successful translation to cache
+                saveToCache(cleanText, sourceLang, targetLang, result);
                 return result;
                 
             } catch (error) {
@@ -3570,7 +4254,7 @@
          };
          
          // Enhanced speak function with user-specific settings
-         async function speakText(text, lang, options = {}) {
+         async function speakText(text, lang, playButton = null, options = {}) {
              if (!ttsSettings.enabled || !('speechSynthesis' in window)) {
                  return Promise.resolve();
              }
@@ -3633,14 +4317,36 @@
                  utterance.onstart = function() {
                      showTTSIndicator(true, options.user);
                      updateSpeakerStatus(options.user, 'speaking');
+                     
+                     // Add playing class to play button if it exists
+                     if (playButton) {
+                         playButton.classList.add('playing');
+                         playButton.innerHTML = '⏸️';
+                         playButton.title = 'إيقاف التشغيل';
+                     }
+                     
+                     // Enhanced vibration feedback for mobile devices
                      if (navigator.vibrate) {
-                         navigator.vibrate(50);
+                         navigator.vibrate([100, 50, 100]); // Pattern: vibrate-pause-vibrate
                      }
                  };
                  
                  utterance.onend = function() {
                      showTTSIndicator(false, options.user);
                      updateSpeakerStatus(options.user, 'idle');
+                     
+                     // Remove playing class from play button
+                     if (playButton) {
+                         playButton.classList.remove('playing');
+                         playButton.innerHTML = '🔊';
+                         playButton.title = 'تشغيل الصوت';
+                     }
+                     
+                     // Success vibration
+                     if (navigator.vibrate) {
+                         navigator.vibrate(200); // Single long vibration for completion
+                     }
+                     
                      resolve();
                  };
                  
@@ -4099,12 +4805,12 @@
                                  console.log('Voice playback failed:', e);
                                  // Fallback to TTS if voice data playback fails
                                  if (data.translation) {
-                                     speakText(data.translation);
+                                     speakText(data.translation, null, null);
                                  }
                              }
                          } else if (data.translation && ttsSettings.enabled && ttsSettings.autoPlay) {
                              // Use TTS for translation if no voice data
-                             speakText(data.translation);
+                             speakText(data.translation, null, null);
                          }
                      }
                      break;
@@ -4336,7 +5042,7 @@
              playButton.title = 'تشغيل الصوت';
              playButton.onclick = () => {
                  const lang = type === 'received' ? document.getElementById('lang1').value : document.getElementById('lang2').value;
-                 speakText(message, lang);
+                 speakText(message, lang, playButton);
              };
              bubble.appendChild(playButton);
              
@@ -4352,7 +5058,7 @@
              if (type === 'received' && autoPlay && ttsSettings.autoPlay && ttsSettings.enabled) {
                  setTimeout(() => {
                      const lang = document.getElementById('lang1').value;
-                     speakText(message, lang);
+                     speakText(message, lang, null);
                  }, 500);
              }
          }
@@ -4506,7 +5212,7 @@
                  if (ttsSettings.enabled && ttsSettings.autoPlay) {
                      setTimeout(async () => {
                          try {
-                             await speakText(translatedText, targetLang, { user: otherSpeaker });
+                             await speakText(translatedText, targetLang, null, { user: otherSpeaker });
                          } catch (error) {
                              console.error('TTS Error:', error);
                          }
