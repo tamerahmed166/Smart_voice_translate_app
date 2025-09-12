@@ -456,21 +456,20 @@
         }
         
         .action-button {
-            width: 60px;
-            height: 60px;
+            width: 45px;
+            height: 45px;
             border: none;
             border-radius: 50%;
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.2rem;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
         
         .action-button:hover {
@@ -580,55 +579,9 @@
             font-style: italic;
         }
         
-        /* Button Labels */
-        .button-label {
-            font-size: 0.7rem;
-            font-weight: 500;
-            margin-top: 5px;
-            opacity: 0.9;
-            text-align: center;
-        }
+
         
-        /* Theme Toggle Button */
-        .theme-toggle {
-            position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 50px;
-            height: 50px;
-            border: none;
-            border-radius: 50%;
-            background: var(--bg-secondary);
-            color: var(--text-primary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .theme-toggle:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-50%) scale(1.1);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-        
-        .theme-toggle:active {
-            transform: translateY(-50%) scale(0.95);
-        }
-        
-        /* Dark theme icon change */
-        .dark-theme .theme-toggle .theme-icon::before {
-            content: '☀️';
-        }
-        
-        .theme-toggle .theme-icon::before {
-            content: '🌙';
-        }
+
         
         .text-button .text-icon {
             font-size: 1.8rem;
@@ -1490,9 +1443,6 @@
         <div class="app-header">
             <img src="logo-new.svg" alt="Logo" class="logo">
             <h1 data-translate="dual_conversation_header">الترجمة الثنائية</h1>
-            <button class="theme-toggle" id="themeToggle" title="تبديل الوضع المظلم/المضيء">
-                <span class="theme-icon">🌙</span>
-            </button>
         </div>
         
         <!-- Mode Selector -->
@@ -1713,15 +1663,12 @@
                                 <div class="essential-buttons">
                                     <button class="action-button mic-button" id="mic1" title="اضغط للتحدث">
                                         🎤
-                                        <div class="button-label">تحدث</div>
                                     </button>
                                     <button class="action-button send-button" id="sendBtn1" title="إرسال النص">
                                         📤
-                                        <div class="button-label">إرسال</div>
                                     </button>
                                     <button class="action-button speaker-button" id="speakerBtn1" title="تشغيل الترجمة">
                                         🔊
-                                        <div class="button-label">استماع</div>
                                     </button>
                                 </div>
                             </div>
@@ -1760,15 +1707,12 @@
                                 <div class="essential-buttons">
                                     <button class="action-button mic-button" id="mic2" title="اضغط للتحدث">
                                         🎤
-                                        <div class="button-label">تحدث</div>
                                     </button>
                                     <button class="action-button send-button" id="sendBtn2" title="إرسال النص">
                                         📤
-                                        <div class="button-label">إرسال</div>
                                     </button>
                                     <button class="action-button speaker-button" id="speakerBtn2" title="تشغيل الترجمة">
                                         🔊
-                                        <div class="button-label">استماع</div>
                                     </button>
                                 </div>
                             </div>
@@ -1840,6 +1784,7 @@
         let synthesis = window.speechSynthesis;
         let currentSpeaker = 1; // البدء بالمتحدث الأول
         let autoDetect = true;
+        let retryCount = 0; // عداد إعادة المحاولة للتعرف على الكلام
         let roomId = null;
         let isConnected = false;
         let ws = null;
@@ -2055,49 +2000,13 @@
             }
         });
 
-        // Theme toggle functionality
-        function toggleTheme() {
-            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            currentTheme = newTheme;
-            localStorage.setItem('theme', newTheme);
-            
-            // Apply theme immediately
-            if (newTheme === 'dark') {
-                document.body.classList.add('dark-theme');
-            } else {
-                document.body.classList.remove('dark-theme');
-            }
-            
-            // Update theme toggle icon
-            const themeIcon = document.querySelector('.theme-icon');
-            if (themeIcon) {
-                themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-            }
-            
-            // Broadcast theme change to other pages
-            settingsChannel.postMessage({
-                type: 'theme',
-                value: newTheme
-            });
-            
-            console.log('Theme changed to:', newTheme);
-        }
+
         
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             applySettings(); // Apply settings first
             
-            // Setup theme toggle button
-            const themeToggle = document.getElementById('themeToggle');
-            if (themeToggle) {
-                themeToggle.addEventListener('click', toggleTheme);
-                
-                // Set initial icon
-                const themeIcon = themeToggle.querySelector('.theme-icon');
-                if (themeIcon) {
-                    themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
-                }
-            }
+
             
             initializeApp();
         });
@@ -2377,9 +2286,12 @@
                     console.error('Speech recognition error:', event.error);
                     
                     let errorMessage = 'خطأ في التعرف على الكلام';
+                    let shouldRetry = false;
+                    
                     switch(event.error) {
                         case 'no-speech':
                             errorMessage = 'لم يتم اكتشاف أي كلام. حاول مرة أخرى.';
+                            shouldRetry = true;
                             break;
                         case 'audio-capture':
                             errorMessage = 'لا يمكن الوصول للميكروفون. تأكد من الأذونات.';
@@ -2388,12 +2300,34 @@
                             errorMessage = 'تم رفض الإذن للوصول للميكروفون.';
                             break;
                         case 'network':
-                            errorMessage = 'خطأ في الشبكة. تحقق من الاتصال.';
+                            errorMessage = 'خطأ في الشبكة. سيتم إعادة المحاولة...';
+                            shouldRetry = true;
                             break;
                         default:
                             errorMessage += ': ' + event.error;
                     }
                     
+                    // Auto-retry for network errors and no-speech
+                    if (shouldRetry && retryCount < 3) {
+                        retryCount++;
+                        console.log(`Retrying speech recognition (attempt ${retryCount}/3)`);
+                        showNotification(`🔄 إعادة المحاولة ${retryCount}/3...`, 'warning');
+                        setTimeout(() => {
+                            if (isRecording) {
+                                try {
+                                    recognition.start();
+                                } catch (error) {
+                                    console.error('Error restarting recognition:', error);
+                                    stopRecording();
+                                    showNotification('فشل في إعادة المحاولة', 'error');
+                                }
+                            }
+                        }, 2000);
+                        return;
+                    }
+                    
+                    // Reset retry count on final failure
+                    retryCount = 0;
                     stopRecording();
                     showNotification(errorMessage, 'error');
                 };
@@ -2485,21 +2419,38 @@
                 try {
                     const utterance = new SpeechSynthesisUtterance(text);
                     
-                    // تحسين إعدادات الصوت
+                    // تحسين إعدادات الصوت مع تحسين خاص للعربية
                     utterance.lang = getTTSLanguage(language);
-                    utterance.rate = ttsSettings.rate || 0.9;
-                    utterance.pitch = ttsSettings.pitch || 1.0;
-                    utterance.volume = ttsSettings.volume || 0.8;
                     
-                    // اختيار أفضل صوت متاح
-                    const voices = window.speechSynthesis.getVoices();
-                    const preferredVoice = voices.find(voice => 
-                        voice.lang.startsWith(language) && voice.localService
-                    ) || voices.find(voice => voice.lang.startsWith(language));
-                    
-                    if (preferredVoice) {
-                        utterance.voice = preferredVoice;
+                    if (language.startsWith('ar')) {
+                        const arabicSettings = getOptimizedArabicSettings();
+                        utterance.rate = ttsSettings.rate || arabicSettings.rate;
+                        utterance.pitch = ttsSettings.pitch || arabicSettings.pitch;
+                        utterance.volume = ttsSettings.volume || arabicSettings.volume;
+                    } else {
+                        utterance.rate = ttsSettings.rate || 0.9;
+                        utterance.pitch = ttsSettings.pitch || 1.0;
+                        utterance.volume = ttsSettings.volume || 0.8;
                     }
+                    
+                    // اختيار أفضل صوت متاح مع تحسين خاص للعربية
+                 let selectedVoice = null;
+                 
+                 if (language.startsWith('ar')) {
+                     // استخدام الدالة المحسنة للأصوات العربية
+                     selectedVoice = findBestArabicVoice();
+                 } else {
+                     // للغات الأخرى، استخدام الطريقة العادية
+                     const voices = window.speechSynthesis.getVoices();
+                     selectedVoice = voices.find(voice => 
+                         voice.lang.startsWith(language) && voice.localService
+                     ) || voices.find(voice => voice.lang.startsWith(language));
+                 }
+                 
+                 if (selectedVoice) {
+                     utterance.voice = selectedVoice;
+                     console.log(`Using voice: ${selectedVoice.name} (${selectedVoice.lang})`);
+                 }
                     
                     // تحديث حالة المتحدث أثناء التشغيل
                     updateSpeakerStatus(speaker, 'playing', 'يتم تشغيل الترجمة...');
@@ -2543,24 +2494,92 @@
         
         // دالة للحصول على لغة TTS المناسبة
         function getTTSLanguage(langCode) {
-            const ttsLanguageMap = {
-                'ar': 'ar-SA',
-                'en': 'en-US',
-                'fr': 'fr-FR',
-                'es': 'es-ES',
-                'de': 'de-DE',
-                'it': 'it-IT',
-                'pt': 'pt-BR',
-                'ru': 'ru-RU',
-                'ja': 'ja-JP',
-                'ko': 'ko-KR',
-                'zh': 'zh-CN',
-                'hi': 'hi-IN',
-                'tr': 'tr-TR'
-            };
-            
-            return ttsLanguageMap[langCode] || langCode;
-        }
+             const ttsLanguageMap = {
+                 'ar': 'ar-SA',
+                 'en': 'en-US',
+                 'fr': 'fr-FR',
+                 'es': 'es-ES',
+                 'de': 'de-DE',
+                 'it': 'it-IT',
+                 'pt': 'pt-BR',
+                 'ru': 'ru-RU',
+                 'ja': 'ja-JP',
+                 'ko': 'ko-KR',
+                 'zh': 'zh-CN',
+                 'hi': 'hi-IN',
+                 'tr': 'tr-TR'
+             };
+             
+             return ttsLanguageMap[langCode] || langCode;
+         }
+         
+         function findBestArabicVoice() {
+             const voices = window.speechSynthesis.getVoices();
+             
+             // Priority order for Arabic voices
+             const arabicVariants = [
+                 'ar-SA', // Saudi Arabic (most common)
+                 'ar-EG', // Egyptian Arabic
+                 'ar-AE', // UAE Arabic
+                 'ar-MA', // Moroccan Arabic
+                 'ar-JO', // Jordanian Arabic
+                 'ar-LB', // Lebanese Arabic
+                 'ar-KW', // Kuwaiti Arabic
+                 'ar-QA', // Qatari Arabic
+                 'ar-BH', // Bahraini Arabic
+                 'ar-OM', // Omani Arabic
+                 'ar-YE', // Yemeni Arabic
+                 'ar-SY', // Syrian Arabic
+                 'ar-IQ', // Iraqi Arabic
+                 'ar-LY', // Libyan Arabic
+                 'ar-TN', // Tunisian Arabic
+                 'ar-DZ', // Algerian Arabic
+                 'ar-SD', // Sudanese Arabic
+                 'ar'     // Generic Arabic
+             ];
+             
+             // First, try to find exact matches in priority order
+             for (const variant of arabicVariants) {
+                 const exactMatch = voices.find(voice => 
+                     voice.lang === variant && voice.localService
+                 );
+                 if (exactMatch) {
+                     console.log(`Found local Arabic voice: ${exactMatch.name} (${exactMatch.lang})`);
+                     return exactMatch;
+                 }
+             }
+             
+             // If no local voice found, try online voices
+             for (const variant of arabicVariants) {
+                 const onlineMatch = voices.find(voice => voice.lang === variant);
+                 if (onlineMatch) {
+                     console.log(`Found online Arabic voice: ${onlineMatch.name} (${onlineMatch.lang})`);
+                     return onlineMatch;
+                 }
+             }
+             
+             // Fallback: any voice that contains 'ar'
+             const fallbackVoice = voices.find(voice => 
+                 voice.lang.toLowerCase().includes('ar')
+             );
+             
+             if (fallbackVoice) {
+                 console.log(`Found fallback Arabic voice: ${fallbackVoice.name} (${fallbackVoice.lang})`);
+                 return fallbackVoice;
+             }
+             
+             console.warn('No Arabic voice found, using default system voice');
+             return null;
+         }
+         
+         // Enhanced function to optimize Arabic TTS settings
+         function getOptimizedArabicSettings() {
+             return {
+                 rate: 0.85,    // أبطأ قليلاً للوضوح
+                 pitch: 1.1,    // نبرة أعلى قليلاً للعربية
+                 volume: 0.9    // صوت واضح
+             };
+         }
         
         function startRecording(speaker = null) {
             // في النظام الجديد، نستخدم currentSpeaker إذا لم يتم تحديد متحدث
@@ -2836,7 +2855,7 @@
                 
                 if (micBtn) {
                     micBtn.classList.remove('recording', 'listening');
-                    micBtn.innerHTML = '🎤 ابدأ التحدث';
+                    micBtn.innerHTML = '🎤';
                     micBtn.style.background = 'var(--primary-color)';
                 }
                 if (recordingIndicator) {
@@ -2879,12 +2898,12 @@
                      mic1.style.opacity = '1';
                      mic1.style.cursor = 'pointer';
                      mic1.disabled = false;
-                     mic1.innerHTML = '🎤 ابدأ التحدث';
+                     mic1.innerHTML = '🎤';
                      
                      mic2.style.opacity = '0.5';
                      mic2.style.cursor = 'not-allowed';
                      mic2.disabled = true;
-                     mic2.innerHTML = '⏳ انتظار الدور';
+                     mic2.innerHTML = '🎤';
                      
                      // تحديث المؤشرات
                      if (indicator1) {
@@ -2903,12 +2922,12 @@
                      mic2.style.opacity = '1';
                      mic2.style.cursor = 'pointer';
                      mic2.disabled = false;
-                     mic2.innerHTML = '🎤 ابدأ التحدث';
+                     mic2.innerHTML = '🎤';
                      
                      mic1.style.opacity = '0.5';
                      mic1.style.cursor = 'not-allowed';
                      mic1.disabled = true;
-                     mic1.innerHTML = '⏳ انتظار الدور';
+                     mic1.innerHTML = '🎤';
                      
                      // تحديث المؤشرات
                      if (indicator2) {
@@ -3571,21 +3590,57 @@
              }
              
              return new Promise((resolve, reject) => {
-                 // Stop any ongoing speech
-                 speechSynthesis.cancel();
+                 // Enhanced speech synthesis management
+                 if (speechSynthesis.speaking) {
+                     console.log('Stopping previous speech synthesis');
+                     speechSynthesis.cancel();
+                     // Wait a bit for the cancellation to complete
+                     setTimeout(() => {
+                         startSpeech();
+                     }, 100);
+                 } else {
+                     startSpeech();
+                 }
+                 
+                 function startSpeech() {
                  
                  const utterance = new SpeechSynthesisUtterance(text);
                  utterance.lang = getTTSLanguage(lang);
                  
-                 // Apply user-specific or global settings
+                 // Apply user-specific or global settings with Arabic optimization
                  const userSettings = options.user ? ttsSettings[`user${options.user === 1 ? 'A' : 'B'}`] : ttsSettings;
-                 utterance.rate = options.rate || userSettings.rate;
-                 utterance.pitch = options.pitch || userSettings.pitch;
-                 utterance.volume = options.volume || userSettings.volume;
                  
-                 // Set voice if specified
+                 if (utterance.lang.startsWith('ar')) {
+                     const arabicSettings = getOptimizedArabicSettings();
+                     utterance.rate = options.rate || userSettings.rate || arabicSettings.rate;
+                     utterance.pitch = options.pitch || userSettings.pitch || arabicSettings.pitch;
+                     utterance.volume = options.volume || userSettings.volume || arabicSettings.volume;
+                 } else {
+                     utterance.rate = options.rate || userSettings.rate;
+                     utterance.pitch = options.pitch || userSettings.pitch;
+                     utterance.volume = options.volume || userSettings.volume;
+                 }
+                 
+                 // اختيار أفضل صوت متاح مع تحسين خاص للعربية
+                 let selectedVoice = null;
+                 
                  if (userSettings.voice) {
-                     utterance.voice = userSettings.voice;
+                     // إذا كان المستخدم قد اختار صوتاً محدداً
+                     selectedVoice = userSettings.voice;
+                 } else if (utterance.lang.startsWith('ar')) {
+                     // استخدام الدالة المحسنة للأصوات العربية
+                     selectedVoice = findBestArabicVoice();
+                 } else {
+                     // للغات الأخرى، استخدام الطريقة العادية
+                     const voices = window.speechSynthesis.getVoices();
+                     selectedVoice = voices.find(voice => 
+                         voice.lang.startsWith(utterance.lang) && voice.localService
+                     ) || voices.find(voice => voice.lang.startsWith(utterance.lang));
+                 }
+                 
+                 if (selectedVoice) {
+                     utterance.voice = selectedVoice;
+                     console.log(`Using voice: ${selectedVoice.name} (${selectedVoice.lang})`);
                  }
                  
                  // Enhanced visual feedback
@@ -3607,11 +3662,22 @@
                      console.error('Speech synthesis error:', event.error);
                      showTTSIndicator(false, options.user);
                      updateSpeakerStatus(options.user, 'error');
-                     showNotification('❌ خطأ في تشغيل الصوت', 'error');
+                     
+                     // Handle different TTS errors
+                     let errorMessage = '❌ خطأ في تشغيل الصوت';
+                     if (event.error === 'interrupted') {
+                         errorMessage = '⚠️ تم مقاطعة تشغيل الصوت';
+                         console.log('TTS interrupted - this is normal when switching between speakers');
+                     } else if (event.error === 'network') {
+                         errorMessage = '🌐 خطأ في الشبكة أثناء تشغيل الصوت';
+                     }
+                     
+                     showNotification(errorMessage, 'warning');
                      reject(event.error);
                  };
                  
                  speechSynthesis.speak(utterance);
+                 } // End of startSpeech function
              });
          }
          
@@ -3874,8 +3940,7 @@
              // Skip WebSocket setup in production environment
              if (!useWebSocket) {
                  console.log('WebSocket disabled in production environment');
-                 updateConnectionStatus('معطل في الإنتاج', 0);
-                 showNotification('التطبيق يعمل في وضع الإنتاج بدون WebSocket', 'info');
+                 updateConnectionStatus('غير متصل', 0);
                  return;
              }
              
