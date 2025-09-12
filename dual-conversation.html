@@ -1518,6 +1518,17 @@
         let roomId = null;
         let isConnected = false;
         let ws = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 15;
+        let reconnectDelay = 1000; // Start with 1 second
+        const maxReconnectDelay = 30000; // Max 30 seconds
+        let heartbeatInterval = null;
+        let heartbeatTimeout = null;
+        const heartbeatIntervalTime = 30000; // 30 seconds
+        const heartbeatTimeoutTime = 5000; // 5 seconds
+        let messageQueue = [];
+        let isReconnecting = false;
+        let lastPingTime = 0;
         let turnBasedMode = true; // النظام الجديد للأدوار
         let detectedLanguages = { speaker1: null, speaker2: null }; // اللغات المكتشفة
         
@@ -2768,15 +2779,15 @@
                         reader.onload = function() {
                             const base64Audio = reader.result.split(',')[1];
                             voiceMessage.voice_data = base64Audio;
-                            ws.send(JSON.stringify(voiceMessage));
+                            sendMessageSafely(voiceMessage);
                         };
                         reader.readAsDataURL(window.lastRecordedAudio);
                     } catch (e) {
                         console.log('Could not attach audio data:', e);
-                        ws.send(JSON.stringify(voiceMessage));
+                        sendMessageSafely(voiceMessage);
                     }
                 } else {
-                    ws.send(JSON.stringify(voiceMessage));
+                    sendMessageSafely(voiceMessage);
                 }
                 
             } catch (error) {
@@ -2794,7 +2805,7 @@
                         language: 'ar'
                     };
                     
-                    ws.send(JSON.stringify(fallbackData));
+                    sendMessageSafely(fallbackData);
                 } catch (fallbackError) {
                     console.error('Fallback voice message failed:', fallbackError);
                 }
@@ -3232,60 +3243,213 @@
          let localUserId = Math.random().toString(36).substring(2, 15);
          let messageListener = null;
          let wsUrl = 'ws://localhost:3000';
-         let reconnectAttempts = 0;
-         let maxReconnectAttempts = 10; // زيادة عدد المحاولات
-         let reconnectDelay = 2000; // تقليل وقت الانتظار إلى ثانيتين
+         // Variables already defined at the top
          
-         function setupWebSocket() {
+         function checkNetworkConnection() {
+             return new Promise((resolve) => {
+                 if (!navigator.onLine) {
+                     resolve(false);
+                     return;
+                 }
+                 
+                 // Try to fetch a small resource to verify actual connectivity
+                 const timeout = setTimeout(() => resolve(false), 3000);
+                 
+                 fetch('/favicon.ico', { 
+                     method: 'HEAD',
+                     cache: 'no-cache'
+                 })
+                 .then(() => {
+                     clearTimeout(timeout);
+                     resolve(true);
+                 })
+                 .catch(() => {
+                     clearTimeout(timeout);
+                     resolve(false);
+                 });
+             });
+         }
+         
+         function calculateReconnectDelay() {
+             // Exponential backoff with jitter
+             const baseDelay = Math.min(reconnectDelay * Math.pow(2, reconnectAttempts), maxReconnectDelay);
+             const jitter = Math.random() * 0.3 * baseDelay; // Add up to 30% jitter
+             return Math.floor(baseDelay + jitter);
+         }
+         
+         function startHeartbeat() {
+             stopHeartbeat();
+             
+             heartbeatInterval = setInterval(() => {
+                 if (ws && ws.readyState === WebSocket.OPEN) {
+                     lastPingTime = Date.now();
+                     ws.send(JSON.stringify({ type: 'ping', timestamp: lastPingTime }));
+                     
+                     // Set timeout for pong response
+                     heartbeatTimeout = setTimeout(() => {
+                         console.log('Heartbeat timeout - connection seems dead');
+                         ws.close(1000, 'Heartbeat timeout');
+                     }, heartbeatTimeoutTime);
+                 }
+             }, heartbeatIntervalTime);
+         }
+         
+         function stopHeartbeat() {
+             if (heartbeatInterval) {
+                 clearInterval(heartbeatInterval);
+                 heartbeatInterval = null;
+             }
+             if (heartbeatTimeout) {
+                 clearTimeout(heartbeatTimeout);
+                 heartbeatTimeout = null;
+             }
+         }
+         
+         function processMessageQueue() {
+             if (messageQueue.length > 0 && ws && ws.readyState === WebSocket.OPEN) {
+                 console.log(`Processing ${messageQueue.length} queued messages`);
+                 const messages = [...messageQueue];
+                 messageQueue = [];
+                 
+                 messages.forEach(message => {
+                     try {
+                         ws.send(JSON.stringify(message));
+                     } catch (error) {
+                         console.error('Error sending queued message:', error);
+                         messageQueue.push(message); // Re-queue if failed
+                     }
+                 });
+             }
+         }
+         
+         function sendMessageSafely(messageData, retryCount = 0) {
+             const maxRetries = 3;
+             
+             if (!ws || ws.readyState !== WebSocket.OPEN) {
+                 // Queue message if not connected
+                 messageQueue.push(messageData);
+                 showNotification('تم حفظ الرسالة - سيتم إرسالها عند الاتصال', 'info');
+                 return;
+             }
+             
+             try {
+                 ws.send(JSON.stringify(messageData));
+             } catch (error) {
+                 console.error('Error sending message:', error);
+                 
+                 if (retryCount < maxRetries) {
+                     setTimeout(() => {
+                         sendMessageSafely(messageData, retryCount + 1);
+                     }, 1000 * (retryCount + 1));
+                 } else {
+                     messageQueue.push(messageData);
+                     showNotification('فشل في إرسال الرسالة - تم حفظها للإرسال لاحقاً', 'warning');
+                 }
+             }
+         }
+         
+         async function setupWebSocket() {
              // Real-time connection setup for remote conversations
              try {
+                 if (isReconnecting) {
+                     return;
+                 }
+                 
+                 isReconnecting = true;
+                 
+                 // Check network connectivity first
+                 const hasNetwork = await checkNetworkConnection();
+                 if (!hasNetwork) {
+                     showNotification('لا يوجد اتصال بالإنترنت', 'error');
+                     isReconnecting = false;
+                     setTimeout(() => setupWebSocket(), 5000);
+                     return;
+                 }
+                 
+                 // Close existing connection if any
+                 if (ws) {
+                     stopHeartbeat();
+                     ws.close();
+                 }
+                 
                  ws = new WebSocket(wsUrl);
                  
                  ws.onopen = function() {
                      console.log('WebSocket connected');
-                     showNotification('تم الاتصال بالخادم', 'success');
-                     reconnectAttempts = 0; // Reset attempts on successful connection
-                     hideReconnectButton(); // Hide reconnect button on successful connection
+                     isConnected = true;
+                     isReconnecting = false;
+                     reconnectAttempts = 0;
+                     reconnectDelay = 1000; // Reset delay
+                     updateConnectionStatus('متصل', 1);
+                     hideReconnectButton();
+                     showNotification('تم الاتصال بالخادم بنجاح', 'success');
+                     
+                     // Start heartbeat
+                     startHeartbeat();
+                     
+                     // Process any queued messages
+                     processMessageQueue();
                  };
                  
                  ws.onmessage = function(event) {
                      try {
                          const data = JSON.parse(event.data);
+                         
+                         // Handle pong response
+                         if (data.type === 'pong') {
+                             if (heartbeatTimeout) {
+                                 clearTimeout(heartbeatTimeout);
+                                 heartbeatTimeout = null;
+                             }
+                             const latency = Date.now() - data.timestamp;
+                             console.log(`Heartbeat latency: ${latency}ms`);
+                             return;
+                         }
+                         
                          handleWebSocketMessage(data);
                      } catch (error) {
                          console.error('Error parsing WebSocket message:', error);
                      }
                  };
                  
-                 ws.onclose = function() {
-                     console.log('WebSocket disconnected');
+                 ws.onclose = function(event) {
+                     console.log('WebSocket disconnected:', event.code, event.reason);
                      isConnected = false;
+                     isReconnecting = false;
+                     stopHeartbeat();
                      updateConnectionStatus('غير متصل', 0);
                      
-                     // Attempt to reconnect
-                     if (reconnectAttempts < maxReconnectAttempts) {
+                     // Attempt to reconnect if not intentionally closed
+                     if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
                          reconnectAttempts++;
-                         showNotification(`محاولة إعادة الاتصال (${reconnectAttempts}/${maxReconnectAttempts})...`, 'info');
+                         const delay = calculateReconnectDelay();
+                         console.log(`Reconnection attempt ${reconnectAttempts}/${maxReconnectAttempts} in ${delay}ms`);
+                         updateConnectionStatus(`جاري إعادة المحاولة ${reconnectAttempts}/${maxReconnectAttempts}...`, 0);
+                         
                          setTimeout(() => {
                              setupWebSocket();
-                         }, reconnectDelay);
-                     } else {
-                         showNotification('فشل الاتصال بالخادم بعد 10 محاولات - اضغط زر إعادة الاتصال', 'error');
-                         showReconnectButton(); // Show reconnect button when max attempts reached
+                         }, delay);
+                     } else if (reconnectAttempts >= maxReconnectAttempts) {
+                         showNotification('فشل في الاتصال بالخادم. يرجى المحاولة يدوياً', 'error');
+                         showReconnectButton();
                          
-                         // محاولة إعادة الاتصال التلقائي كل 30 ثانية
+                         // محاولة إعادة الاتصال التلقائي كل دقيقة
                          setTimeout(() => {
-                             manualReconnect();
-                         }, 30000);
+                             reconnectAttempts = 0;
+                             setupWebSocket();
+                         }, 60000);
                      }
                  };
                  
                  ws.onerror = function(error) {
                      console.error('WebSocket error:', error);
+                     isReconnecting = false;
+                     
                      if (reconnectAttempts === 0) {
-                         showNotification('خطأ في الاتصال بالخادم - جاري المحاولة مرة أخرى...', 'warning');
+                         showNotification('خطأ في الاتصال بالخادم', 'error');
                      }
-                     // Show reconnect button on connection error
+                     
+                     // Show reconnect button on repeated errors
                      if (reconnectAttempts >= maxReconnectAttempts) {
                          showReconnectButton();
                      }
@@ -3293,8 +3457,9 @@
                  
              } catch (error) {
                  console.error('Error setting up WebSocket:', error);
-                 showNotification('فشل في الاتصال بالخادم', 'error');
-                 showReconnectButton(); // Show reconnect button on setup error
+                 isReconnecting = false;
+                 showNotification('خطأ في إعداد الاتصال', 'error');
+                 showReconnectButton();
              }
          }
          
@@ -3413,7 +3578,7 @@
                      isCreator: isCreator
                  };
                  
-                 ws.send(JSON.stringify(joinData));
+                 sendMessageSafely(joinData);
                  
                  // Store room info locally
                  roomConnection = {
@@ -3542,7 +3707,7 @@
                          language: lang1
                      };
                      
-                     ws.send(JSON.stringify(messageData));
+                     sendMessageSafely(messageData);
                      
                  } catch (error) {
                      console.error('Error sending message:', error);
@@ -3557,7 +3722,7 @@
                              language: 'ar'
                          };
                          
-                         ws.send(JSON.stringify(fallbackData));
+                         sendMessageSafely(fallbackData);
                      } catch (fallbackError) {
                          console.error('Fallback message send failed:', fallbackError);
                      }
@@ -3762,15 +3927,18 @@
          });
          
          // Manual reconnection function
-         function manualReconnect() {
+         async function manualReconnect() {
              console.log('Manual reconnection initiated');
              showNotification('جاري إعادة الاتصال بالخادم...', 'info');
              
-             // Reset reconnection attempts
+             // Reset reconnection attempts and delay
              reconnectAttempts = 0;
+             reconnectDelay = 1000;
+             isReconnecting = false;
              
              // Close existing connection if any
              if (ws) {
+                 stopHeartbeat();
                  ws.close();
              }
              
@@ -3779,6 +3947,14 @@
              
              // تحديث حالة الاتصال
              updateConnectionStatus('جاري الاتصال...', 0);
+             
+             // Check network first
+             const hasNetwork = await checkNetworkConnection();
+             if (!hasNetwork) {
+                 showNotification('لا يوجد اتصال بالإنترنت - يرجى التحقق من الاتصال', 'error');
+                 showReconnectButton();
+                 return;
+             }
              
              // Attempt to reconnect
              setTimeout(() => {
