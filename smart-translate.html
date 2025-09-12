@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ترجمة ذكية - Smart Translate</title>
+    <title data-translate="smart_translate_title">ترجمة ذكية - Smart Translate</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#667eea">
     <link rel="icon" href="logo-new.svg" type="image/svg+xml">
@@ -1112,16 +1112,16 @@
     <div class="container">
         <header>
             <div class="header-nav">
-                <a href="index.html" class="back-btn">🏠 الرئيسية</a>
+                <a href="index.html" class="back-btn" data-translate="home_button">🏠 الرئيسية</a>
                 <div style="display: flex; gap: 10px;">
-                    <a href="settings.html" class="settings-btn">⚙️ الإعدادات</a>
+                    <a href="settings.html" class="settings-btn" data-translate="settings_button">⚙️ الإعدادات</a>
                 </div>
             </div>
             
             <div class="app-header">
                 <div style="display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px;">
                      <img src="logo-new.svg" alt="Logo" class="logo" style="width: 35px; height: 35px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));">
-                     <h1 style="font-size: 1.4rem; margin: 0;">ترجمة ذكية</h1>
+                     <h1 style="font-size: 1.4rem; margin: 0;" data-translate="smart_translate_header">ترجمة ذكية</h1>
                  </div>
  
             </div>
@@ -1131,16 +1131,16 @@
             <div class="card">
                 <!-- Tabs -->
                 <div class="tabs" role="tablist">
-                    <button class="tab active" data-mode="text">📝 النص</button>
-                    <button class="tab" data-mode="camera">📷 الكاميرا</button>
-                    <button class="tab" data-mode="image">🖼️ الصور</button>
+                    <button class="tab active" data-mode="text" data-translate="text_tab">📝 النص</button>
+                    <button class="tab" data-mode="camera" data-translate="camera_tab">📷 الكاميرا</button>
+                    <button class="tab" data-mode="image" data-translate="image_tab">🖼️ الصور</button>
                 </div>
 
                 <!-- Language selection -->
                 <div class="lang-row">
                     <div class="lang-selector">
                         <select id="fromLang">
-                            <option value="auto">كشف تلقائي</option>
+                            <option value="auto" data-translate="auto_detect_option">كشف تلقائي</option>
                             <option value="ar">العربية</option>
                             <option value="en">English</option>
                             <option value="fr">Français</option>
@@ -1181,16 +1181,16 @@
                 <!-- MODE: TEXT -->
                 <div id="mode_text" class="mode active">
                     <div class="field">
-                        <label for="textInput">النص المراد ترجمته:</label>
-                        <textarea id="textInput" placeholder="اكتب النص أو انسخ محتوى هنا..."></textarea>
+                        <label for="textInput" data-translate="text_to_translate_label">النص المراد ترجمته:</label>
+                        <textarea id="textInput" data-translate-placeholder="text_input_placeholder" placeholder="اكتب النص أو انسخ محتوى هنا..."></textarea>
                     </div>
                     <div class="controls">
-                        <button id="translateTextBtn">🔄 ترجمة</button>
-                        <button id="clearTextBtn" class="ghost">🗑️ مسح</button>
+                        <button id="translateTextBtn" data-translate="translate_button">🔄 ترجمة</button>
+                        <button id="clearTextBtn" class="ghost" data-translate="clear_button">🗑️ مسح</button>
                     </div>
                     <div id="textResult" class="result"></div>
                     <div class="controls" style="margin-top: 10px; justify-content: center;">
-                        <button id="ttsTextBtn" class="ghost">🔊 تشغيل الصوت</button>
+                        <button id="ttsTextBtn" class="ghost" data-translate="play_audio_button">🔊 تشغيل الصوت</button>
                     </div>
                 </div>
 
@@ -1202,16 +1202,16 @@
                         <div id="cameraPlaceholder" class="img-box">
                             <div style="text-align: center;">
                                 <div style="font-size: 48px; margin-bottom: 10px;">📷</div>
-                                <div class="small">اضغط لفتح الكاميرا</div>
+                                <div class="small" data-translate="click_to_open_camera">اضغط لفتح الكاميرا</div>
                             </div>
                         </div>
                     </div>
                     <div class="controls">
-                        <button id="openCamBtn">📷 فتح الكاميرا</button>
-                        <button id="snapBtn" style="display: none;">📸 التقاط وترجمة</button>
-                        <button id="stopCamBtn" class="ghost" style="display: none;">⏹️ إيقاف الكاميرا</button>
+                        <button id="openCamBtn" data-translate="open_camera_button">📷 فتح الكاميرا</button>
+                        <button id="snapBtn" style="display: none;" data-translate="capture_translate_button">📸 التقاط وترجمة</button>
+                        <button id="stopCamBtn" class="ghost" style="display: none;" data-translate="stop_camera_button">⏹️ إيقاف الكاميرا</button>
                     </div>
-                    <div class="small" style="margin-top: 10px;">💡 وجه الكاميرا نحو النص أو اللافتة المراد ترجمتها</div>
+                    <div class="small" style="margin-top: 10px;" data-translate="camera_instruction">💡 وجه الكاميرا نحو النص أو اللافتة المراد ترجمتها</div>
                     <div id="cameraResult" class="result"></div>
                 </div>
 
@@ -1221,30 +1221,30 @@
                         <div class="img-box" id="dropZone">
                             <div style="text-align: center;">
                                 <div style="font-size: 48px; margin-bottom: 10px;">🖼️</div>
-                                <div class="small">اسحب الصورة أو اضغط للرفع</div>
+                                <div class="small" data-translate="drag_or_click_upload">اسحب الصورة أو اضغط للرفع</div>
                             </div>
                         </div>
                         <div class="img-box" id="previewBox">
                             <div style="text-align: center; color: var(--muted);">
                                 <div style="font-size: 24px; margin-bottom: 10px;">👁️</div>
-                                <div class="small">معاينة الصورة</div>
+                                <div class="small" data-translate="image_preview">معاينة الصورة</div>
                             </div>
                         </div>
                     </div>
                     <input type="file" id="imgFile" accept="image/*" style="display: none;" />
                     <div class="controls">
-                        <button id="processImgBtn">🔍 استخراج وترجمة النص</button>
+                        <button id="processImgBtn" data-translate="extract_translate_text_button">🔍 استخراج وترجمة النص</button>
                     </div>
-                    <div class="small" style="margin-top: 10px;">💡 يدعم التطبيق صور PNG, JPG, JPEG, WebP</div>
+                    <div class="small" style="margin-top: 10px;" data-translate="supported_formats_info">💡 يدعم التطبيق صور PNG, JPG, JPEG, WebP</div>
                     <div id="imageResult" class="result"></div>
                     <div class="controls" style="margin-top: 10px; justify-content: center;">
-                        <button id="ttsImgBtn" class="ghost">🔊 تشغيل الترجمة</button>
+                        <button id="ttsImgBtn" class="ghost" data-translate="play_translation_button">🔊 تشغيل الترجمة</button>
                     </div>
                 </div>
 
                 <div class="footer">
-                    <button id="downloadHistory" class="ghost">💾 حفظ السجل</button>
-                    <button id="shareResult" class="ghost">📤 مشاركة</button>
+                    <button id="downloadHistory" class="ghost" data-translate="save_history_button">💾 حفظ السجل</button>
+                    <button id="shareResult" class="ghost" data-translate="share_button">📤 مشاركة</button>
                 </div>
             </div>
         </main>
@@ -1252,6 +1252,9 @@
 
     <!-- Tesseract.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
+    
+    <!-- Language Manager -->
+    <script src="language-manager.js"></script>
 
     <script>
         // ---------- State ----------
@@ -1307,13 +1310,37 @@
             }
             
             // Apply language
-            if (currentLanguage === 'en') {
-                document.documentElement.lang = 'en';
-                document.documentElement.dir = 'ltr';
-            } else {
-                document.documentElement.lang = 'ar';
-                document.documentElement.dir = 'rtl';
-            }
+            const languageMap = {
+                'ar': { lang: 'ar', dir: 'rtl' },
+                'en': { lang: 'en', dir: 'ltr' },
+                'fr': { lang: 'fr', dir: 'ltr' },
+                'es': { lang: 'es', dir: 'ltr' },
+                'de': { lang: 'de', dir: 'ltr' },
+                'zh': { lang: 'zh', dir: 'ltr' }
+            };
+            
+            const langConfig = languageMap[currentLanguage] || languageMap['ar'];
+            document.documentElement.lang = langConfig.lang;
+            document.documentElement.dir = langConfig.dir;
+            
+            // Apply translation settings
+            const translationEngine = localStorage.getItem('translation-engine') || 'google';
+            const translationQuality = localStorage.getItem('translation-quality') || 'standard';
+            const translationMethod = localStorage.getItem('translation-method') || 'realtime';
+            
+            // Update global translation settings
+            window.translationSettings = {
+                engine: translationEngine,
+                quality: translationQuality,
+                method: translationMethod,
+                autoTranslate: localStorage.getItem('save-history') !== 'false'
+            };
+            
+            console.log('Settings applied:', {
+                theme: currentTheme,
+                language: currentLanguage,
+                translation: window.translationSettings
+            });
         }
         
         // Listen for settings changes from other pages
@@ -1328,16 +1355,42 @@
                     currentLanguage = event.data.language;
                     localStorage.setItem('language', currentLanguage);
                     applySettings();
+                } else if (event.data.type === 'settings-update') {
+                    // Apply all settings from settings page
+                    const settings = event.data.settings;
+                    if (settings) {
+                        // Update theme and language
+                        if (settings.theme) {
+                            currentTheme = settings.theme;
+                            localStorage.setItem('theme', currentTheme);
+                        }
+                        if (settings.language) {
+                            currentLanguage = settings.language;
+                            localStorage.setItem('language', currentLanguage);
+                        }
+                        
+                        // Update translation settings
+                        localStorage.setItem('translation-engine', settings.translationEngine || 'google');
+                        localStorage.setItem('translation-quality', settings.translationQuality || 'standard');
+                        localStorage.setItem('translation-method', settings.translationMethod || 'realtime');
+                        localStorage.setItem('save-history', settings.saveHistory !== false);
+                        
+                        // Apply all settings
+                        applySettings();
+                        console.log('All settings updated from settings page:', settings);
+                    }
                 } else if (event.data.type === 'translation-settings') {
-                    // Apply translation settings
+                    // Legacy support for old translation settings
                     const settings = event.data.settings;
                     if (settings) {
                         localStorage.setItem('translation-engine', settings.engine || 'google');
                         localStorage.setItem('translation-quality', settings.quality || 'standard');
+                        if (settings.method) {
+                            localStorage.setItem('translation-method', settings.method);
+                        }
                         localStorage.setItem('autoTranslate', settings.autoTranslate || false);
                         
-                        // Update global translation settings
-                        window.translationSettings = settings;
+                        applySettings();
                         console.log('Translation settings updated:', settings);
                     }
                 }
@@ -2723,6 +2776,21 @@
         console.log('   Ctrl+2: وضع الكاميرا');
         console.log('   Ctrl+3: وضع الصور');
         console.log('   Ctrl+Enter: ترجمة (في وضع النص)');
+        
+        // Initialize Language Manager
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof LanguageManager !== 'undefined') {
+                LanguageManager.init();
+                LanguageManager.applyLanguage();
+                
+                // Listen for language changes
+                document.addEventListener('languageChanged', function(event) {
+                    console.log('Language changed to:', event.detail.language);
+                });
+            } else {
+                console.warn('LanguageManager not found');
+            }
+        });
     </script>
 </body>
 </html>

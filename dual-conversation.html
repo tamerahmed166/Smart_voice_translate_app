@@ -2525,10 +2525,10 @@
                     recognition.grammars = new (window.SpeechGrammarList || window.webkitSpeechGrammarList)();
                 }
                 
-                // تحسين الحساسية والدقة
-                if ('serviceURI' in recognition) {
-                    recognition.serviceURI = 'wss://www.google.com/speech-api/v2/recognize';
-                }
+                // تحسين الحساسية والدقة - تم إزالة serviceURI لتجنب مشاكل الشبكة
+                // if ('serviceURI' in recognition) {
+                //     recognition.serviceURI = 'wss://www.google.com/speech-api/v2/recognize';
+                // }
                 
                 recognition.onstart = function() {
                     console.log('Speech recognition started');
@@ -2605,8 +2605,15 @@
                             errorMessage = 'تم رفض الإذن للوصول للميكروفون.';
                             break;
                         case 'network':
-                            errorMessage = 'خطأ في الشبكة. سيتم إعادة المحاولة...';
-                            shouldRetry = true;
+                            errorMessage = 'خطأ في الشبكة. التحقق من الاتصال...';
+                            // Check network connectivity before retrying
+                            if (navigator.onLine) {
+                                shouldRetry = true;
+                                errorMessage = 'خطأ في الشبكة. سيتم إعادة المحاولة...';
+                            } else {
+                                errorMessage = 'لا يوجد اتصال بالإنترنت. تحقق من الشبكة.';
+                                shouldRetry = false;
+                            }
                             break;
                         default:
                             errorMessage += ': ' + event.error;
