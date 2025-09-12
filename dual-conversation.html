@@ -2767,23 +2767,31 @@
                 });
             }
             
-            // Setup remote-specific handlers for STT
-            if (currentMode === 'remote') {
-                recognition.onresult = (event) => {
-                    const transcript = event.results[0][0].transcript;
+            // Setup speech recognition handlers for all modes
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                if (currentMode === 'remote') {
                     handleRemoteSpeech(transcript);
-                };
-                
-                recognition.onerror = (event) => {
-                    console.error('Speech recognition error:', event.error);
-                    showNotification('خطأ في التعرف على الكلام', 'error');
-                    stopRecording();
-                };
-                
-                recognition.onend = () => {
-                    stopRecording();
-                };
-            }
+                } else {
+                    // For face-to-face mode, add text directly to input
+                    const chatInput = document.getElementById('chatInput');
+                    if (chatInput) {
+                        chatInput.value = transcript;
+                        chatInput.focus();
+                    }
+                    showNotification('تم إضافة النص المنطوق إلى مربع الكتابة', 'success');
+                }
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech recognition error:', event.error);
+                showNotification('خطأ في التعرف على الكلام', 'error');
+                stopRecording();
+            };
+            
+            recognition.onend = () => {
+                stopRecording();
+            };
             
             recognition.start();
         }
@@ -3170,49 +3178,16 @@
         
         async function handleRemoteSpeech(transcript) {
             try {
-                if (!isConnected || !ws || ws.readyState !== WebSocket.OPEN) {
-                    showNotification('يجب الاتصال بغرفة أولاً', 'warning');
-                    return;
+                // Add the spoken text to the chat input box
+                const chatInput = document.getElementById('chatInput');
+                if (chatInput) {
+                    chatInput.value = transcript;
+                    // Focus on the input to show the user that text has been added
+                    chatInput.focus();
                 }
                 
-                const lang1 = document.getElementById('lang1').value;
-                const lang2 = document.getElementById('lang2').value;
-                
-                // Translate the speech for remote users
-                const translatedText = await translateText(transcript, lang1, lang2);
-                
-                // Add to local chat
-                addChatBubble(translatedText, 'sent', transcript);
-                
-                // Send voice message via WebSocket with proper structure
-                const voiceMessage = {
-                    type: 'send_voice',
-                    room_id: roomConnection?.roomId,
-                    user_id: localUserId,
-                    transcript: transcript,
-                    translation: translatedText,
-                    voice_data: null, // Will be set if audio recording is available
-                    language: lang1
-                };
-                
-                // Try to get recorded audio data if available
-                if (window.lastRecordedAudio) {
-                    try {
-                        // Convert audio blob to base64
-                        const reader = new FileReader();
-                        reader.onload = function() {
-                            const base64Audio = reader.result.split(',')[1];
-                            voiceMessage.voice_data = base64Audio;
-                            sendMessageSafely(voiceMessage);
-                        };
-                        reader.readAsDataURL(window.lastRecordedAudio);
-                    } catch (e) {
-                        console.log('Could not attach audio data:', e);
-                        sendMessageSafely(voiceMessage);
-                    }
-                } else {
-                    sendMessageSafely(voiceMessage);
-                }
+                // Show notification that speech was captured
+                showNotification('تم إضافة النص المنطوق إلى مربع الكتابة', 'success');
                 
             } catch (error) {
                 console.error('Error handling remote speech:', error);
