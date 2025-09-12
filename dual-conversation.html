@@ -2275,10 +2275,18 @@
                         handleSpeechResult(interimTranscript.trim(), false);
                     }
                     
-                    // معالجة النص النهائي للترجمة
+                    // معالجة النص النهائي للترجمة وإيقاف التسجيل
                     if (finalTranscript.trim()) {
                         console.log('Final transcript with confidence:', finalTranscript, confidence);
                         handleSpeechResult(finalTranscript.trim(), true);
+                        
+                        // إيقاف التسجيل تلقائياً بعد الحصول على نص نهائي
+                        setTimeout(() => {
+                            if (isRecording) {
+                                console.log('🛑 Auto-stopping recording after final transcript received');
+                                stopRecording();
+                            }
+                        }, 1000); // تأخير قصير للسماح بمعالجة النص
                     }
                 };
                 
@@ -2334,37 +2342,20 @@
                 
                 recognition.onend = function() {
                     console.log('Speech recognition ended');
+                    
+                    // إيقاف التسجيل تلقائياً عند انتهاء التعرف على الكلام
+                    // بدلاً من إعادة التشغيل المستمر
                     if (isRecording) {
-                        // إعادة تشغيل التسجيل إذا كان لا يزال نشطاً مع تحسينات
-                        setTimeout(() => {
-                            if (isRecording && recognition) {
-                                try {
-                                    // تحديث لغة التعرف حسب المتحدث الحالي
-                                    const lang1 = document.getElementById('lang1').value;
-                                    const lang2 = document.getElementById('lang2').value;
-                                    recognition.lang = currentSpeaker === 1 ? lang1 : lang2;
-                                    
-                                    recognition.start();
-                                    console.log('Recognition restarted with language:', recognition.lang);
-                                } catch (error) {
-                                    console.error('Error restarting recognition:', error);
-                                    // محاولة إعادة التهيئة في حالة الفشل
-                                    if (error.name === 'InvalidStateError') {
-                                        setTimeout(() => {
-                                            try {
-                                                recognition.start();
-                                            } catch (retryError) {
-                                                console.error('Retry failed:', retryError);
-                                                stopRecording();
-                                                showNotification('فشل في إعادة تشغيل التسجيل', 'error');
-                                            }
-                                        }, 500);
-                                    } else {
-                                        stopRecording();
-                                    }
-                                }
-                            }
-                        }, 200); // زيادة التأخير قليلاً لضمان الاستقرار
+                        console.log('🛑 Auto-stopping recording after speech recognition ended');
+                        stopRecording();
+                        
+                        // إشعار المستخدم بانتهاء التسجيل
+                        showNotification('تم إيقاف التسجيل تلقائياً', 'info');
+                        
+                        // تحديث حالة المتحدث
+                        if (currentSpeaker) {
+                            updateSpeakerStatus(currentSpeaker, 'ready', 'اضغط للتحدث مرة أخرى');
+                        }
                     }
                 };
                 } catch (error) {
@@ -3379,29 +3370,38 @@
             }
             
             const cleanText = text.trim();
-            console.log(`Translating: "${cleanText}" from ${sourceLang} to ${targetLang}`);
+            console.log(`🔄 Starting translation: "${cleanText}" from ${sourceLang} to ${targetLang}`);
+            console.log(`🌍 Environment: isProduction = ${isProduction}`);
+            console.log(`🔑 Google API Key status: ${GOOGLE_API_KEY !== 'YOUR_GOOGLE_TRANSLATE_API_KEY' ? 'Valid' : 'Not configured'}`);
             
             try {
+                let result;
                 // Use Vercel Functions in production, local APIs in development
                 if (isProduction) {
-                    console.log('Using Vercel Functions for translation');
-                    return await translateWithVercel(cleanText, sourceLang, targetLang);
+                    console.log('📡 Using Vercel Functions for translation');
+                    result = await translateWithVercel(cleanText, sourceLang, targetLang);
                 } else {
                     // التحقق من وجود مفتاح Google API
                     if (GOOGLE_API_KEY && GOOGLE_API_KEY !== 'YOUR_GOOGLE_TRANSLATE_API_KEY') {
-                        console.log('Using Google Translate API');
-                        return await translateWithGoogle(cleanText, sourceLang, targetLang);
+                        console.log('🔍 Using Google Translate API');
+                        result = await translateWithGoogle(cleanText, sourceLang, targetLang);
                     } else {
-                        console.log('Using MyMemory API as fallback');
+                        console.log('🔄 Using MyMemory API as fallback');
                         // استخدام MyMemory API كبديل مجاني
-                        return await translateWithMyMemory(cleanText, sourceLang, targetLang);
+                        result = await translateWithMyMemory(cleanText, sourceLang, targetLang);
                     }
                 }
+                
+                console.log(`✅ Translation successful: "${result}"`);
+                return result;
+                
             } catch (error) {
-                console.error('Translation error:', error);
-                console.log('Using simulation as final fallback');
+                console.error('❌ Translation error:', error);
+                console.log('🎭 Using simulation as final fallback');
                 // في حالة فشل جميع الطرق، استخدم الترجمة المحاكاة
-                return await simulateTranslation(cleanText, sourceLang, targetLang);
+                const fallbackResult = await simulateTranslation(cleanText, sourceLang, targetLang);
+                console.log(`🎭 Simulation result: "${fallbackResult}"`);
+                return fallbackResult;
             }
         }
         
@@ -4870,6 +4870,5 @@
             }
         });
     </script>
-    <script src="language-manager.js"></script>
  </body>
  </html>
