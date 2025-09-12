@@ -75,8 +75,8 @@
         .header-nav {
             background: var(--bg-primary);
             border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px;
+            margin-bottom: 10px;
             box-shadow: var(--shadow-md);
             display: flex;
             justify-content: space-between;
@@ -105,7 +105,7 @@
         /* App Header */
         .app-header {
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
         
         .app-header .logo {
@@ -131,8 +131,8 @@
         .mode-selector-container {
             background: var(--bg-primary);
             border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px;
+            margin-bottom: 10px;
             box-shadow: var(--shadow-md);
             display: flex;
             justify-content: center;
@@ -173,12 +173,12 @@
         .language-bar {
             background: var(--bg-primary);
             border-radius: var(--border-radius);
-            padding: 20px;
-            margin-bottom: 20px;
+            padding: 15px;
+            margin-bottom: 10px;
             box-shadow: var(--shadow-md);
             display: grid;
             grid-template-columns: 1fr auto 1fr;
-            gap: 20px;
+            gap: 15px;
             align-items: center;
         }
         
@@ -1531,6 +1531,9 @@
         let lastPingTime = 0;
         let turnBasedMode = true; // النظام الجديد للأدوار
         let detectedLanguages = { speaker1: null, speaker2: null }; // اللغات المكتشفة
+        let speakerTurnActive = false; // متغير لتتبع حالة الدور النشط
+        let lastTranscript = ''; // لحفظ آخر نص مسجل
+        let isProcessingTurn = false; // لمنع التداخل أثناء المعالجة
         
         // Language mappings
         const languageNames = {
@@ -2201,10 +2204,22 @@
             console.log('🎙️ Starting recording for speaker:', speaker);
             console.log('📊 Current state:', { isRecording, currentSpeaker, recognitionExists: !!recognition });
             
-            // في النظام الجديد، إيقاف التسجيل إذا كان نشطاً
-            if (isRecording) {
-                console.log('⏹️ Stopping current recording');
+            // في النظام الجديد، التحقق من الدور النشط
+            if (isProcessingTurn) {
+                showNotification('يرجى انتظار انتهاء المعالجة الحالية', 'warning');
+                return;
+            }
+            
+            // إذا كان هناك تسجيل نشط لنفس المتحدث، إيقافه
+            if (isRecording && currentSpeaker === speaker) {
+                console.log('⏹️ Stopping current recording for same speaker');
                 stopRecording();
+                return;
+            }
+            
+            // إذا كان هناك نشط لمتحدث آخر، منع البدء
+            if (isRecording && currentSpeaker !== speaker) {
+                showNotification(`المتحدث ${currentSpeaker} يتحدث حالياً. يرجى انتظار انتهاء دوره.`, 'warning');
                 return;
             }
             
@@ -2399,7 +2414,9 @@
         function stopRecording() {
             if (!isRecording) return;
             
+            console.log('🛑 Stopping recording for speaker:', currentSpeaker);
             isRecording = false;
+            isProcessingTurn = true; // بدء معالجة الدور
             
             // Stop MediaRecorder if it exists
             if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {
@@ -2727,8 +2744,8 @@
                 
                 console.log('Translation completed successfully');
                 
-                // تحديث حالة المتحدث إلى جاهز بعد اكتمال الترجمة
-                updateSpeakerStatus(currentSpeaker, 'ready', 'جاهز للتحدث');
+                // إنهاء معالجة الدور وتفعيل المتحدث التالي
+                finishSpeakerTurn();
                 
             } catch (error) {
                 console.error('Translation error:', error);
@@ -2739,9 +2756,39 @@
                 addMessageToConversation(currentSpeaker, 'فشل في الترجمة، يرجى المحاولة مرة أخرى', 'error');
                 showNotification('خطأ في الترجمة', 'error');
                 
-                // تحديث حالة المتحدث إلى جاهز حتى في حالة الخطأ
-                updateSpeakerStatus(currentSpeaker, 'ready', 'جاهز للتحدث');
+                // إنهاء معالجة الدور حتى في حالة الخطأ
+                finishSpeakerTurn();
             }
+        }
+        
+        // وظيفة جديدة لإنهاء دور المتحدث وتفعيل المتحدث التالي
+        function finishSpeakerTurn() {
+            console.log('🔄 Finishing turn for speaker:', currentSpeaker);
+            
+            // إنهاء معالجة الدور
+            isProcessingTurn = false;
+            
+            if (!currentSpeaker) return;
+            
+            // تحديث حالة المتحدث الحالي إلى انتهى الدور
+            updateSpeakerStatus(currentSpeaker, 'ready', 'انتهى الدور');
+            
+            // تبديل الدور للمتحدث التالي
+            const nextSpeaker = currentSpeaker === 1 ? 2 : 1;
+            
+            // تحديث حالة المتحدث التالي
+            updateSpeakerStatus(nextSpeaker, 'ready', 'دورك الآن - اضغط للتحدث');
+            
+            // تحديث أزرار الميكروفون
+            updateMicrophoneButtons();
+            
+            // إشعار بتبديل الدور
+            showNotification(`الآن دور المتحدث ${nextSpeaker}`, 'info');
+            
+            // تحديث المتحدث الحالي
+            currentSpeaker = nextSpeaker;
+            
+            console.log('✅ Turn finished. Next speaker:', nextSpeaker);
         }
         
         async function handleRemoteSpeech(transcript) {
@@ -2931,6 +2978,10 @@
             return 'en';
         }
         
+        // Environment detection
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        const API_BASE_URL = isProduction ? '/api' : '';
+        
         // Google Translate API configuration
         const GOOGLE_API_KEY = 'YOUR_GOOGLE_TRANSLATE_API_KEY'; // يجب استبدالها بمفتاح API حقيقي
         const TRANSLATE_API_URL = 'https://translation.googleapis.com/language/translate/v2';
@@ -2945,14 +2996,20 @@
             console.log(`Translating: "${cleanText}" from ${sourceLang} to ${targetLang}`);
             
             try {
-                // التحقق من وجود مفتاح Google API
-                if (GOOGLE_API_KEY && GOOGLE_API_KEY !== 'YOUR_GOOGLE_TRANSLATE_API_KEY') {
-                    console.log('Using Google Translate API');
-                    return await translateWithGoogle(cleanText, sourceLang, targetLang);
+                // Use Vercel Functions in production, local APIs in development
+                if (isProduction) {
+                    console.log('Using Vercel Functions for translation');
+                    return await translateWithVercel(cleanText, sourceLang, targetLang);
                 } else {
-                    console.log('Using MyMemory API as fallback');
-                    // استخدام MyMemory API كبديل مجاني
-                    return await translateWithMyMemory(cleanText, sourceLang, targetLang);
+                    // التحقق من وجود مفتاح Google API
+                    if (GOOGLE_API_KEY && GOOGLE_API_KEY !== 'YOUR_GOOGLE_TRANSLATE_API_KEY') {
+                        console.log('Using Google Translate API');
+                        return await translateWithGoogle(cleanText, sourceLang, targetLang);
+                    } else {
+                        console.log('Using MyMemory API as fallback');
+                        // استخدام MyMemory API كبديل مجاني
+                        return await translateWithMyMemory(cleanText, sourceLang, targetLang);
+                    }
                 }
             } catch (error) {
                 console.error('Translation error:', error);
@@ -2962,7 +3019,36 @@
             }
         }
         
-        // Google Translate API function
+        // Vercel Functions translation (for production)
+        async function translateWithVercel(text, sourceLang, targetLang) {
+            const response = await fetch(`${API_BASE_URL}/translate`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    text: text,
+                    sourceLang: sourceLang,
+                    targetLang: targetLang
+                })
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                console.error('Vercel Function Error:', errorData);
+                throw new Error(`Vercel API Error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success && data.translatedText) {
+                return data.translatedText;
+            } else {
+                throw new Error('استجابة غير متوقعة من Vercel Function');
+            }
+        }
+        
+        // Google Translate API function (for local development)
         async function translateWithGoogle(text, sourceLang, targetLang) {
             const requestBody = {
                 q: text,
@@ -3349,6 +3435,14 @@
          }
          
          async function setupWebSocket() {
+             // Skip WebSocket setup in production environment
+             if (!useWebSocket) {
+                 console.log('WebSocket disabled in production environment');
+                 updateConnectionStatus('معطل في الإنتاج', 0);
+                 showNotification('التطبيق يعمل في وضع الإنتاج بدون WebSocket', 'info');
+                 return;
+             }
+             
              // Real-time connection setup for remote conversations
              try {
                  if (isReconnecting) {
