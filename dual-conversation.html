@@ -261,14 +261,20 @@
         .person-panel {
             background: var(--bg-primary);
             border-radius: var(--border-radius);
-            padding: 20px;
-            box-shadow: var(--shadow-md);
+            padding: 25px;
+            box-shadow: var(--shadow-lg);
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            min-height: 400px;
+            gap: 20px;
+            min-height: 450px;
             transition: all 0.3s ease;
             position: relative;
+            border: 2px solid transparent;
+        }
+        
+        .person-panel:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
         
         /* حالات المتحدثين المحسنة */
@@ -399,21 +405,48 @@
             color: var(--person2-color);
         }
         
-        .mic-button {
-            width: 60px;
-            height: 60px;
+        /* Essential Buttons - Simplified Design */
+        .essential-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            margin-top: 15px;
+        }
+        
+        .action-button {
+            width: 70px;
+            height: 70px;
             border: none;
             border-radius: 50%;
-            background: var(--primary-color);
             color: white;
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .action-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .mic-button {
+            background: linear-gradient(135deg, var(--primary-color), #2563eb);
+        }
+        
+        .send-button {
+            background: linear-gradient(135deg, var(--success-color), #16a34a);
+        }
+        
+        .speaker-button {
+            background: linear-gradient(135deg, var(--secondary-color), #059669);
         }
         
         .mic-button:hover {
@@ -466,31 +499,94 @@
         /* أنماط التحكم في الإدخال */
         .input-controls {
             display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        /* Text Input Area - Simplified */
+        .text-input-container {
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        
+        .text-input {
+            width: 100%;
+            min-height: 80px;
+            padding: 15px;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: inherit;
+            resize: vertical;
+            transition: all 0.3s ease;
+            box-sizing: border-box;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            background: var(--bg-primary);
+        }
+        
+        .text-input::placeholder {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+        
+        /* Button Labels */
+        .button-label {
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-top: 5px;
+            opacity: 0.9;
+            text-align: center;
+        }
+        
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: absolute;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
             justify-content: center;
         }
         
-        .text-button {
-            background: linear-gradient(135deg, var(--success-color), #45a049);
+        .theme-toggle:hover {
+            background: var(--primary-color);
             color: white;
-            border: none;
-            border-radius: 50px;
-            width: 80px;
-            height: 80px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 4px;
+            transform: translateY(-50%) scale(1.1);
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
+        }
+        
+        .theme-toggle:active {
+            transform: translateY(-50%) scale(0.95);
+        }
+        
+        /* Dark theme icon change */
+        .dark-theme .theme-toggle .theme-icon::before {
+            content: '☀️';
+        }
+        
+        .theme-toggle .theme-icon::before {
+            content: '🌙';
         }
         
         .text-button .text-icon {
@@ -1223,6 +1319,32 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
+        /* Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 50px;
+            height: 50px;
+            border: none;
+            border-radius: 50%;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: var(--shadow-lg);
+        }
+        
         /* Dark theme styles */
         .dark-theme {
             --bg-primary: #1e293b;
@@ -1327,6 +1449,9 @@
         <div class="app-header">
             <img src="logo-new.svg" alt="Logo" class="logo">
             <h1 data-translate="dual_conversation_header">الترجمة الثنائية</h1>
+            <button class="theme-toggle" id="themeToggle" title="تبديل الوضع المظلم/المضيء">
+                <span class="theme-icon">🌙</span>
+            </button>
         </div>
         
         <!-- Mode Selector -->
@@ -1536,30 +1661,29 @@
                                 <div class="voice-bar"></div>
                                 <div class="voice-bar"></div>
                             </div>
-                            <div class="tts-controls">
-                                <button class="tts-btn" id="autoPlayBtn" title="تشغيل تلقائي للترجمة">🔊</button>
-                                <button class="tts-btn" id="ttsToggleBtn" title="تفعيل/إلغاء TTS">🗣️</button>
-                                <button class="tts-btn" id="ttsSpeedBtn" title="سرعة القراءة">⚡</button>
-                            </div>
-                            <div class="input-controls">
-                                <button class="mic-button enhanced" id="mic1" title="اضغط للتحدث">
-                                    <span class="mic-icon">🎤</span>
-                                    <span class="mic-text" data-translate="press_to_speak">اضغط للتحدث</span>
-                                </button>
-                                <button class="text-button" id="textBtn1" onclick="toggleTextInput(1)" title="اكتب نص">
-                                    <span class="text-icon">✏️</span>
-                                    <span class="text-text" data-translate="write_text">اكتب نص</span>
-                                </button>
-                            </div>
-                            <div class="text-input-area" id="textInput1" style="display: none;">
-                                <textarea id="textArea1" placeholder="اكتب رسالتك هنا..." rows="3" data-translate-placeholder="write_message_placeholder"></textarea>
-                                <div class="text-controls">
-                                    <button onclick="sendTextMessage(1)" data-translate="send_button">📤 إرسال</button>
-                                    <button onclick="speakTextInput(1)" data-translate="speak_button">🔊 نطق</button>
-                                    <button onclick="cancelTextInput(1)" data-translate="cancel_button">❌ إلغاء</button>
-                                </div>
-                            </div>
                         </div>
+                        
+                        <!-- Text Input Area -->
+                        <div class="text-input-container">
+                            <textarea class="text-input" id="textArea1" placeholder="اكتب رسالتك هنا أو استخدم الميكروفون للتحدث..." data-translate-placeholder="write_message_placeholder"></textarea>
+                        </div>
+                        
+                        <!-- Essential Buttons -->
+                        <div class="essential-buttons">
+                            <button class="action-button mic-button" id="mic1" title="اضغط للتحدث">
+                                🎤
+                                <div class="button-label">تحدث</div>
+                            </button>
+                            <button class="action-button send-button" id="sendBtn1" title="إرسال الرسالة">
+                                📤
+                                <div class="button-label">إرسال</div>
+                            </button>
+                            <button class="action-button speaker-button" id="speakerBtn1" title="تشغيل الترجمة">
+                                🔊
+                                <div class="button-label">استماع</div>
+                            </button>
+                        </div>
+                        
                         <div class="conversation-area" id="conversation1">
                             <!-- Messages will be added here dynamically -->
                         </div>
@@ -1581,28 +1705,30 @@
                                 <div class="voice-bar"></div>
                                 <div class="voice-bar"></div>
                             </div>
-                            <div class="tts-controls">
-                                <div class="tts-indicator" id="ttsIndicator"><span data-translate="reading_indicator">🔊 جاري القراءة...</span></div>
-                            </div>
-                            <div class="input-controls">
-                                <button class="mic-button enhanced" id="mic2" title="اضغط للتحدث">
-                                    <span class="mic-icon">🎤</span>
-                                    <span class="mic-text">اضغط للتحدث</span>
-                                </button>
-                                <button class="text-button" id="textBtn2" onclick="toggleTextInput(2)" title="اكتب نص">
-                                    <span class="text-icon">✏️</span>
-                                    <span class="text-text" data-translate="write_text">اكتب نص</span>
-                                </button>
-                            </div>
-                            <div class="text-input-area" id="textInput2" style="display: none;">
-                                <textarea id="textArea2" placeholder="اكتب رسالتك هنا..." rows="3" data-translate-placeholder="write_message_placeholder"></textarea>
-                                <div class="text-controls">
-                                    <button onclick="sendTextMessage(2)" data-translate="send_button">📤 إرسال</button>
-                                    <button onclick="speakTextInput(2)" data-translate="speak_button">🔊 نطق</button>
-                                    <button onclick="cancelTextInput(2)" data-translate="cancel_button">❌ إلغاء</button>
-                                </div>
-                            </div>
+                            <div class="tts-indicator" id="ttsIndicator"><span data-translate="reading_indicator">🔊 جاري القراءة...</span></div>
                         </div>
+                        
+                        <!-- Text Input Area -->
+                        <div class="text-input-container">
+                            <textarea class="text-input" id="textArea2" placeholder="اكتب رسالتك هنا أو استخدم الميكروفون للتحدث..." data-translate-placeholder="write_message_placeholder"></textarea>
+                        </div>
+                        
+                        <!-- Essential Buttons -->
+                        <div class="essential-buttons">
+                            <button class="action-button mic-button" id="mic2" title="اضغط للتحدث">
+                                🎤
+                                <div class="button-label">تحدث</div>
+                            </button>
+                            <button class="action-button send-button" id="sendBtn2" title="إرسال الرسالة">
+                                📤
+                                <div class="button-label">إرسال</div>
+                            </button>
+                            <button class="action-button speaker-button" id="speakerBtn2" title="تشغيل الترجمة">
+                                🔊
+                                <div class="button-label">استماع</div>
+                            </button>
+                        </div>
+                        
                         <div class="conversation-area" id="conversation2">
                             <!-- Messages will be added here dynamically -->
                         </div>
@@ -1884,9 +2010,50 @@
             }
         });
 
+        // Theme toggle functionality
+        function toggleTheme() {
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            currentTheme = newTheme;
+            localStorage.setItem('theme', newTheme);
+            
+            // Apply theme immediately
+            if (newTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+            } else {
+                document.body.classList.remove('dark-theme');
+            }
+            
+            // Update theme toggle icon
+            const themeIcon = document.querySelector('.theme-icon');
+            if (themeIcon) {
+                themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
+            }
+            
+            // Broadcast theme change to other pages
+            settingsChannel.postMessage({
+                type: 'theme',
+                value: newTheme
+            });
+            
+            console.log('Theme changed to:', newTheme);
+        }
+        
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             applySettings(); // Apply settings first
+            
+            // Setup theme toggle button
+            const themeToggle = document.getElementById('themeToggle');
+            if (themeToggle) {
+                themeToggle.addEventListener('click', toggleTheme);
+                
+                // Set initial icon
+                const themeIcon = themeToggle.querySelector('.theme-icon');
+                if (themeIcon) {
+                    themeIcon.textContent = currentTheme === 'dark' ? '☀️' : '🌙';
+                }
+            }
+            
             initializeApp();
         });
         
