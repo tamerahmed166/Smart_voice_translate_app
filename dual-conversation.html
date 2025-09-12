@@ -3468,32 +3468,41 @@
         
         // MyMemory API function (free alternative)
         async function translateWithMyMemory(text, sourceLang, targetLang) {
-            const langPair = sourceLang === 'auto' ? `auto|${targetLang}` : `${sourceLang}|${targetLang}`;
-            const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
-            
-            console.log('MyMemory API URL:', apiUrl);
-            
-            const response = await fetch(apiUrl, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
+            try {
+                const langPair = sourceLang === 'auto' ? `auto|${targetLang}` : `${sourceLang}|${targetLang}`;
+                const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langPair}`;
+                
+                console.log('MyMemory API URL:', apiUrl);
+                console.log('Translating text:', text, 'from', sourceLang, 'to', targetLang);
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    },
+                    timeout: 10000
+                });
+                
+                if (!response.ok) {
+                    console.error(`MyMemory API HTTP Error: ${response.status} ${response.statusText}`);
+                    throw new Error(`MyMemory API HTTP Error: ${response.status}`);
                 }
-            });
-            
-            if (!response.ok) {
-                throw new Error(`MyMemory API HTTP Error: ${response.status}`);
-            }
-            
-            const data = await response.json();
-            console.log('MyMemory API Response:', data);
-            
-            if (data.responseStatus === 200 && data.responseData && data.responseData.translatedText) {
-                const translatedText = data.responseData.translatedText;
-                console.log('MyMemory translation successful:', translatedText);
-                return translatedText;
-            } else {
-                console.warn('MyMemory API returned error or empty result:', data);
-                throw new Error(`MyMemory API Error: ${data.responseStatus || 'Unknown error'}`);
+                
+                const data = await response.json();
+                console.log('MyMemory API Response:', data);
+                
+                if (data.responseStatus === 200 && data.responseData && data.responseData.translatedText) {
+                    const translatedText = data.responseData.translatedText.trim();
+                    console.log('MyMemory translation successful:', translatedText);
+                    return translatedText;
+                } else {
+                    console.warn('MyMemory API returned error or empty result:', data);
+                    throw new Error(`MyMemory API Error: ${data.responseStatus || 'Unknown error'} - ${data.responseDetails || 'No details'}`);
+                }
+            } catch (error) {
+                console.error('MyMemory API Error:', error);
+                throw error;
             }
         }
         
@@ -3512,7 +3521,8 @@
                     'goodbye': 'وداعا', 'see you later': 'أراك لاحقا',
                     'what is your name': 'ما اسمك', 'my name is': 'اسمي',
                     'nice to meet you': 'سعيد بلقائك', 'how much': 'كم السعر',
-                    'where': 'أين', 'when': 'متى', 'why': 'لماذا', 'what': 'ماذا', 'who': 'من'
+                    'where': 'أين', 'when': 'متى', 'why': 'لماذا', 'what': 'ماذا', 'who': 'من',
+                    'write here or use the microphone': 'اكتب هنا أو استخدم الميكروفون'
                 },
                 'en': {
                     'مرحبا': 'hello', 'كيف حالك': 'how are you', 'صباح الخير': 'good morning',
@@ -3521,7 +3531,8 @@
                     'آسف': 'sorry', 'وداعا': 'goodbye', 'أراك لاحقا': 'see you later',
                     'ما اسمك': 'what is your name', 'اسمي': 'my name is',
                     'سعيد بلقائك': 'nice to meet you', 'كم السعر': 'how much',
-                    'أين': 'where', 'متى': 'when', 'لماذا': 'why', 'ماذا': 'what', 'من': 'who'
+                    'أين': 'where', 'متى': 'when', 'لماذا': 'why', 'ماذا': 'what', 'من': 'who',
+                    'اكتب هنا أو استخدم الميكروفون': 'write here or use the microphone'
                 },
                 'fr': {
                     'hello': 'bonjour', 'thank you': 'merci', 'yes': 'oui', 'no': 'non',
