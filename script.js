@@ -3246,7 +3246,10 @@ class VoiceTranslateApp {
         const fromLang = document.getElementById('from-lang');
         const toLang = document.getElementById('to-lang');
         
-        if (!textInput || !textResult || !fromLang || !toLang) return;
+        if (!textInput || !textResult || !fromLang || !toLang) {
+            console.error('❌ Required elements not found for text translation');
+            return;
+        }
         
         const text = textInput.value.trim();
         if (!text) {
@@ -3254,13 +3257,67 @@ class VoiceTranslateApp {
             return;
         }
         
+        // التحقق من صحة اللغات
+        if (!fromLang.value || !toLang.value) {
+            this.showSmartError(textResult, 'يرجى تحديد لغة المصدر والهدف');
+            return;
+        }
+        
+        // التحقق من طول النص
+        if (text.length > 5000) {
+            this.showSmartError(textResult, 'النص طويل جداً. الحد الأقصى 5000 حرف');
+            return;
+        }
+        
+        console.log('🔄 Starting text translation:', { text: text.substring(0, 50) + '...', from: fromLang.value, to: toLang.value });
+        
         this.showSmartLoading(textResult, 'جاري الترجمة...');
         
         try {
-            const translatedText = await this.translateWithMyMemory(text, fromLang.value, toLang.value);
+            // محاولة الترجمة مع إعادة المحاولة
+            let translatedText;
+            let attempts = 0;
+            const maxAttempts = 3;
+            
+            while (attempts < maxAttempts) {
+                try {
+                    translatedText = await this.translateWithMyMemory(text, fromLang.value, toLang.value);
+                    if (translatedText && translatedText.trim()) {
+                        break;
+                    }
+                } catch (attemptError) {
+                    console.warn(`Translation attempt ${attempts + 1} failed:`, attemptError);
+                    attempts++;
+                    
+                    if (attempts < maxAttempts) {
+                        this.showSmartLoading(textResult, `جاري إعادة المحاولة (${attempts + 1}/${maxAttempts})...`);
+                        await new Promise(resolve => setTimeout(resolve, 1000));
+                    }
+                }
+            }
+            
+            if (!translatedText || !translatedText.trim()) {
+                throw new Error('فشل في الحصول على ترجمة صالحة');
+            }
+            
+            console.log('✅ Text translation successful');
             this.showSmartResult(textResult, text, translatedText, fromLang.value, toLang.value);
+            
         } catch (error) {
-            this.showSmartError(textResult, 'خطأ في الترجمة. يرجى المحاولة مرة أخرى.');
+            console.error('❌ Text translation failed:', error);
+            
+            let errorMessage = 'خطأ في الترجمة. يرجى المحاولة مرة أخرى.';
+            
+            // تخصيص رسالة الخطأ بناءً على نوع الخطأ
+            if (error.message.includes('network') || error.message.includes('fetch')) {
+                errorMessage = 'خطأ في الاتصال بالإنترنت. تحقق من الشبكة وحاول مرة أخرى.';
+            } else if (error.message.includes('timeout')) {
+                errorMessage = 'انتهت مهلة الاتصال. حاول مرة أخرى.';
+            } else if (error.message.includes('API')) {
+                errorMessage = 'خطأ في خدمة الترجمة. حاول مرة أخرى لاحقاً.';
+            }
+            
+            this.showSmartError(textResult, errorMessage);
         }
     }
     
