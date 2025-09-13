@@ -2501,6 +2501,12 @@
         function initializeSpeechRecognition() {
             console.log('🎤 Initializing Speech Recognition...');
             
+            // Check internet connectivity before initializing
+            if (!navigator.onLine) {
+                showNotification('⚠️ التعرف على الكلام يتطلب اتصالاً بالإنترنت. تحقق من الشبكة أولاً.', 'warning');
+                return;
+            }
+            
             if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
                 try {
                     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -2606,12 +2612,22 @@
                             break;
                         case 'network':
                             errorMessage = 'خطأ في الشبكة. التحقق من الاتصال...';
-                            // Check network connectivity before retrying
+                            // Enhanced network connectivity check
                             if (navigator.onLine) {
-                                shouldRetry = true;
-                                errorMessage = 'خطأ في الشبكة. سيتم إعادة المحاولة...';
+                                // Test actual connectivity with a quick ping
+                                fetch('https://www.google.com/favicon.ico', { 
+                                    method: 'HEAD', 
+                                    mode: 'no-cors',
+                                    cache: 'no-cache'
+                                }).then(() => {
+                                    shouldRetry = true;
+                                    errorMessage = 'خطأ مؤقت في الشبكة. سيتم إعادة المحاولة...';
+                                }).catch(() => {
+                                    shouldRetry = false;
+                                    errorMessage = 'لا يمكن الوصول لخدمات التعرف على الكلام. تحقق من الاتصال بالإنترنت.';
+                                });
                             } else {
-                                errorMessage = 'لا يوجد اتصال بالإنترنت. تحقق من الشبكة.';
+                                errorMessage = 'لا يوجد اتصال بالإنترنت. التعرف على الكلام يتطلب اتصالاً مستقراً بالإنترنت.';
                                 shouldRetry = false;
                             }
                             break;
@@ -3072,7 +3088,14 @@
                 return;
             }
             
+            // Check internet connectivity before starting recording
+            if (!navigator.onLine) {
+                showNotification('⚠️ لا يوجد اتصال بالإنترنت. التعرف على الكلام يتطلب اتصالاً مستقراً.', 'warning');
+                return;
+            }
+            
             console.log('✅ Recognition object available, proceeding with recording');
+            showNotification('🎤 بدء التسجيل... تأكد من استقرار الاتصال بالإنترنت', 'info');
             
             // تحديث المتحدث الحالي
             currentSpeaker = speaker;
@@ -3943,9 +3966,8 @@
         const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
         const API_BASE_URL = isProduction ? '/api' : '';
         
-        // Google Translate API configuration
-        const GOOGLE_API_KEY = 'YOUR_GOOGLE_TRANSLATE_API_KEY'; // يجب استبدالها بمفتاح API حقيقي
-        const TRANSLATE_API_URL = 'https://translation.googleapis.com/language/translate/v2';
+        // Free Translation Model configuration
+        // No API keys required - using free services only
         
         // Cache management functions
         function getCacheKey(text, sourceLang, targetLang) {
@@ -4040,20 +4062,14 @@
             
             try {
                 let result;
-                // Use Vercel Functions in production, local APIs in development
+                // Use free translation model in all environments
                 if (isProduction) {
-                    console.log('📡 Using Vercel Functions for translation');
+                    console.log('📡 Using Free Translation API via Vercel Functions');
                     result = await translateWithVercel(cleanText, sourceLang, targetLang);
                 } else {
-                    // التحقق من وجود مفتاح Google API
-                    if (GOOGLE_API_KEY && GOOGLE_API_KEY !== 'YOUR_GOOGLE_TRANSLATE_API_KEY') {
-                        console.log('🔍 Using Google Translate API');
-                        result = await translateWithGoogle(cleanText, sourceLang, targetLang);
-                    } else {
-                        console.log('🔄 Using MyMemory API as fallback');
-                        // استخدام MyMemory API كبديل مجاني
-                        result = await translateWithMyMemory(cleanText, sourceLang, targetLang);
-                    }
+                    console.log('🆓 Using Free Translation Model locally');
+                    // استخدام النموذج المجاني المحلي
+                    result = await translateWithFreeModel(cleanText, sourceLang, targetLang);
                 }
                 
                 console.log(`✅ Translation successful: "${result}"`);
@@ -4100,36 +4116,44 @@
             }
         }
         
-        // Google Translate API function (for local development)
-        async function translateWithGoogle(text, sourceLang, targetLang) {
-            const requestBody = {
-                q: text,
-                target: targetLang,
-                source: sourceLang === 'auto' ? undefined : sourceLang,
-                format: 'text'
-            };
+        // Free Translation Model function (for local development)
+        async function translateWithFreeModel(text, sourceLang, targetLang) {
+            // Try multiple free services in order of preference
+            const services = ['mymemory', 'lingva', 'libretranslate', 'googletranslate'];
             
-            const response = await fetch(`${TRANSLATE_API_URL}?key=${GOOGLE_API_KEY}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                console.error('Google Translate API Error:', errorData);
-                throw new Error(`Google API Error: ${response.status}`);
+            for (const service of services) {
+                try {
+                    console.log(`🔄 Trying ${service} service...`);
+                    let result;
+                    
+                    switch (service) {
+                        case 'mymemory':
+                            result = await translateWithMyMemory(text, sourceLang, targetLang);
+                            break;
+                        case 'lingva':
+                            result = await translateWithLingva(text, sourceLang, targetLang);
+                            break;
+                        case 'libretranslate':
+                            result = await translateWithLibreTranslate(text, sourceLang, targetLang);
+                            break;
+                        case 'googletranslate':
+                            result = await translateWithFreeGoogle(text, sourceLang, targetLang);
+                            break;
+                    }
+                    
+                    if (result && result.trim()) {
+                        console.log(`✅ ${service} translation successful: "${result}"`);
+                        return result;
+                    }
+                } catch (error) {
+                    console.warn(`⚠️ ${service} failed:`, error.message);
+                    continue;
+                }
             }
             
-            const data = await response.json();
-            
-            if (data.data && data.data.translations && data.data.translations.length > 0) {
-                return data.data.translations[0].translatedText;
-            } else {
-                throw new Error('استجابة غير متوقعة من Google API');
-            }
+            // If all services fail, use simulation
+            console.log('🎭 All services failed, using simulation');
+            return await simulateTranslation(text, sourceLang, targetLang);
         }
         
         // MyMemory API function (free alternative)
@@ -4168,6 +4192,107 @@
                 }
             } catch (error) {
                 console.error('MyMemory API Error:', error);
+                throw error;
+            }
+        }
+        
+        // Lingva Translate API function (free alternative)
+        async function translateWithLingva(text, sourceLang, targetLang) {
+            try {
+                const source = sourceLang === 'auto' ? 'auto' : sourceLang;
+                const apiUrl = `https://lingva.ml/api/v1/${source}/${targetLang}/${encodeURIComponent(text)}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    },
+                    timeout: 8000
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Lingva API HTTP Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.translation && data.translation.trim()) {
+                    return data.translation.trim();
+                } else {
+                    throw new Error('Lingva API returned empty translation');
+                }
+            } catch (error) {
+                console.error('Lingva API Error:', error);
+                throw error;
+            }
+        }
+        
+        // LibreTranslate API function (free alternative)
+        async function translateWithLibreTranslate(text, sourceLang, targetLang) {
+            try {
+                const source = sourceLang === 'auto' ? 'auto' : sourceLang;
+                const apiUrl = 'https://libretranslate.de/translate';
+                
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        q: text,
+                        source: source,
+                        target: targetLang,
+                        format: 'text'
+                    }),
+                    timeout: 10000
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`LibreTranslate API HTTP Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.translatedText && data.translatedText.trim()) {
+                    return data.translatedText.trim();
+                } else {
+                    throw new Error('LibreTranslate API returned empty translation');
+                }
+            } catch (error) {
+                console.error('LibreTranslate API Error:', error);
+                throw error;
+            }
+        }
+        
+        // Free Google Translate API function (using public endpoint)
+        async function translateWithFreeGoogle(text, sourceLang, targetLang) {
+            try {
+                const source = sourceLang === 'auto' ? 'auto' : sourceLang;
+                const apiUrl = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${source}&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+                
+                const response = await fetch(apiUrl, {
+                    method: 'GET',
+                    headers: {
+                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                    },
+                    timeout: 8000
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Free Google Translate HTTP Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data && data[0] && data[0][0] && data[0][0][0]) {
+                    return data[0][0][0].trim();
+                } else {
+                    throw new Error('Free Google Translate returned empty translation');
+                }
+            } catch (error) {
+                console.error('Free Google Translate Error:', error);
                 throw error;
             }
         }

@@ -8,6 +8,7 @@
     <meta name="theme-color" content="#667eea">
     <link rel="icon" href="logo-new.svg" type="image/svg+xml">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@300;400;600;700&display=swap" rel="stylesheet">
+
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="الترجمة الذكية">
@@ -1253,8 +1254,7 @@
     <!-- Tesseract.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4.1.1/dist/tesseract.min.js"></script>
     
-    <!-- Language Manager -->
-    <script src="language-manager.js"></script>
+    <!-- Language Manager is now included inline below -->
 
     <script>
         // ---------- State ----------
@@ -1507,6 +1507,196 @@
             }
         }
         
+        // Enhanced translation with context awareness
+        async function enhancedTranslateText(text, fromLang, toLang, context = null) {
+            console.log('🌐 بدء الترجمة المحسنة:', { text: text.substring(0, 50) + '...', fromLang, toLang, context });
+            
+            try {
+                // Use the free translation model
+                const result = await translateWithFreeModel(text, fromLang, toLang);
+                
+                // Apply context-aware improvements if context is provided
+                if (context && result && !result.includes('خطأ في')) {
+                    return applyContextualImprovements(result, context);
+                }
+                
+                return result;
+            } catch (error) {
+                console.error('❌ خطأ في الترجمة المحسنة:', error);
+                return 'خطأ في الترجمة المحسنة. يرجى المحاولة مرة أخرى.';
+            }
+        }
+        
+        // Apply contextual improvements to translation
+        function applyContextualImprovements(translation, context) {
+            let improvedTranslation = translation;
+            
+            // Apply improvements based on context type
+            if (context.type === 'menu') {
+                // Improve menu-specific translations
+                improvedTranslation = improvedTranslation.replace(/\bmenu\b/gi, 'قائمة الطعام');
+                improvedTranslation = improvedTranslation.replace(/\bprice\b/gi, 'السعر');
+            } else if (context.type === 'signage') {
+                // Improve signage translations
+                improvedTranslation = improvedTranslation.replace(/\bwarning\b/gi, 'تحذير');
+                improvedTranslation = improvedTranslation.replace(/\bcaution\b/gi, 'احذر');
+            } else if (context.type === 'document') {
+                // Improve document translations
+                improvedTranslation = improvedTranslation.replace(/\bcertificate\b/gi, 'شهادة');
+                improvedTranslation = improvedTranslation.replace(/\bdocument\b/gi, 'وثيقة');
+            }
+            
+            // Apply quality-based improvements
+            if (context.quality === 'low') {
+                // Apply more aggressive text cleaning for low quality OCR
+                improvedTranslation = improvedTranslation.replace(/[\u200B-\u200D\uFEFF]/g, ''); // Remove zero-width characters
+                improvedTranslation = improvedTranslation.replace(/\s+/g, ' ').trim(); // Normalize spaces
+            }
+            
+            return improvedTranslation;
+        }
+        
+        // Free translation model using multiple providers
+        async function translateWithFreeModel(text, fromLang, toLang) {
+            console.log('🆓 استخدام النموذج المجاني للترجمة');
+            
+            // Try Lingva first (most reliable)
+            try {
+                const lingvaResult = await translateWithLingva(text, fromLang, toLang);
+                if (lingvaResult && !lingvaResult.includes('خطأ في')) {
+                    console.log('✅ نجحت الترجمة باستخدام Lingva');
+                    return lingvaResult;
+                }
+            } catch (error) {
+                console.log('⚠️ فشل Lingva، جاري المحاولة مع الخدمة التالية...');
+            }
+            
+            // Try LibreTranslate as backup
+            try {
+                const libreResult = await translateWithLibreTranslate(text, fromLang, toLang);
+                if (libreResult && !libreResult.includes('خطأ في')) {
+                    console.log('✅ نجحت الترجمة باستخدام LibreTranslate');
+                    return libreResult;
+                }
+            } catch (error) {
+                console.log('⚠️ فشل LibreTranslate، جاري المحاولة مع الخدمة التالية...');
+            }
+            
+            // Try Free Google as backup
+            try {
+                const freeGoogleResult = await translateWithFreeGoogle(text, fromLang, toLang);
+                if (freeGoogleResult && !freeGoogleResult.includes('خطأ في')) {
+                    console.log('✅ نجحت الترجمة باستخدام Free Google');
+                    return freeGoogleResult;
+                }
+            } catch (error) {
+                console.log('⚠️ فشل Free Google، جاري المحاولة مع الخدمة التالية...');
+            }
+            
+            // Fallback to MyMemory
+            try {
+                const myMemoryResult = await translateWithMyMemory(text, fromLang, toLang);
+                if (myMemoryResult && !myMemoryResult.includes('خطأ في')) {
+                    console.log('✅ نجحت الترجمة باستخدام MyMemory');
+                    return myMemoryResult;
+                }
+            } catch (error) {
+                console.log('⚠️ فشل MyMemory أيضاً');
+            }
+            
+            // If all services fail, return error message
+            return 'فشل في الترجمة. جميع الخدمات المجانية غير متاحة حالياً.';
+        }
+        
+        // Lingva Translate (Free Google Translate API)
+        async function translateWithLingva(text, fromLang, toLang) {
+            const url = `https://lingva.ml/api/v1/${fromLang}/${toLang}/${encodeURIComponent(text)}`;
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Lingva API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.translation || 'خطأ في استخراج الترجمة من Lingva';
+        }
+        
+        // LibreTranslate (Open source translation)
+        async function translateWithLibreTranslate(text, fromLang, toLang) {
+            const url = 'https://libretranslate.de/translate';
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    q: text,
+                    source: fromLang,
+                    target: toLang,
+                    format: 'text'
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`LibreTranslate API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.translatedText || 'خطأ في استخراج الترجمة من LibreTranslate';
+        }
+        
+        // Free Google Translate (via translate.googleapis.com)
+        async function translateWithFreeGoogle(text, fromLang, toLang) {
+            const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${fromLang}&tl=${toLang}&dt=t&q=${encodeURIComponent(text)}`;
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                }
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Free Google API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data && data[0] && data[0][0] && data[0][0][0]) {
+                return data[0][0][0];
+            }
+            
+            throw new Error('خطأ في تحليل استجابة Free Google');
+        }
+        
+        // MyMemory API (existing function, kept as final fallback)
+        async function translateWithMyMemory(text, fromLang, toLang) {
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${fromLang}|${toLang}`;
+            
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error(`MyMemory API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.responseStatus === 200 && data.responseData) {
+                return data.responseData.translatedText;
+            }
+            
+            throw new Error('خطأ في استجابة MyMemory API');
+        }
+
         // Enhanced AI-powered speech synthesis
         async function speakText(text, lang = 'ar') {
             console.log('🔊 بدء تشغيل الصوت:', { text: text.substring(0, 30) + '...', lang });
@@ -2777,20 +2967,232 @@
         console.log('   Ctrl+3: وضع الصور');
         console.log('   Ctrl+Enter: ترجمة (في وضع النص)');
         
-        // Initialize Language Manager
-        document.addEventListener('DOMContentLoaded', function() {
-            if (typeof LanguageManager !== 'undefined') {
-                LanguageManager.init();
-                LanguageManager.applyLanguage();
+        // Language Manager - نظام إدارة اللغات
+        class LanguageManager {
+            constructor() {
+                this.currentLanguage = localStorage.getItem('app_language') || 'ar';
+                this.translations = {
+                    ar: {
+                        // صفحة التسجيل
+                        'welcome_title': 'مرحباً بك في تطبيق الترجمة الصوتية',
+                        'login_title': 'تسجيل الدخول',
+                        'username_label': 'اسم المستخدم',
+                        'password_label': 'كلمة المرور',
+                        'login_button': 'دخول',
+                        'register_button': 'إنشاء حساب جديد',
+                        'forgot_password': 'نسيت كلمة المرور؟',
+                        'remember_me': 'تذكرني',
+                        
+                        // صفحة الإعدادات
+                        'settings_title': 'الإعدادات',
+                        'language_setting': 'اللغة',
+                        'arabic_lang': 'العربية',
+                        'english_lang': 'English',
+                        'voice_settings': 'إعدادات الصوت',
+                        'microphone_test': 'اختبار الميكروفون',
+                        'speaker_test': 'اختبار السماعات',
+                        'translation_settings': 'إعدادات الترجمة',
+                        'auto_translate': 'الترجمة التلقائية',
+                        'save_settings': 'حفظ الإعدادات',
+                        'reset_settings': 'إعادة تعيين',
+                        'back_to_home': 'العودة للرئيسية',
+                        
+                        // صفحة المحادثة الثنائية
+                        'dual_conversation_title': 'المحادثة الثنائية',
+                        'person_a': 'الشخص أ',
+                        'person_b': 'الشخص ب',
+                        'start_recording': 'بدء التسجيل',
+                        'stop_recording': 'إيقاف التسجيل',
+                        'play_audio': 'تشغيل الصوت',
+                        'translate_text': 'ترجمة النص',
+                        'clear_conversation': 'مسح المحادثة',
+                        'switch_mode': 'تبديل الوضع',
+                        'face_to_face_mode': 'وضع وجهاً لوجه',
+                        'remote_mode': 'الوضع عن بُعد',
+                        'join_room': 'انضمام لغرفة',
+                        'create_room': 'إنشاء غرفة',
+                        'room_code': 'رمز الغرفة',
+                        'connected': 'متصل',
+                        'disconnected': 'غير متصل',
+                        'connecting': 'جاري الاتصال...',
+                        'reconnect': 'إعادة الاتصال',
+                        
+                        // صفحة المحادثة الذكية
+                        'smart_translate_title': 'الترجمة الذكية',
+                        'speak_now': 'تحدث الآن',
+                        'listening': 'جاري الاستماع...',
+                        'processing': 'جاري المعالجة...',
+                        'translation_result': 'نتيجة الترجمة',
+                        'detected_language': 'اللغة المكتشفة',
+                        'target_language': 'اللغة المستهدفة',
+                        'copy_text': 'نسخ النص',
+                        'share_translation': 'مشاركة الترجمة',
+                        'history': 'السجل',
+                        'clear_history': 'مسح السجل',
+                        
+                        // رسائل عامة
+                        'loading': 'جاري التحميل...',
+                        'error': 'خطأ',
+                        'success': 'نجح',
+                        'cancel': 'إلغاء',
+                        'confirm': 'تأكيد',
+                        'close': 'إغلاق',
+                        'retry': 'إعادة المحاولة',
+                        'microphone_permission': 'يرجى السماح بالوصول للميكروفون',
+                        'network_error': 'خطأ في الشبكة',
+                        'translation_failed': 'فشلت الترجمة',
+                        'audio_playback_failed': 'فشل تشغيل الصوت'
+                    },
+                    en: {
+                        // Login page
+                        'welcome_title': 'Welcome to Voice Translation App',
+                        'login_title': 'Login',
+                        'username_label': 'Username',
+                        'password_label': 'Password',
+                        'login_button': 'Login',
+                        'register_button': 'Create New Account',
+                        'forgot_password': 'Forgot Password?',
+                        'remember_me': 'Remember Me',
+                        
+                        // Settings page
+                        'settings_title': 'Settings',
+                        'language_setting': 'Language',
+                        'arabic_lang': 'العربية',
+                        'english_lang': 'English',
+                        'voice_settings': 'Voice Settings',
+                        'microphone_test': 'Test Microphone',
+                        'speaker_test': 'Test Speakers',
+                        'translation_settings': 'Translation Settings',
+                        'auto_translate': 'Auto Translate',
+                        'save_settings': 'Save Settings',
+                        'reset_settings': 'Reset Settings',
+                        'back_to_home': 'Back to Home',
+                        
+                        // Dual conversation page
+                        'dual_conversation_title': 'Dual Conversation',
+                        'person_a': 'Person A',
+                        'person_b': 'Person B',
+                        'start_recording': 'Start Recording',
+                        'stop_recording': 'Stop Recording',
+                        'play_audio': 'Play Audio',
+                        'translate_text': 'Translate Text',
+                        'clear_conversation': 'Clear Conversation',
+                        'switch_mode': 'Switch Mode',
+                        'face_to_face_mode': 'Face-to-Face Mode',
+                        'remote_mode': 'Remote Mode',
+                        'join_room': 'Join Room',
+                        'create_room': 'Create Room',
+                        'room_code': 'Room Code',
+                        'connected': 'Connected',
+                        'disconnected': 'Disconnected',
+                        'connecting': 'Connecting...',
+                        'reconnect': 'Reconnect',
+                        
+                        // Smart translate page
+                        'smart_translate_title': 'Smart Translation',
+                        'speak_now': 'Speak Now',
+                        'listening': 'Listening...',
+                        'processing': 'Processing...',
+                        'translation_result': 'Translation Result',
+                        'detected_language': 'Detected Language',
+                        'target_language': 'Target Language',
+                        'copy_text': 'Copy Text',
+                        'share_translation': 'Share Translation',
+                        'history': 'History',
+                        'clear_history': 'Clear History',
+                        
+                        // General messages
+                        'loading': 'Loading...',
+                        'error': 'Error',
+                        'success': 'Success',
+                        'cancel': 'Cancel',
+                        'confirm': 'Confirm',
+                        'close': 'Close',
+                        'retry': 'Retry',
+                        'microphone_permission': 'Please allow microphone access',
+                        'network_error': 'Network Error',
+                        'translation_failed': 'Translation Failed',
+                        'audio_playback_failed': 'Audio Playback Failed'
+                    }
+                };
                 
-                // Listen for language changes
-                document.addEventListener('languageChanged', function(event) {
-                    console.log('Language changed to:', event.detail.language);
-                });
-            } else {
-                console.warn('LanguageManager not found');
+                this.init();
             }
-        });
+            
+            init() {
+                // تطبيق اللغة المحفوظة عند تحميل الصفحة
+                this.applyLanguage();
+                
+                // إضافة مستمع لتغيير اللغة
+                document.addEventListener('languageChanged', (event) => {
+                    this.setLanguage(event.detail.language);
+                });
+            }
+            
+            setLanguage(language) {
+                if (this.translations[language]) {
+                    this.currentLanguage = language;
+                    localStorage.setItem('app_language', language);
+                    this.applyLanguage();
+                    
+                    // إرسال حدث تغيير اللغة
+                    document.dispatchEvent(new CustomEvent('languageApplied', {
+                        detail: { language: language }
+                    }));
+                }
+            }
+            
+            getCurrentLanguage() {
+                return this.currentLanguage;
+            }
+            
+            translate(key) {
+                return this.translations[this.currentLanguage][key] || key;
+            }
+            
+            applyLanguage() {
+                // تطبيق اتجاه النص
+                document.documentElement.dir = this.currentLanguage === 'ar' ? 'rtl' : 'ltr';
+                document.documentElement.lang = this.currentLanguage;
+                
+                // ترجمة جميع العناصر التي تحتوي على data-translate
+                const elementsToTranslate = document.querySelectorAll('[data-translate]');
+                elementsToTranslate.forEach(element => {
+                    const key = element.getAttribute('data-translate');
+                    const translation = this.translate(key);
+                    
+                    if (element.tagName === 'INPUT' && (element.type === 'text' || element.type === 'password')) {
+                        element.placeholder = translation;
+                    } else if (element.tagName === 'INPUT' && element.type === 'submit') {
+                        element.value = translation;
+                    } else {
+                        element.textContent = translation;
+                    }
+                });
+                
+                // ترجمة العناصر التي تحتوي على data-translate-title
+                const elementsWithTitle = document.querySelectorAll('[data-translate-title]');
+                elementsWithTitle.forEach(element => {
+                    const key = element.getAttribute('data-translate-title');
+                    element.title = this.translate(key);
+                });
+            }
+            
+            // دالة مساعدة لإضافة خيارات اللغة إلى select
+            populateLanguageSelect(selectElement) {
+                selectElement.innerHTML = `
+                    <option value="ar" ${this.currentLanguage === 'ar' ? 'selected' : ''}>${this.translate('arabic_lang')}</option>
+                    <option value="en" ${this.currentLanguage === 'en' ? 'selected' : ''}>${this.translate('english_lang')}</option>
+                `;
+                
+                selectElement.addEventListener('change', (e) => {
+                    this.setLanguage(e.target.value);
+                });
+            }
+        }
+        
+        // إنشاء مثيل عام من مدير اللغات
+        const languageManager = new LanguageManager();
     </script>
 </body>
 </html>

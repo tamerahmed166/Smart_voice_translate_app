@@ -225,6 +225,17 @@ class LanguageManager {
 // إنشاء مثيل عام من مدير اللغات
 const languageManager = new LanguageManager();
 
+// تهيئة تلقائية عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    languageManager.init();
+    languageManager.applyLanguage();
+    
+    // Listen for language changes
+    document.addEventListener('languageChanged', function(event) {
+        console.log('Language changed to:', event.detail.language);
+    });
+});
+
 // تصدير للاستخدام في ملفات أخرى
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = LanguageManager;
