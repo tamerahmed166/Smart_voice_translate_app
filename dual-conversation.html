@@ -1963,6 +1963,7 @@
         let speakerTurnActive = false; // متغير لتتبع حالة الدور النشط
         let lastTranscript = ''; // لحفظ آخر نص مسجل
         let isProcessingTurn = false; // لمنع التداخل أثناء المعالجة
+        let recordingEndedByRecognition = false; // لتتبع ما إذا انتهى التسجيل من خلال recognition.onend
         
         // Translation Cache System
         const translationCache = new Map(); // Cache للترجمات
@@ -2664,18 +2665,42 @@
                     console.log('Speech recognition ended');
                     
                     // إيقاف التسجيل تلقائياً عند انتهاء التعرف على الكلام
-                    // بدلاً من إعادة التشغيل المستمر
                     if (isRecording) {
                         console.log('🛑 Auto-stopping recording after speech recognition ended');
-                        stopRecording();
                         
-                        // إشعار المستخدم بانتهاء التسجيل
-                        showNotification('تم إيقاف التسجيل تلقائياً', 'info');
+                        // تعيين المتغير لتتبع أن التسجيل انتهى من خلال recognition
+                        recordingEndedByRecognition = true;
                         
-                        // تحديث حالة المتحدث
-                        if (currentSpeaker) {
-                            updateSpeakerStatus(currentSpeaker, 'ready', 'اضغط للتحدث مرة أخرى');
+                        // إيقاف التسجيل دون تحديث حالة المتحدث
+                        isRecording = false;
+                        isProcessingTurn = true; // بدء معالجة الدور
+                        
+                        // تنظيف معالجة الصوت المتقدمة
+                        cleanupAudioProcessing();
+                        
+                        // Stop MediaRecorder if it exists
+                        if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {
+                            window.mediaRecorder.stop();
                         }
+                        
+                        // تحديث الواجهة لإظهار أن التسجيل انتهى والمعالجة بدأت
+                        if (currentSpeaker) {
+                            updateSpeakerStatus(currentSpeaker, 'processing', 'جاري المعالجة...');
+                            
+                            // تحديث زر الميكروفون
+                            const micBtn = document.getElementById(`mic${currentSpeaker}`);
+                            if (micBtn) {
+                                micBtn.classList.remove('recording', 'listening');
+                                micBtn.innerHTML = '⏳';
+                                micBtn.style.background = '#ff9800';
+                            }
+                        }
+                        
+                        // إشعار المستخدم بانتهاء التسجيل وبدء المعالجة
+                        showNotification('انتهى التسجيل، جاري المعالجة...', 'info');
+                        
+                        // Audio feedback
+                        playNotificationSound('stop');
                     }
                 };
                 } catch (error) {
@@ -3302,7 +3327,20 @@
         }
         
         function stopRecording() {
-            if (!isRecording) return;
+            // إذا انتهى التسجيل بالفعل من خلال recognition.onend، لا تفعل شيئاً
+            if (recordingEndedByRecognition) {
+                console.log('Recording already stopped by recognition.onend');
+                recordingEndedByRecognition = false; // إعادة تعيين المتغير
+                return;
+            }
+            
+            if (!isRecording) {
+                // إذا كان التسجيل متوقف بالفعل، تحقق من حالة المعالجة
+                if (!isProcessingTurn) {
+                    isProcessingTurn = true; // بدء معالجة الدور فقط إذا لم تبدأ بعد
+                }
+                return;
+            }
             
             console.log('🛑 Stopping recording for speaker:', currentSpeaker);
             
@@ -3800,6 +3838,7 @@
             
             // إنهاء معالجة الدور
             isProcessingTurn = false;
+            recordingEndedByRecognition = false; // إعادة تعيين متغير انتهاء التسجيل
             
             if (!currentSpeaker) return;
             
