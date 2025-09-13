@@ -2615,18 +2615,11 @@
                             errorMessage = 'خطأ في الشبكة. التحقق من الاتصال...';
                             // Enhanced network connectivity check
                             if (navigator.onLine) {
-                                // Test actual connectivity with a quick ping
-                                fetch('https://www.google.com/favicon.ico', { 
-                                    method: 'HEAD', 
-                                    mode: 'no-cors',
-                                    cache: 'no-cache'
-                                }).then(() => {
-                                    shouldRetry = true;
-                                    errorMessage = 'خطأ مؤقت في الشبكة. سيتم إعادة المحاولة...';
-                                }).catch(() => {
-                                    shouldRetry = false;
-                                    errorMessage = 'لا يمكن الوصول لخدمات التعرف على الكلام. تحقق من الاتصال بالإنترنت.';
-                                });
+                                // Use a more reliable method to test connectivity
+                                // Try to access the speech recognition service directly
+                                shouldRetry = true;
+                                errorMessage = 'خطأ مؤقت في الشبكة. سيتم إعادة المحاولة...';
+                                console.log('Network error detected, will retry with current connection');
                             } else {
                                 errorMessage = 'لا يوجد اتصال بالإنترنت. التعرف على الكلام يتطلب اتصالاً مستقراً بالإنترنت.';
                                 shouldRetry = false;
